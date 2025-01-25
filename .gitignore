@@ -1,0 +1,51 @@
+# Backend ignores
+backend/node_modules/
+backend/dist/
+backend/.env
+backend/logs/
+backend/coverage/
+backend/*.log
+
+# Client ignores
+client/node_modules/
+client/frontend/node_modules/
+client/frontend/dist/
+client/frontend/.env
+client/frontend/.env.local
+client/frontend/.env.development.local
+client/frontend/.env.test.local
+client/frontend/.env.production.local
+
+# Common ignores for the entire project
+node_modules/
+.vscode/
+.DS_Store
+.idea/
+*.log
+.cache/
+.parcel-cache/
+.fusebox/
+.serverless/
+.dynamodb/
+.npm/
+.next/
+out/
+*.tsbuildinfo
+*.tgz
+*.suo
+*.sw?
+.yarn/
+.yarn-integrity
+
+# Optional editor files
+*.sln
+*.njsproj
+*.ntvs*
+node_repl_history
+
+# Ignore React and Vite-related build files
+client/frontend/dist-ssr/
+
+# Optional: Ignore Tailwind and PostCSS caches (if any)
+tailwind.config.js.cache
+postcss.config.js.cache
