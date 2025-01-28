@@ -35,3 +35,61 @@ export const createCoupon = asyncHandler(async (req, res) => {
     coupon,
   });
 });
+
+
+export const getAllCoupons = asyncHandler(async (req, res) => {
+  const coupons = await Coupon.find();
+  res.status(200).json({
+    status: "success",
+    message: "All coupons",
+    coupons,
+  });
+});
+
+
+export const getCoupon = asyncHandler(async (req, res) => {
+  const coupon = await Coupon.findOne({ code: req.query.code });
+  //check if is not found
+  if (coupon === null) {
+    throw new Error("Coupon not found");
+  }
+  //check if expired
+  if (coupon.isExpired) {
+    throw new Error("Coupon Expired");
+  }
+  res.json({
+    status: "success",
+    message: "Coupon fetched",
+    coupon,
+  });
+});
+
+export const updateCoupon = asyncHandler(async (req, res) => {
+  const { code, startDate, endDate, discount } = req.body;
+  const coupon = await Coupon.findByIdAndUpdate(
+    req.params.id,
+    {
+      code: code?.toUpperCase(),
+      discount,
+      startDate,
+      endDate,
+    },
+    {
+      new: true,
+    }
+  );
+  res.json({
+    status: "success",
+    message: "Coupon updated successfully",
+    coupon,
+  });
+});
+
+export const deleteCoupon= asyncHandler(async (req, res) => {
+  const coupon = await Coupon.findByIdAndDelete(req.params.id);
+  res.json({
+    status: "success",
+    message: "Coupon deleted successfully",
+    coupon,
+  });
+});

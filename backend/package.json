@@ -1,12 +1,12 @@
 {
-  "name": "ecommerce-api",
+  "name": "backend",
   "version": "1.0.0",
   "description": "nodejs-api",
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "server": "nodemon app/app.js",
-    "start": "node app/app.js"
+   "start": "node app/app.js",
+    "dev": "nodemon app/app.js"
   },
   "keywords": [],
   "author": "amith",

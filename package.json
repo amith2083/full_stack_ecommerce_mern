@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "frontend":"cd client/frontend && npm run dev",
-    "backend":"cd backend && npm start",
+    "backend":"cd backend && nodemon --experimental-specifier-resolution=node app/app.js",
     "dev": "concurrently \"npm run frontend\" \"npm run backend\""
   },
   "keywords": [],
