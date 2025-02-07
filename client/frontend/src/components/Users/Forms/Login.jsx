@@ -3,9 +3,11 @@ import { useDispatch,useSelector } from "react-redux";
 import { loginUserAction } from "../../../redux/slices/users/userSlices";
 import ErrorMsg from "../../ErrorMsg/ErrorMsg";
 import LoadingComponent from "../../LoadingComp/LoadingComponent";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -17,11 +19,12 @@ const Login = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  //---onsubmit handler----
-  const onSubmitHandler = (e) => {
+  //---onsubmit handler-------------------------------------------------------------------------
+  const onSubmitHandler = async(e) => {
     e.preventDefault();
     console.log(email,password)
-    dispatch(loginUserAction({email,password}))
+    await dispatch(loginUserAction({email,password}))
+    navigate('/')
   };
 
   //select store data

@@ -23,20 +23,21 @@ const RegisterForm = () => {
   };
 
   //---onsubmit handler----
-  const onSubmitHandler = (e) => {
+  const onSubmitHandler = async(e) => {
     e.preventDefault();
-    dispatch(registerUserAction({email,password,name}))
+    await dispatch(registerUserAction({email,password,name}))
+    navigate('/login')
   };
   //select store data
 
   //select store data
   const { user, error, loading } = useSelector((state) => state?.users);
   console.log(user)
-    useEffect(() => {
-    if (user) {
-     navigate('/login')
-    }
-  }, [user,navigate]);
+  //   useEffect(() => {
+  //   if (user) {
+  //    navigate('/login')
+  //   }
+  // }, [user,navigate]);
   // Check if user is available, then redirect to login page
   // Redirect to /login when the user is successfully registered
 

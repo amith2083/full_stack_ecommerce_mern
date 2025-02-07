@@ -24,7 +24,7 @@ export default function CustomerProfile() {
       {loading ? (
         <h2>Loading...</h2>
       ) : error ? (
-        <h2>{error}</h2>
+        <h2>{error?.message}</h2>
       ) : orders?.length <= 0 ? (
         <h2 className="text-center mt-10">No Order Found</h2>
       ) : (

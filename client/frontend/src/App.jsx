@@ -83,7 +83,8 @@ const App = () => {
         {/* users */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<RegisterForm />} />
-        <Route path="/customer-profile" element={<CustomerProfile />} />
+     
+        <Route path="/customer-profile" element={<AuthRoute><CustomerProfile /></AuthRoute>} />
       </Routes>
     </BrowserRouter>
   );

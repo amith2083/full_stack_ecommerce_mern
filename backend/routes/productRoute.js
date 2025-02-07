@@ -10,7 +10,7 @@ const productRoute = express.Router()
 
 
 productRoute.post('/', isLoggedIn, isAdmin, upload.array('files') ,createProduct);
-productRoute.get('/',isLoggedIn,getProducts)
+productRoute.get('/',getProducts)
 productRoute.get('/:id',isLoggedIn,singleProduct)
 productRoute.put('/:id',isLoggedIn,isAdmin,updateProduct)
 productRoute.delete('/:id',isLoggedIn,isAdmin,deleteProduct)

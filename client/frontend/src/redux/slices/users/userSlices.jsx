@@ -72,6 +72,15 @@ export const loginUserAction = createAsyncThunk(
 
     }
 )
+
+//logout action
+export const logoutAction = createAsyncThunk(
+    "users/logout",
+    async (payload, { rejectWithValue, getState, dispatch }) => {
+        Cookies.remove('user');
+      return true;
+    }
+  );
 //usersSlice
 const userSlice = createSlice({
     name:'users',
@@ -98,6 +107,10 @@ const userSlice = createSlice({
         builder.addCase(registerUserAction.rejected,(state,action)=>{
             state.error =action.payload;
             state.loading =false
+        });
+        builder.addCase(logoutAction.fulfilled, (state) => {
+            state.userAuth.userInfo = {};
+           
         });
           //reset error action
     builder.addCase(resetError.pending, (state) => {
