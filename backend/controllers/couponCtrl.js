@@ -6,8 +6,8 @@ export const createCoupon = asyncHandler(async (req, res) => {
   const { code, startDate, endDate, discount } = req.body;
   console.log(req.body);
    // Parse dates
-   const parsedStartDate = moment(startDate, "DD-MM-YYYY").toDate();
-   const parsedEndDate = moment(endDate, "DD-MM-YYYY").toDate();
+  //  const parsedStartDate = moment(startDate, "DD-MM-YYYY").toDate();
+  //  const parsedEndDate = moment(endDate, "DD-MM-YYYY").toDate();
   
   //check if coupon already exists
   const couponsExists = await Coupon.findOne({
@@ -23,8 +23,8 @@ export const createCoupon = asyncHandler(async (req, res) => {
   //create coupon
   const coupon = await Coupon.create({
     code: code,
-    startDate:parsedStartDate,
-    endDate:parsedEndDate,
+    startDate,
+    endDate,
     discount,
     user: req.userAuthId,
   });
@@ -54,9 +54,9 @@ export const getCoupon = asyncHandler(async (req, res) => {
     throw new Error("Coupon not found");
   }
   //check if expired
-  if (coupon.isExpired) {
-    throw new Error("Coupon Expired");
-  }
+  // if (coupon.isExpired) {
+  //   throw new Error("Coupon Expired");
+  // }
   res.json({
     status: "success",
     message: "Coupon fetched",

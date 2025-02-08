@@ -1,16 +1,28 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import ErrorMsg from "../../ErrorMsg/ErrorMsg";
 import LoadingComponent from "../../LoadingComp/LoadingComponent";
 import NoDataFound from "../../NoDataFound/NoDataFound";
-
+import { useDispatch, useSelector } from "react-redux";
+import { deleteCoupon, fetchCoupons } from "../../../redux/slices/coupon/couponSlices";
+import { useEffect } from "react";
 export default function ManageCoupons() {
+  const dispatch  = useDispatch()
+  const{id}= useParams()
+  useEffect(()=>{
+    dispatch(fetchCoupons())
+
+  },[dispatch])
   //get coupons
-  const { coupons, loading, error } = {};
+  const { coupons, loading, error } = useSelector((state)=>state?.coupons)
+  console.log('coupons',coupons,loading,error)
 
   //---deleteHandler---
 
-  const deleteCouponHandler = (id) => {};
+  const deleteCouponHandler = (id) => {
+    dispatch(deleteCoupon(id));
+    window.location.reload()
+  };
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
@@ -93,6 +105,17 @@ export default function ManageCoupons() {
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             {coupon?.discount}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            {coupon?.isExpired ? (
+                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-700 text-gray-300">
+                                Expired
+                              </span>
+                            ) : (
+                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-400 text-green-800">
+                                Active
+                              </span>
+                            )}
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             {new Date(coupon.startDate)?.toLocaleDateString()}

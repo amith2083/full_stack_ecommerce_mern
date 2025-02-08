@@ -3,23 +3,49 @@ import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
 import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import LoadingComponent from "../../LoadingComp/LoadingComponent";
 import ErrorMsg from "../../ErrorMsg/ErrorMsg";
 import SuccessMsg from "../../SuccessMsg/SuccessMsg";
+import { fetchCoupon, updateCoupon } from "../../../redux/slices/coupon/couponSlices";
+
 
 export default function UpdateCoupon() {
-  //---Fetch coupon ---
-  const { coupon, loading, error, isUpdated } = {};
-  //get the coupon
+  const dispatch = useDispatch();
+
+  //get the coupon from url
   const { code } = useParams();
+  // Initialize formData state
+  const [formData, setFormData] = useState({
+    code: "",
+    discount: "",
+  });
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
 
-  //---handle form data---
-  const [formData, setFormData] = useState({
-    code: coupon?.coupon?.code,
-    discount: coupon?.coupon?.discount,
-  });
+  useEffect(() => {
+    dispatch(fetchCoupon(code));
+  }, [dispatch, code]);
+  const { coupon, loading, error, isUpdated } = useSelector(
+    (state) => state?.coupons
+  );
+  useEffect(() => {
+    if (coupon?.coupon) {
+      setFormData({
+        code: coupon.coupon.code || "",
+        discount: coupon.coupon.discount || "",
+      });
+
+      setStartDate(new Date(coupon.coupon.startDate || new Date())); // Set start date
+      setEndDate(new Date(coupon.coupon.endDate || new Date())); // Set end date
+    }
+  }, [coupon]); // Runs when coupon changes
+
+  // //---handle form data---
+  // const [formData, setFormData] = useState({
+  //   code: coupon?.coupon?.code,
+  //   discount: coupon?.coupon?.discount,
+  // });
 
   //onHandleChange---
   const onHandleChange = (e) => {
@@ -28,7 +54,12 @@ export default function UpdateCoupon() {
   //onHandleSubmit---
   const onHandleSubmit = (e) => {
     e.preventDefault();
-
+dispatch(updateCoupon({id:coupon?.coupon?._id,
+  code:formData?.code,
+  discount:formData?.discount,
+  startDate,
+  endDate
+}))
     //reset
     setFormData({
       code: "",
@@ -110,7 +141,8 @@ export default function UpdateCoupon() {
                 ) : (
                   <button
                     type="submit"
-                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
                     Update Coupon
                   </button>
                 )}

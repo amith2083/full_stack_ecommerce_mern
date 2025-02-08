@@ -55,8 +55,32 @@ CouponSchema.pre("validate", function (next) {
 });
 
 CouponSchema.pre("validate", function (next) {
-  if (this.startDate < Date.now()) {
-    next(new Error("Start date cannot be less than today"));
+  // if (this.startDate < Date.now()) {
+  //   next(new Error("Start date cannot be less than today"));
+  // }
+  // const today = new Date();
+  // today.setUTCHours(0, 0, 0, 0); // Convert today to UTC midnight
+
+  // const startDate = new Date(this.startDate);
+  // startDate.setUTCHours(0, 0, 0, 0); // Convert startDate to UTC midnight
+
+  // console.log("Start Date (UTC):", startDate);
+  // console.log("Today (UTC):", today);
+
+  // if (startDate < today) {
+  //   return next(new Error("Start date cannot be less than today"));
+  // }
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0); // Convert today to UTC midnight
+
+  const startDate = new Date(this.startDate);
+  startDate.setUTCHours(0, 0, 0, 0); // Convert startDate to UTC midnight
+
+  console.log("Start Date (UTC):", startDate);
+  console.log("Today (UTC):", today);
+
+  if (startDate < today) {
+    return next(new Error("Start date cannot be less than today"));
   }
   next();
 });
