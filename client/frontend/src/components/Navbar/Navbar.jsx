@@ -13,6 +13,7 @@ import Cookies from 'js-cookie'
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCategory } from "../../redux/slices/category/categorySlices";
 import { logoutAction } from "../../redux/slices/users/userSlices";
+import { fetchCoupons } from "../../redux/slices/coupon/couponSlices";
 
 
 export default function Navbar() {
@@ -42,6 +43,15 @@ export default function Navbar() {
     window.location.href='/login'
   
   }
+  
+  useEffect(()=>{
+    dispatch(fetchCoupons())
+
+  },[dispatch])
+  //get coupons
+  const { coupons, loading, error } = useSelector((state)=>state?.coupons)
+  const latestCoupon = coupons?.coupons?.[coupons?.coupons?.length-1]
+ 
   
 
   //get cart items from local storage
@@ -169,7 +179,7 @@ export default function Navbar() {
           <div className="bg-gray-900">
             <div className="mx-auto flex h-10 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
               <p className="flex-1 text-center text-sm font-medium text-white lg:flex-none">
-                Get free delivery on orders over $100
+               {latestCoupon?`${latestCoupon?.code}-${latestCoupon?.discount}%`:'No Flash Sale'}
               </p>
 
               <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">

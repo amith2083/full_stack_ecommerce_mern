@@ -6,6 +6,7 @@ import dbConnect from "../config/dbConnect.js";
 import userRoutes from "../routes/userRoute.js";
 import productRoute from "../routes/productRoute.js";
 import categoryRoute from "../routes/categoryRoute.js";
+import orderRoute from "../routes/orderRoute.js";
 import {
   globalErrHandler,
   notFound,
@@ -29,6 +30,7 @@ app.use("/color", colorRoute);
 app.use("/cart",cartRoute)
 app.use("/review", reviewRoute);
 app.use("/coupon",couponRoute);
+app.use("/order",orderRoute);
 
 app.use(notFound);
 app.use(globalErrHandler);

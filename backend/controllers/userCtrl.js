@@ -42,7 +42,60 @@ export const login = asyncHandler(async(req,res)=>{
     }
    
 })
-export const profilePage =asyncHandler(async(req,res)=>{
+
+export const updateShippingAddress = asyncHandler(async (req, res) => {
+  const {
+    firstName,
+    lastName,
+    address,
+    city,
+    postalCode,
+    phone,
+    country,
+  } = req.body;
+  const user = await User.findByIdAndUpdate(
+    req.userAuthId,
+    { $push:{
+      shippingAddress: {
+        firstName,
+        lastName,
+        address,
+        city,
+        postalCode,
+        phone,
+        country,
+      },
+    },
+      hasShippingAddress: true,
+    },
+    {
+      new: true,
+    }
+  );
+  //send response
+  res.json({
+    status: "success",
+    message: "User shipping address updated successfully",
+    user,
+  });
+});
+export const getUserProfile = asyncHandler(async (req, res) => {
+  //find the user
+  const user = await User.findById(req.userAuthId)
+  res.json({
+    status: "success",
+    message: "User profile fetched successfully",
+    user,
+  });
+});
+
+// export const profilePage =asyncHandler(async(req,res)=>{
  
-    res.status(200).json({msg:'profile page'})
-})
+//     // res.status(200).json({msg:'profile page'})
+    
+//   res.json({
+//     status: "success",
+//     message: "User profile fetched successfully",
+//     user,
+//   });
+// })

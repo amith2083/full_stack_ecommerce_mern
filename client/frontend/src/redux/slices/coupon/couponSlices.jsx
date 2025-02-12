@@ -185,12 +185,14 @@ const couponSlice = createSlice({
     builder.addCase(resetError.pending, (state, action) => {
       state.isAdded = false;
       state.error = null;
+      state.isUpdated= false
     });
     //reset success action
     builder.addCase(resetSuccess.pending, (state, action) => {
       state.isAdded = false;
       state.error = null;
-      state.isUpdated = false;
+      state.isUpdated= false
+      
     });
   },
 });

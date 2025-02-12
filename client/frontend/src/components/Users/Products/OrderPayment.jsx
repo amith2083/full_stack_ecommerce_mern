@@ -1,21 +1,38 @@
 import { useDispatch, useSelector } from "react-redux";
 import AddShippingAddress from "../Forms/AddShippingAddress";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getCartItemsFromDatabase } from "../../../redux/slices/cart/cartSlices";
+import { useLocation } from "react-router-dom";
+import ShippingAddressModal from "../../shippingAddressModal";
+import { getUser } from "../../../redux/slices/users/userSlices";
+import { createOrder } from "../../../redux/slices/order/orderSlices";
 
 export default function OrderPayment() {
   const dispatch = useDispatch();
+  const location = useLocation()
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const sumOfTotalPrice= location.state
+
   useEffect(()=>{dispatch(getCartItemsFromDatabase())},[dispatch])
-  const {cartItems,loading,error,}=useSelector((state)=>state?.carts)
+  const {cartItems}=useSelector((state)=>state?.carts)
   //---get cart items from store---
   // const { cartItems } = [];
-
+console.log('selected',selectedAddress)
   const calculateTotalDiscountedPrice = () => {};
 
   //create order submit handler
   const createOrderSubmitHandler = (e) => {
     e.preventDefault();
   };
+  const{loading,error,profile}=useSelector((state)=>state?.users)
+  const user =profile?.user?.shippingAddress
+  useEffect(()=>{
+    dispatch(getUser())
+  },[dispatch])
+  const placeOrderHandler =()=>{
+    dispatch(createOrder({orderItems:cartItems,shippingAddress:selectedAddress,totalPrice:sumOfTotalPrice}))
+  }
 
   return (
     <div className="bg-gray-50">
@@ -26,8 +43,21 @@ export default function OrderPayment() {
           <div className="lg:grid lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16">
             <div>
               <div className="mt-10 border-t border-gray-200 pt-10">
+              <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="mb-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Select Shipping Address
+                </button>
+
+                {/* Shipping Address Modal */}
+                <ShippingAddressModal
+                  isOpen={isModalOpen}
+                  onClose={() => setIsModalOpen(false)}
+                  onSelectAddress={setSelectedAddress}
+                />
                 {/* shipping Address */}
-                <AddShippingAddress />
+                <AddShippingAddress selectedAddress={selectedAddress} />
               </div>
             </div>
 
@@ -87,16 +117,16 @@ export default function OrderPayment() {
                   <div className="flex items-center justify-between border-t border-gray-200 pt-6">
                     <dt className="text-base font-medium">Sub Total</dt>
                     <dd className="text-base font-medium text-gray-900">
-                      $ {calculateTotalDiscountedPrice()}
+                      $ {sumOfTotalPrice}.00
                     </dd>
                   </div>
                 </dl>
 
                 <div className="border-t border-gray-200 py-6 px-4 sm:px-6">
                   <button
-                    onClick={createOrderSubmitHandler}
+                    onClick={placeOrderHandler}
                     className="w-full rounded-md border border-transparent bg-indigo-600 py-3 px-4 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50">
-                    Confirm Payment - ${calculateTotalDiscountedPrice()}
+                    Confirm Payment - ${sumOfTotalPrice}
                   </button>
                 </div>
               </div>

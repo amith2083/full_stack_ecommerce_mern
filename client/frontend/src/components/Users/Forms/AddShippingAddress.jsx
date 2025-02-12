@@ -1,11 +1,20 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getUser, updateShippingAddress } from "../../../redux/slices/users/userSlices";
+import LoadingComponent from "../../LoadingComp/LoadingComponent";
+import ErrorMsg from "../../ErrorMsg/ErrorMsg";
 
-const AddShippingAddress = () => {
+const AddShippingAddress = ({ selectedAddress }) => {
+   const dispatch = useDispatch()
   //user profile
-  const { user } = {};
-
+ 
+  const{loading,error,profile}=useSelector((state)=>state?.users)
+  const user =profile?.user?.shippingAddress
+  useEffect(()=>{
+    dispatch(getUser())
+  },[dispatch])
   const [formData, setFormData] = useState({
-    firstName: user?.shippingAddress?.firstName,
+    firstName: "",
     lastName: "",
     address: "",
     city: "",
@@ -14,6 +23,13 @@ const AddShippingAddress = () => {
     postalCode: "",
     phone: "",
   });
+  useEffect(() => {
+    if (selectedAddress) {
+      setFormData(selectedAddress); // Auto-fill form when address is selected
+    }
+  }, [selectedAddress]);
+  console.log('selectedin add',selectedAddress)
+
   //onchange
   const onChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,12 +38,17 @@ const AddShippingAddress = () => {
   //onsubmit
   const onSubmit = (e) => {
     e.preventDefault();
+    dispatch(updateShippingAddress(formData))
   };
+   // Decide which shipping address to display
+   const userAddress = selectedAddress || profile?.user?.shippingAddress;
+
 
   return (
     <>
+    {error&&<ErrorMsg message={error?.message}/>}
       {/* shipping details */}
-      {user?.hasShippingAddress ? (
+      {userAddress  ? (
         <div className="mt-6">
           <h3 className="text-lg font-medium text-gray-900">
             Shipping details
@@ -37,24 +58,12 @@ const AddShippingAddress = () => {
             Double check your information.
           </p>
           <div>
-            <p className="mt-1 text-sm text-gray-500">
-              First Name : {user?.shippingAddress?.firstName}
-            </p>
-            <p className="mt-1 text-sm text-gray-500">
-              Last Name : {user?.shippingAddress?.lastName}
-            </p>
-            <p className="mt-1 text-sm text-gray-500">
-              Address : {user?.shippingAddress?.address}
-            </p>
-            <p className="mt-1 text-sm text-gray-500">
-              City : {user?.shippingAddress?.city}
-            </p>
-            <p className="mt-1 text-sm text-gray-500">
-              Country : {user?.shippingAddress?.country}
-            </p>
-            <p className="mt-1 text-sm text-gray-500">
-              phone : {user?.shippingAddress?.phone}
-            </p>
+          <p className="mt-1 text-sm text-gray-500">First Name: {userAddress?.firstName}</p>
+            <p className="mt-1 text-sm text-gray-500">Last Name: {userAddress?.lastName}</p>
+            <p className="mt-1 text-sm text-gray-500">Address: {userAddress?.address}</p>
+            <p className="mt-1 text-sm text-gray-500">City: {userAddress?.city}</p>
+            <p className="mt-1 text-sm text-gray-500">Country: {userAddress?.country}</p>
+            <p className="mt-1 text-sm text-gray-500">Phone: {userAddress?.phone}</p>
           </div>
         </div>
       ) : (
@@ -146,6 +155,7 @@ const AddShippingAddress = () => {
                 value={formData.country}
                 onChange={onChange}
                 className="block w-full rounded-md border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+               <option value="USA">India</option>
                 <option value="USA">United States</option>
                 <option value="CAN">Canada</option>
                 <option value="MEX">Mexico</option>
@@ -210,12 +220,14 @@ const AddShippingAddress = () => {
               />
             </div>
           </div>
-          <button
+          {loading ?<LoadingComponent/>: <button
             type="submit"
             className="w-full rounded-md border border-transparent bg-indigo-600 py-3 px-4 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50">
             Add Shipping Address
           </button>
+}
         </form>
+        
       )}
     </>
   );

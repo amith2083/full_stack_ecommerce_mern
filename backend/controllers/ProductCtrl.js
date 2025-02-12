@@ -300,38 +300,3 @@ export const deleteProduct = asyncHandler(async (req, res) => {
   });
 });
 
-export const updateShippingAddress = asyncHandler(async (req, res) => {
-    const {
-      firstName,
-      lastName,
-      address,
-      city,
-      postalCode,
-      phone,
-      country,
-    } = req.body;
-    const user = await User.findByIdAndUpdate(
-      req.userAuthId,
-      {
-        shippingAddress: {
-          firstName,
-          lastName,
-          address,
-          city,
-          postalCode,
-          phone,
-          country,
-        },
-        hasShippingAddress: true,
-      },
-      {
-        new: true,
-      }
-    );
-    //send response
-    res.json({
-      status: "success",
-      message: "User shipping address updated successfully",
-      user,
-    });
-  });
