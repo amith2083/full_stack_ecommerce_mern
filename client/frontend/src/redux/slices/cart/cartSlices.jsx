@@ -28,7 +28,7 @@ export const addOrderToCart = createAsyncThunk(
 
 // Fetch cart items
 export const getCartItemsFromDatabase= createAsyncThunk(
-  "cart/get-order-items",
+  "cart/get-cart-items",
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get("/cart");

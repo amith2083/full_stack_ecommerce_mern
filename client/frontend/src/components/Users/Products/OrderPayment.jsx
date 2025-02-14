@@ -6,6 +6,10 @@ import { useLocation } from "react-router-dom";
 import ShippingAddressModal from "../../shippingAddressModal";
 import { getUser } from "../../../redux/slices/users/userSlices";
 import { createOrder } from "../../../redux/slices/order/orderSlices";
+import LoadingComponent from "../../LoadingComp/LoadingComponent";
+import ErrorMsg from "../../ErrorMsg/ErrorMsg";
+
+
 
 export default function OrderPayment() {
   const dispatch = useDispatch();
@@ -17,14 +21,11 @@ export default function OrderPayment() {
   useEffect(()=>{dispatch(getCartItemsFromDatabase())},[dispatch])
   const {cartItems}=useSelector((state)=>state?.carts)
   //---get cart items from store---
-  // const { cartItems } = [];
+ 
 console.log('selected',selectedAddress)
   const calculateTotalDiscountedPrice = () => {};
 
-  //create order submit handler
-  const createOrderSubmitHandler = (e) => {
-    e.preventDefault();
-  };
+
   const{loading,error,profile}=useSelector((state)=>state?.users)
   const user =profile?.user?.shippingAddress
   useEffect(()=>{
@@ -33,8 +34,11 @@ console.log('selected',selectedAddress)
   const placeOrderHandler =()=>{
     dispatch(createOrder({orderItems:cartItems,shippingAddress:selectedAddress,totalPrice:sumOfTotalPrice}))
   }
+  const{loading:orderLoading,error:orderError}=useSelector((state)=>state?.orders)
 
   return (
+    <>
+    {orderError&&<ErrorMsg message={orderError?.message}/>}
     <div className="bg-gray-50">
       <main className="mx-auto max-w-7xl px-4 pt-16 pb-24 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl lg:max-w-none">
@@ -123,11 +127,12 @@ console.log('selected',selectedAddress)
                 </dl>
 
                 <div className="border-t border-gray-200 py-6 px-4 sm:px-6">
-                  <button
+                {orderLoading?<LoadingComponent/>: <button
                     onClick={placeOrderHandler}
                     className="w-full rounded-md border border-transparent bg-indigo-600 py-3 px-4 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50">
                     Confirm Payment - ${sumOfTotalPrice}
-                  </button>
+                  </button>}
+                 
                 </div>
               </div>
             </div>
@@ -135,5 +140,6 @@ console.log('selected',selectedAddress)
         </div>
       </main>
     </div>
+    </>
   );
 }

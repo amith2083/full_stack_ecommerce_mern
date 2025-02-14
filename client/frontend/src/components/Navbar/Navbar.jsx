@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchCategory } from "../../redux/slices/category/categorySlices";
 import { logoutAction } from "../../redux/slices/users/userSlices";
 import { fetchCoupons } from "../../redux/slices/coupon/couponSlices";
+import { getCartItemsFromDatabase } from "../../redux/slices/cart/cartSlices";
 
 
 export default function Navbar() {
@@ -43,6 +44,10 @@ export default function Navbar() {
     window.location.href='/login'
   
   }
+  useEffect(()=>{dispatch(getCartItemsFromDatabase())},[dispatch])
+  const {cartItems,}=useSelector((state)=>state?.carts)
+  console.log('cart',cartItems)
+ 
   
   useEffect(()=>{
     dispatch(fetchCoupons())
@@ -312,9 +317,7 @@ export default function Navbar() {
                             aria-hidden="true"
                           />
                           <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
-                            {cartItemsFromLocalStorage?.length > 0
-                              ? cartItemsFromLocalStorage.length
-                              : 0}
+                          {cartItems?.length > 0 ? cartItems[0]?.items?.length || 0 : 0}
                           </span>
                         </Link>
                       </div>

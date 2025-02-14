@@ -19,8 +19,9 @@ export default function ShoppingCart() {
   
   const dispatch = useDispatch();
   const [couponCode, setCouponCode] = useState(null);
+  const {cartItems}=useSelector((state)=>state?.carts)
   useEffect(()=>{dispatch(getCartItemsFromDatabase())},[dispatch])
-  const {cartItems,}=useSelector((state)=>state?.carts)
+ 
   console.log('cart',cartItems);
  
   const applyCouponSubmit = (e) => {
@@ -76,7 +77,9 @@ export default function ShoppingCart() {
     <div className="bg-white">
 
       <div className="mx-auto max-w-2xl px-4 pt-16 pb-24 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+       {cartItems?.length<=0 ||cartItems[0]?.items?.length<=0 ? <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          your Shopping Cart is empty
+        </h1>:<><h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
           Shopping Cart
         </h1>
         <div className="mt-12 lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16">
@@ -246,6 +249,7 @@ export default function ShoppingCart() {
             </div>
           </section>
         </div>
+        </>} 
       </div>
     </div>
   );

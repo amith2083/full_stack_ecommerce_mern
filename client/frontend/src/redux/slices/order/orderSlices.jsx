@@ -28,28 +28,47 @@ export const createOrder = createAsyncThunk(
 
       const response = await axiosInstance.post(`/order`, { orderItems,shippingAddress,totalPrice});
       console.log("res", response.data);
+      const orderId = response.data.orderId; // ✅ Store orderId before opening Razorpay
+      console.log("orderId:", orderId);
       if (response.data.razorpayOrderId) {
         // Call Razorpay Modal
         const options = {
           key: response.data.key, // Razorpay Key ID
           amount: response.data.amount * 100, // Amount in paisa
           currency: "INR",
-          name: "Your Store",
+          name: "Madrid",
           description: "Order Payment",
           order_id: response.data.razorpayOrderId, // Razorpay Order ID
           handler: async function (response) {
             console.log("Payment Success:", response);
-            alert("Payment Successful!");
-
-            // Call Backend API to verify the payment
-            await axiosInstance.post("/order/payment-verify", {
+           try {
+             // Call Backend API to verify the payment
+            const verifyResponse = await axiosInstance.post(`/order/payment-verify`, {
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_order_id: response.razorpay_order_id,
+              orderId:orderId,
+            
               razorpay_signature: response.razorpay_signature,
             });
+            //  Redirect based on payment verification
+            if (verifyResponse.data.success) {
+              alert("Payment Successful!");
+              window.location.href = "/success"; // ✅ Redirect to success page
+            } else {
+              alert("Payment verification failed. Redirecting to orders.");
+              window.location.href = "/orders"; //  Redirect to orders page
+            }
+            
+           } catch (error) {
+            console.error("Payment verification error:", error);
+              alert("Payment verification failed. Redirecting to orders.");
+              window.location.href = "/orders"; // ✅ Redirect to orders on error
+            
+           }
 
-            // Refresh order details
-            window.location.href = "/orders";
+           
+
+          
           },
           prefill: {
             name: "Test User",
@@ -73,7 +92,7 @@ export const createOrder = createAsyncThunk(
   }
 );
 
-//fetching products---------------------------------------------------------------------------------------------------------
+//fetching orders---------------------------------------------------------------------------------------------------------
 export const fetchOrders= createAsyncThunk(
   "/orders/fetch",
   async (payload, { rejectWithValue, getState, dispatch }) => {
