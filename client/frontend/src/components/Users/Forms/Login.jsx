@@ -4,6 +4,7 @@ import { loginUserAction } from "../../../redux/slices/users/userSlices";
 import ErrorMsg from "../../ErrorMsg/ErrorMsg";
 import LoadingComponent from "../../LoadingComp/LoadingComponent";
 import { useNavigate } from "react-router-dom";
+import { getCartItemsFromDatabase } from "../../../redux/slices/cart/cartSlices";
 
 const Login = () => {
   const dispatch = useDispatch()
@@ -24,7 +25,9 @@ const Login = () => {
     e.preventDefault();
     console.log(email,password)
     await dispatch(loginUserAction({email,password}))
+    await dispatch(getCartItemsFromDatabase());
     navigate('/')
+    
   };
 
   //select store data

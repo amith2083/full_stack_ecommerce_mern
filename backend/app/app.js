@@ -1,19 +1,20 @@
 import dotenv from "dotenv";
 dotenv.config();
-import cors from 'cors'
+import cors from "cors";
 import express from "express";
 import dbConnect from "../config/dbConnect.js";
 import userRoutes from "../routes/userRoute.js";
 import productRoute from "../routes/productRoute.js";
 import categoryRoute from "../routes/categoryRoute.js";
 import orderRoute from "../routes/orderRoute.js";
+import reviewRoute from "../routes/reviewRoute.js";
 import {
   globalErrHandler,
   notFound,
 } from "../middlewares/globalErrorHandler.js";
 import brandRoute from "../routes/brandRoute.js";
 import colorRoute from "../routes/colorRoute.js";
-import reviewRoute from "../routes/reviewRoute.js";
+
 import cartRoute from "../routes/cartRoute.js";
 import couponRoute from "../routes/couponRoute.js";
 const app = express();
@@ -27,10 +28,10 @@ app.use("/product", productRoute);
 app.use("/category", categoryRoute);
 app.use("/brand", brandRoute);
 app.use("/color", colorRoute);
-app.use("/cart",cartRoute)
+app.use("/cart", cartRoute);
 app.use("/review", reviewRoute);
-app.use("/coupon",couponRoute);
-app.use("/order",orderRoute);
+app.use("/coupon", couponRoute);
+app.use("/order", orderRoute);
 
 app.use(notFound);
 app.use(globalErrHandler);

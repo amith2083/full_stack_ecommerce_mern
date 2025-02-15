@@ -9,6 +9,7 @@ import colorReducer from "../slices/color/colorSlices";
 import cartReducer from "../slices/cart/cartSlices";
 import couponReducer from "../slices/coupon/couponSlices";
 import orderReducer from "../slices/order/orderSlices";
+import reviewReducer from "../slices/review/reviewSlices";
 const store = configureStore({
     reducer:{
         users:userReducer,
@@ -19,6 +20,7 @@ const store = configureStore({
         carts:cartReducer,
         coupons: couponReducer,
         orders:orderReducer,
+        reviews:reviewReducer
         }
 });
 export default store
