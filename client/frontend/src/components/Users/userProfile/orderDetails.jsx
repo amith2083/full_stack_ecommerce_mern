@@ -12,13 +12,26 @@ const OrderDetails = ({ order, goBack }) => {
         🔙 Back
       </button>
 
-      {/* Order Info */}
-      <div className="border border-gray-300 p-4 rounded-lg bg-white text-gray-900 shadow-md">
-        <h3 className="text-lg font-bold text-indigo-700">Order Number: #{order.orderNumber}</h3>
-        <p className="text-gray-800 font-medium">📦 Status: <span className="text-blue-500">{order.status}</span></p>
-        <p className="text-gray-800 font-medium">💰 Total Price: <span className="text-green-500">Rs {order.totalPrice}</span></p>
-        <p className="text-gray-800 font-medium">💳 Payment Status: <span className="text-red-500">{order.paymentStatus}</span></p>
-        <p className="text-gray-600">🗓 Date: {new Date(order.createdAt).toDateString()}</p>
+      {/* Order Info & Shipping Address Side by Side */}
+      <div className="border border-gray-300 p-4 rounded-lg bg-white text-gray-900 shadow-md flex justify-between items-start">
+        {/* Order Details */}
+        <div className="w-1/2">
+          <h3 className="text-lg font-bold text-indigo-700">Order Number: #{order.orderNumber}</h3>
+          <p className="text-gray-800 font-medium">📦 Status: <span className="text-blue-500">{order.status}</span></p>
+          <p className="text-gray-800 font-medium">💰 Total Price: <span className="text-green-500">Rs {order.totalPrice}</span></p>
+          <p className="text-gray-800 font-medium">💳 Payment Status: <span className="text-red-500">{order.paymentStatus}</span></p>
+          <p className="text-gray-600">🗓 Date: {new Date(order.createdAt).toDateString()}</p>
+        </div>
+
+        {/* Shipping Address */}
+        <div className="w-1/2 border-l-2 border-gray-300 pl-4">
+          <h3 className="text-lg font-bold text-indigo-700">📍 Shipping Address</h3>
+          <p className="text-gray-800 font-medium">{order.shippingAddress.firstName} {order.shippingAddress.lastName}</p>
+          <p className="text-gray-800">{order.shippingAddress.address}, {order.shippingAddress.city}</p>
+          <p className="text-gray-800">📮 {order.shippingAddress.postalCode}</p>
+          {order.shippingAddress.country && <p className="text-gray-800">🌍 {order.shippingAddress.country}</p>}
+          <p className="text-gray-800">📞 {order.shippingAddress.phone}</p>
+        </div>
       </div>
 
       <h3 className="mt-6 text-2xl font-semibold text-yellow-300">🛍 Ordered Items:</h3>

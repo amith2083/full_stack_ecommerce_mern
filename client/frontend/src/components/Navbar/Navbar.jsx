@@ -289,7 +289,7 @@ export default function Navbar() {
                       <div className="flex space-x-8">
                         {isLoggedIn&&<div className="flex">
                           <Link
-                            to="/customer-profile"
+                            to="/user-profile"
                             className="-m-2 p-2 text-gray-400 hover:text-gray-500">
                             <UserIcon className="h-6 w-6" aria-hidden="true" />
                           </Link>

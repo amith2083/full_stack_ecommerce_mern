@@ -2,10 +2,28 @@ import { Link } from "react-router-dom";
 import ErrorMsg from "../../ErrorMsg/ErrorMsg";
 import LoadingComponent from "../../LoadingComp/LoadingComponent";
 import NoDataFound from "../../NoDataFound/NoDataFound";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { fetchProduct } from "../../../redux/slices/products/productSlices";
 
 export default function ManageStocks() {
-  //Selector
-  let products, loading, error;
+const dispatch = useDispatch()
+  
+  //fetching products------------------------------------------------------------------------------------------------
+  //build up url
+  let productUrl = `/product`;
+  useEffect(() => {
+    dispatch(fetchProduct({ url: productUrl }));
+  },[dispatch]);
+  //get data from store
+  const {
+    products: { products },loading,error
+  } = useSelector((state) => state?.products);
+
+
+ 
+
+  // let products, loading, error;
 
   //delete product handler
   const deleteProductHandler = (id) => {};
@@ -96,7 +114,7 @@ export default function ManageStocks() {
                             <div className="h-10 w-10 flex-shrink-0">
                               <img
                                 className="h-10 w-10 rounded-full"
-                                src={product?.image}
+                                src={product?.images[0]}
                                 alt={product?.name}
                               />
                             </div>
