@@ -40,6 +40,35 @@ export const registerUserAction = createAsyncThunk(
     }
   }
 );
+export const verifyOtp = createAsyncThunk(
+  "user/verifyOtp",
+  async ({ email, otp }, { rejectWithValue }) => {
+    console.log('verify',email,otp)
+    try {
+      const response = await axiosInstance.post(`/user/verify-otp`, { email, otp });
+      console.log('verifyres',response)
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
+export const resendOtp = createAsyncThunk(
+  "user/resendOtp",
+  async ({ email }, { rejectWithValue }) => {
+    console.log("Resend OTP for:", email);
+    try {
+      const response = await axiosInstance.post(`/user/resend-otp`, { email });
+      console.log("Resend OTP Response:", response);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
+
+
+
 
 export const loginUserAction = createAsyncThunk(
   "user/login",

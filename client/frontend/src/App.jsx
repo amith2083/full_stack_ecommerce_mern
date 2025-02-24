@@ -36,6 +36,8 @@ import AuthRoute from "./components/Authenciation/AuthRoute";
 import AdminCheck from "./components/Authenciation/AdminCheck";
 import ProfilePage from "./components/Users/userProfile/ProfilePage";
 import Orders from "./components/Users/userProfile/Orders";
+import ProductUpdate from "./components/Admin/Products/ProductUpdate";
+import OtpVerification from "./components/Users/Forms/OtpVerification";
 
 
 
@@ -52,7 +54,7 @@ const App = () => {
           {/* products */} <Route path="" element={<OrdersList />} />
           <Route path="add-product" element={<AddProduct />} />
           <Route path="manage-products" element={<ManageStocks />} />
-          <Route path="products/edit/:id" element={<UpdateProduct />} />
+          <Route path="products/edit/:id" element={<ProductUpdate />} />
           {/* coupons */}
           <Route path="add-coupon" element={<AddCoupon />} />
           <Route path="manage-coupon" element={<ManageCoupons />} />
@@ -89,7 +91,9 @@ const App = () => {
         {/* users */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<RegisterForm />} />
-        <Route path="/register" element={<RegisterForm />} />
+        <Route path="/verify-otp" element={<OtpVerification />} />
+
+        {/* <Route path="/register" element={<RegisterForm />} /> */}
         <Route path="/user-profile" element={<ProfilePage />}>
   <Route path="/user-profile/orders" element={<Orders />} />
 </Route>

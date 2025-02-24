@@ -25,8 +25,14 @@ const RegisterForm = () => {
   //---onsubmit handler----
   const onSubmitHandler = async(e) => {
     e.preventDefault();
-    await dispatch(registerUserAction({email,password,name}))
-    navigate('/login')
+    localStorage.setItem("email", email);
+   const resultAction= await dispatch(registerUserAction({email,password,name}))
+   console.log('result',resultAction)
+    
+    if (registerUserAction.fulfilled.match(resultAction)) {
+      // Navigate only if the user is newly registered
+      navigate("/verify-otp");
+    }
   };
   //select store data
 
