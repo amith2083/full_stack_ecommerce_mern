@@ -4,9 +4,11 @@ import bcrypt from 'bcrypt'
 import generateToken from "../utils/generateToken.js";
 import { getTokenFromHeader } from "../utils/getTokenFromHeader.js";
 import { verifyToken } from "../utils/verifyToken.js";
-import sendEmail from "../utils/sendEmai.js";
+import sendEmail from "../utils/sendEmail.js";
 import OTP from "../model/Otp.js";
 import crypto from 'crypto'
+import oauth2client from "../utils/googleConfig.js";
+import axios from 'axios'
 
 // export const register = asyncHandler(async (req, res) => {
 //     const { name, email, password } = req.body;
@@ -129,7 +131,36 @@ export const login = asyncHandler(async(req,res)=>{
     }
    
 })
+export const googleLogin =asyncHandler(async(req,res)=>{
+  try {
+    const{code}= req.query;
+    console.log('code',code)
+  const googleRes = await oauth2client.getToken(code)
+  console.log(googleRes)
+  oauth2client.setCredentials(googleRes.tokens)
+  const userRes = await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`)
+  console.log('userres',userRes)
+const{email,name,picture}= userRes.data;
+// Check if user exists, else create new user
+let user = await User.findOne({ email });
 
+if (!user) {
+  user = await User.create({ email, name, isGoogleAuth: true, });
+}
+const token = await generateToken(user?._id)
+return res.status(200).json({
+  message:'success',
+  user,
+  token
+})
+    
+  } catch (error) {
+    console.error("Google Login Error:", error);
+    res.status(500).json({  message: "Authentication failed" });
+    
+  }
+  
+})
 export const updateShippingAddress = asyncHandler(async (req, res) => {
   const {
     firstName,

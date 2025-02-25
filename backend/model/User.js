@@ -13,13 +13,19 @@ const UserSchema = new Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: function () {
+        return !this.isGoogleAuth; // Only required if not using Google login
+      },
     },
-    googleId: {
-      type: String,
-      unique: true,
-      sparse: true // Allows for the googleId field to be missing (non-Google users),
+    isGoogleAuth: {
+      type: Boolean,
+      default: false, // Mark if user signed up using Google
     },
+    // googleId: {
+    //   type: String,
+    //   unique: true,
+    //   sparse: true // Allows for the googleId field to be missing (non-Google users),
+    // },
     mobno: {
       type: String,
       required: false,

@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Route, Routes,Outlet } from "react-router-dom";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import ManageCoupons from "./components/Admin/Coupons/ManageCoupons";
@@ -90,7 +91,9 @@ const App = () => {
         <Route path="/order-payment" element={<OrderPayment />} />
         {/* users */}
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<RegisterForm />} />
+        <Route path="/register" element={<GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+              <RegisterForm />
+            </GoogleOAuthProvider>} />
         <Route path="/verify-otp" element={<OtpVerification />} />
 
         {/* <Route path="/register" element={<RegisterForm />} /> */}
