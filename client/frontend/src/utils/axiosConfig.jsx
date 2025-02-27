@@ -25,5 +25,17 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+// Response Interceptor to handle token expiry
+// axiosInstance.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     if (error.response && error.response.status === 401) {
+//       console.log('Token expired, redirecting to login...');
+//       Cookies.remove('user'); // Remove expired token
+//       window.location.href = '/login'; // Redirect to login
+//     }
+//     return Promise.reject(error);
+//   }
+// );
 
 export default axiosInstance;

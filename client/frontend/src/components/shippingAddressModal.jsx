@@ -1,7 +1,9 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getUser } from "../redux/slices/users/userSlices";
 
 const ShippingAddressModal = ({ isOpen, onClose, onSelectAddress }) => {
+  const dispatch = useDispatch()
   const { profile } = useSelector((state) => state?.users);
   const shippingAddresses = profile?.user?.shippingAddress || [];
   console.log('shipp',shippingAddresses)
@@ -14,7 +16,9 @@ const ShippingAddressModal = ({ isOpen, onClose, onSelectAddress }) => {
     onSelectAddress(address); // Pass selected address to parent
     onClose(); // Close modal after selecting
   };
-
+// useEffect(()=>{
+//   dispatch(getUser())
+// },[dispatch])
   if (!isOpen) return null;
 
   return (

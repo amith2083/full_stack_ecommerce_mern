@@ -1,5 +1,6 @@
 import React, { useState,useEffect } from "react";
 import { useDispatch,useSelector } from "react-redux";
+import Cookies from "js-cookie";
 
 import { registerUserAction } from "../../../redux/slices/users/userSlices";
 import LoadingComponent from "../../LoadingComp/LoadingComponent";
@@ -56,10 +57,15 @@ const RegisterForm = () => {
     try {
       console.log('auth',authResult)
     if(authResult?.code){
-      const res4= await axios.get(
+      const response= await axios.get(
           `http://localhost:7000/user/google/callback?code=${authResult.code}`,
           { withCredentials: true })
-          console.log('res4',res4)
+          console.log('res4',response)
+          console.log(response?.data)
+          
+      Cookies.set("user", JSON.stringify(response.data), { expires: 7 });
+      navigate('/')
+
 
     }
        
@@ -107,7 +113,7 @@ const RegisterForm = () => {
                     onChange={onChangeHandler}
                     className="w-full mb-4 px-12 py-6 border border-gray-200 focus:ring-blue-300 focus:border-blue-300 rounded-md"
                     type="text"
-                    placeholder="Full Name"
+                    placeholder="Full Name" required
                   />
                   <input
                     name="email"
@@ -115,7 +121,7 @@ const RegisterForm = () => {
                     onChange={onChangeHandler}
                     className="w-full mb-4 px-12 py-6 border border-gray-200 focus:ring-blue-300 focus:border-blue-300 rounded-md"
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder="Enter your email" required
                   />
                   <input
                     name="password"
@@ -123,7 +129,7 @@ const RegisterForm = () => {
                     onChange={onChangeHandler}
                     className="w-full mb-4 px-12 py-6 border border-gray-200 focus:ring-blue-300 focus:border-blue-300 rounded-md"
                     type="password"
-                    placeholder="Enter your password"
+                    placeholder="Enter your password" required
                   />
                 {loading ? (
                     <LoadingComponent />

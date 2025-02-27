@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import AddShippingAddress from "../Forms/AddShippingAddress";
 import { useEffect, useState } from "react";
 import { getCartItemsFromDatabase } from "../../../redux/slices/cart/cartSlices";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ShippingAddressModal from "../../shippingAddressModal";
 import { getUser } from "../../../redux/slices/users/userSlices";
 import { createOrder } from "../../../redux/slices/order/orderSlices";
@@ -12,7 +12,9 @@ import ErrorMsg from "../../ErrorMsg/ErrorMsg";
 
 
 export default function OrderPayment() {
+  const navigate = useNavigate()
   const dispatch = useDispatch();
+ 
   const location = useLocation()
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -32,7 +34,7 @@ console.log('selected',selectedAddress)
     dispatch(getUser())
   },[dispatch])
   const placeOrderHandler =()=>{
-    dispatch(createOrder({orderItems:cartItems,shippingAddress:selectedAddress,totalPrice:sumOfTotalPrice}))
+    dispatch(createOrder({orderItems:cartItems,shippingAddress:selectedAddress,totalPrice:sumOfTotalPrice,navigate}))
   }
   const{loading:orderLoading,error:orderError}=useSelector((state)=>state?.orders)
 

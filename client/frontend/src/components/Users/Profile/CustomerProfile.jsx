@@ -1,5 +1,5 @@
 import CustomerDetails from "./CustomerDetails";
-import ShippingAddressDetails from "./ShippingAddressDetails";
+// import ShippingAddressDetails from "./ShippingAddressDetails";
 
 export default function CustomerProfile() {
   let profile;

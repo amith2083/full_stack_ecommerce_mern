@@ -58,8 +58,8 @@ export const addToCart = asyncHandler(async (req, res) => {
       throw new Error("Product not found");
     }
    // Log the product price and quantity for debugging
-   console.log("Product Price:", product.price);
-   console.log("Quantity:", quantity);
+  //  console.log("Product Price:", product.price);
+  //  console.log("Quantity:", quantity);
     // Find the user's cart
     let cart = await Cart.findOne({ user: req.userAuthId });
     if (!cart) {
@@ -108,13 +108,13 @@ const cartItems = await Cart.find({ user: req.userAuthId })
   select: "name price images totalQty totalSold qtyLeft",
   
 })
-console.log('cart',cartItems)
+// console.log('cart',cartItems)
  // Modify the populated data to only include the first image
  // Log each item in the items array for inspection
 cartItems.forEach((cartItem) => {
-    console.log('Items in cart:', cartItem.items);
+    // console.log('Items in cart:', cartItem.items);
     cartItem.items.forEach((item, index) => {
-      console.log(`Item ${index + 1}:`, item);
+      // console.log(`Item ${index + 1}:`, item);
     });
   });
  cartItems.forEach(cart => {
@@ -184,11 +184,12 @@ if (!mongoose.Types.ObjectId.isValid(objectIdProductId)) {
     res.status(404);
     throw new Error("Product not found");
   }
-
+console.log('updateproduct',product)
 //   cartItem.quantity = quantity;
 //   await cartItem.save();
  // Calculate the new totalPrice for the item
  const newTotalPrice = product.price * qty;
+ console.log('new',newTotalPrice)
 const cartItems = await Cart.findOneAndUpdate(
     { "items.product": objectIdProductId }, // Find the cart with the product
     {
@@ -197,9 +198,11 @@ const cartItems = await Cart.findOneAndUpdate(
     },
     { new: true } // Return the updated cart document
   );
+  console.log('cartitems',cartItems)
   if (!cartItems) {
     throw new Error("Cart  not found");
   }
+ 
 
   res.json({
     status: "success",

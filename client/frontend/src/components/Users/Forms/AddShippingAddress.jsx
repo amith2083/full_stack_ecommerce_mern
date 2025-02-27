@@ -6,6 +6,9 @@ import ErrorMsg from "../../ErrorMsg/ErrorMsg";
 
 const AddShippingAddress = ({ selectedAddress }) => {
    const dispatch = useDispatch()
+  
+   const [isEditing, setIsEditing] = useState(false)
+ 
   //user profile
  
   const{loading,error,profile}=useSelector((state)=>state?.users)
@@ -36,19 +39,22 @@ const AddShippingAddress = ({ selectedAddress }) => {
   };
 
   //onsubmit
-  const onSubmit = (e) => {
+  const onSubmit = async(e) => {
     e.preventDefault();
-    dispatch(updateShippingAddress(formData))
+   await dispatch(updateShippingAddress(formData))
+    dispatch(getUser())
+    setIsEditing(false);
   };
    // Decide which shipping address to display
    const userAddress = selectedAddress || profile?.user?.shippingAddress;
+   const showForm = !userAddress || isEditing;
 
 
   return (
     <>
     {error&&<ErrorMsg message={error?.message}/>}
       {/* shipping details */}
-      {userAddress  ? (
+      {userAddress  && !isEditing ? (
         <div className="mt-6">
           <h3 className="text-lg font-medium text-gray-900">
             Shipping details
@@ -65,6 +71,11 @@ const AddShippingAddress = ({ selectedAddress }) => {
             <p className="mt-1 text-sm text-gray-500">Country: {userAddress?.country}</p>
             <p className="mt-1 text-sm text-gray-500">Phone: {userAddress?.phone}</p>
           </div>
+          <button 
+      onClick={() => setIsEditing(true)} 
+      className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+      Change Address
+    </button>
         </div>
       ) : (
         <form
@@ -84,7 +95,7 @@ const AddShippingAddress = ({ selectedAddress }) => {
                 value={formData.firstName}
                 autoComplete="given-name"
                 className="block w-full rounded-md border-gray-300  p-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              />
+              required/>
             </div>
           </div>
 
@@ -101,7 +112,7 @@ const AddShippingAddress = ({ selectedAddress }) => {
                 onChange={onChange}
                 value={formData.lastName}
                 className="block w-full rounded-md border-gray-300  p-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              />
+             required />
             </div>
           </div>
 
@@ -119,7 +130,7 @@ const AddShippingAddress = ({ selectedAddress }) => {
                 value={formData.address}
                 autoComplete="street-address"
                 className="block w-full rounded-md border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              />
+              required/>
             </div>
           </div>
 
@@ -137,7 +148,7 @@ const AddShippingAddress = ({ selectedAddress }) => {
                 value={formData.city}
                 autoComplete="address-level2"
                 className="block w-full rounded-md border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              />
+              required/>
             </div>
           </div>
 
@@ -198,7 +209,7 @@ const AddShippingAddress = ({ selectedAddress }) => {
                 value={formData.postalCode}
                 autoComplete="postal-code"
                 className="block w-full rounded-md border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              />
+             required />
             </div>
           </div>
 
@@ -217,7 +228,7 @@ const AddShippingAddress = ({ selectedAddress }) => {
                 value={formData.phone}
                 autoComplete="tel"
                 className="block w-full rounded-md border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              />
+              required/>
             </div>
           </div>
           {loading ?<LoadingComponent/>: <button

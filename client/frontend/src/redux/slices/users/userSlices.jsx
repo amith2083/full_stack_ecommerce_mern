@@ -3,7 +3,8 @@ import Cookies from "js-cookie";
 import axios from "axios";
 // import baseURL from '../../../utils/baseURL';
 import axiosInstance from "../../../utils/axiosConfig";
-import { resetError } from "../../resetError/resetError";
+import { resetError,resetSuccess } from "../../resetError/resetError";
+import { CornerDownLeft } from "lucide-react";
 const initialState = {
   loading: false,
   error: null,
@@ -15,6 +16,8 @@ const initialState = {
     error: null,
     userInfo: {},
   },
+  updated:false,
+  isdelete:false
 };
 export const registerUserAction = createAsyncThunk(
   "user/register",
@@ -131,17 +134,47 @@ export const updateShippingAddress = createAsyncThunk(
     }
   }
 );
+// Update shipping address
+export const updateUserShippingAddress = createAsyncThunk(
+  "user/updateAddress",
+  async ({addressId,updatedAddress}, { rejectWithValue }) => {
+    try {
+      console.log('addressid',addressId)
+      console.log('updateaddress',updatedAddress)
+      const response = await axiosInstance.put(`/user/profile/shippingaddress/${addressId}`, updatedAddress);
+      console.log('data',response.data)
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+//delete user shipping address
+export const deleteUserShippingAddress = createAsyncThunk(
+  "user/deleteAddress",
+  async ({  addressId }, { rejectWithValue }) => {
+    try {
+      console.log("Deleting address:", addressId);
+      const response = await axiosInstance.delete(`/user/profile/shippingaddress/${addressId}`);
+      console.log("Delete response:", response.data);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 export const getUser = createAsyncThunk(
     "user/getuser",
     async (
-      payloaad,
+      payload,
       { rejectWithValue, getState, dispatch }
     ) => {
       try {
+        console.log('hello world')
         const response = await axiosInstance.get(`/user/profile`, {
          
         });
-        console.log(response.data);
+        console.log('hi',response.data);
         // Store user info in cookies
         // Cookies.set('user', JSON.stringify(response.data));
         return response.data;
@@ -199,6 +232,30 @@ const userSlice = createSlice({
         state.error = action.payload;
         state.loading = false;
       });
+      builder.addCase(updateUserShippingAddress.pending, (state, action) => {
+        state.loading = true;
+      });
+      builder.addCase(updateUserShippingAddress.fulfilled, (state, action) => {
+        state.profile = action.payload;
+        state.loading = false;
+        state.updated=true
+      });
+      builder.addCase(updateUserShippingAddress.rejected, (state, action) => {
+        state.error = action.payload;
+        state.loading = false;
+      });
+      builder.addCase(deleteUserShippingAddress.pending, (state, action) => {
+        state.loading = true;
+      });
+      builder.addCase(deleteUserShippingAddress.fulfilled, (state, action) => {
+        state.profile = action.payload;
+        state.loading = false;
+        state.isdelete=true
+      });
+      builder.addCase(deleteUserShippingAddress.rejected, (state, action) => {
+        state.error = action.payload;
+        state.loading = false;
+      });
       builder.addCase(getUser.pending, (state, action) => {
         state.loading = true;
       });
@@ -218,6 +275,11 @@ const userSlice = createSlice({
     builder.addCase(resetError.pending, (state) => {
       state.error = null;
       state.userAuth.error = null;
+    });
+    builder.addCase(resetSuccess.pending, (state) => {
+      state.updated =false;
+      state.isdelete= false
+
     });
   },
 });

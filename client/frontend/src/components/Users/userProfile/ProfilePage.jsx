@@ -23,7 +23,7 @@ const ProfilePage = () => {
             <span>Dashboard</span>
           </Link>
           <Link
-            to="/profile/addresses"
+            to="/user-profile/addresses"
             className={`flex items-center space-x-2 p-3 rounded-lg transition-all ${
               active === "addresses" ? "bg-green-500 text-white" : "text-gray-700 hover:bg-gray-200"
             }`}

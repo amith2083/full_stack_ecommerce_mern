@@ -20,7 +20,7 @@ const razorpay = new Razorpay({
 });
 
 export const createOrder = asyncHandler(async (req, res) => {
-  const { orderItems, shippingAddress, totalPrice } = req.body;
+  const { orderItems, shippingAddress, totalPrice ,navigate} = req.body;
   console.log(req.body);
   //Find the user
   const user = await User.findById(req.userAuthId);
@@ -122,6 +122,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     razorpayOrderId: razorpayOrder.id,
     amount: totalPrice,
     key: process.env.RAZORPAY_KEY_ID,
+    navigate:navigate
   });
 });
 

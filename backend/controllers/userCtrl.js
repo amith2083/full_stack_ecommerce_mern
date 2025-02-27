@@ -197,9 +197,69 @@ export const updateShippingAddress = asyncHandler(async (req, res) => {
     user,
   });
 });
+
+export const updateUserShippingAddress = asyncHandler(async (req, res) => {
+  try {
+    console.log("Received request body:", req.body);
+
+    const { addressId } = req.params;
+    const {...updatedAddress } = req.body
+    
+    console.log("Address ID:", addressId);
+    console.log("Updated Address:", updatedAddress);
+
+    // Find user and update the specific shipping address
+    const user = await User.findOneAndUpdate(
+      { _id: req.userAuthId, "shippingAddress._id": addressId },
+      {
+        $set: {
+          "shippingAddress.$.firstName": updatedAddress.firstName,
+          "shippingAddress.$.lastName": updatedAddress.lastName,
+          "shippingAddress.$.address": updatedAddress.address,
+          "shippingAddress.$.city": updatedAddress.city,
+          "shippingAddress.$.postalCode": updatedAddress.postalCode,
+          "shippingAddress.$.phone": updatedAddress.phone,
+          // "shippingAddress.$.country": updatedAddress.country,
+        },
+      },
+      { new: true } // Return updated user
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User or address not found" });
+    }
+
+    res.status(200).json({ message: "Shipping address updated", user });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+export const deleteUserShippingAddress = asyncHandler(async (req, res) => {
+  try {
+    const {  addressId } = req.params;
+    console.log("Deleting address:",  addressId);
+
+    // Find the user and update the shipping address array
+    const user = await User.findByIdAndUpdate(
+      req.userAuthId,
+      { $pull: { shippingAddress: { _id: addressId } } },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User or address not found" });
+    }
+
+    res.status(200).json({ message: "Shipping address deleted", user });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
 export const getUserProfile = asyncHandler(async (req, res) => {
   //find the user
   const user = await User.findById(req.userAuthId)
+  console.log('getuser',user)
   res.json({
     status: "success",
     message: "User profile fetched successfully",

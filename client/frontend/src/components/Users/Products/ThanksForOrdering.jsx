@@ -1,12 +1,18 @@
 import { Link } from "react-router-dom";
+import Thanks from './thanks.jpg'
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { getCartItemsFromDatabase } from "../../../redux/slices/cart/cartSlices";
 
 export default function ThanksForOrdering() {
+  const dispatch = useDispatch()
+  useEffect(()=>{ dispatch(getCartItemsFromDatabase())},[dispatch])
   return (
     <>
       <main className="relative lg:min-h-full">
         <div className="h-80 overflow-hidden lg:absolute lg:h-full lg:w-1/2 lg:pr-4 xl:pr-12">
           <img
-            src="https://tailwindui.com/img/ecommerce-images/confirmation-page-06-hero.jpg"
+            src={Thanks}
             alt="Image"
             className="h-full w-full object-cover object-center"
           />

@@ -39,6 +39,9 @@ import ProfilePage from "./components/Users/userProfile/ProfilePage";
 import Orders from "./components/Users/userProfile/Orders";
 import ProductUpdate from "./components/Admin/Products/ProductUpdate";
 import OtpVerification from "./components/Users/Forms/OtpVerification";
+import ShippingAddressDetails from "./components/Users/userProfile/shippingAddressDetails";
+
+
 
 
 
@@ -99,6 +102,7 @@ const App = () => {
         {/* <Route path="/register" element={<RegisterForm />} /> */}
         <Route path="/user-profile" element={<ProfilePage />}>
   <Route path="/user-profile/orders" element={<Orders />} />
+  <Route path="/user-profile/addresses" element={<ShippingAddressDetails/>} />
 </Route>
      
         <Route path="/customer-profile" element={<AuthRoute><CustomerProfile /></AuthRoute>} />
