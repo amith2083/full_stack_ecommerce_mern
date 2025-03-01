@@ -9,7 +9,7 @@ const HomeProductTrending = () => {
   useEffect(()=>{
     dispatch(fetchProduct({url:productUrl}))
   },[dispatch]);
-  const {products:{products},loading,error}=useSelector((state)=>state?.products)
+  const {products,loading,error}=useSelector((state)=>state?.products)
   const trendingProducts = [];
   return (
     <>

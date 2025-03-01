@@ -4,7 +4,7 @@ import {
   Bars3Icon,
   ShoppingCartIcon,
   UserIcon,
-  XMarkIcon,
+  XMarkIcon,HeartIcon
 } from "@heroicons/react/24/outline";
 import { Link, useNavigate } from "react-router-dom";
 import baseURL from "../../utils/baseURL";
@@ -15,6 +15,7 @@ import { fetchCategory } from "../../redux/slices/category/categorySlices";
 import { logoutAction } from "../../redux/slices/users/userSlices";
 import { fetchCoupons } from "../../redux/slices/coupon/couponSlices";
 import { getCartItemsFromDatabase } from "../../redux/slices/cart/cartSlices";
+import { fetchWishlist } from "../../redux/slices/wishlist/wishListSlices";
 
 
 export default function Navbar() {
@@ -28,10 +29,10 @@ export default function Navbar() {
   },[dispatch])
   const {categories}=useSelector((state)=>state?.categories)
   
-  console.log('cat',categories)
+ 
   
   const categoriesToDisplay = categories?.categories?.slice(0, 2) || [];
-  console.log('categories',categoriesToDisplay)
+ 
 
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -44,9 +45,14 @@ export default function Navbar() {
     window.location.href='/login'
   
   }
-  useEffect(()=>{dispatch(getCartItemsFromDatabase())},[dispatch])
+  useEffect(()=>{
+    dispatch(getCartItemsFromDatabase())
+    dispatch(fetchWishlist())
+
+  },[dispatch])
   const {cartItems,}=useSelector((state)=>state?.carts)
   console.log('cart',cartItems)
+  const { wishLists } = useSelector((state) => state?.wishLists);
  
   
   useEffect(()=>{
@@ -205,7 +211,7 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Deskto Navigation */}
+          {/* Desktop Navigation */}
           <div className="bg-white">
             <div className="border-b border-gray-200">
               <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -290,7 +296,7 @@ export default function Navbar() {
                         {isLoggedIn&&<div className="flex">
                           <Link
                             to="/user-profile"
-                            className="-m-2 p-2 text-gray-400 hover:text-gray-500">
+                            className="-m-2 p-2 mr-2 text-gray-400 hover:text-gray-500">
                             <UserIcon className="h-6 w-6" aria-hidden="true" />
                           </Link>
                           <button onClick={logoutHandler}>
@@ -307,6 +313,17 @@ export default function Navbar() {
                         className="mx-4 h-6 w-px bg-gray-200 lg:mx-6"
                         aria-hidden="true"
                       />
+                      <div className="ml-4 flow-root lg:ml-6">
+  <Link to="/wishlist" className="group -m-2 flex items-center p-2">
+    <HeartIcon
+      className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
+      aria-hidden="true"
+    />
+    <span className="ml-2 mr-4 text-sm font-medium text-gray-700 group-hover:text-gray-800">
+    {wishLists?.length > 0 ? wishLists?.length || null : null}
+    </span>
+  </Link>
+</div>
                       {/* login shopping cart mobile */}
                       <div className="flow-root">
                         <Link
@@ -317,7 +334,7 @@ export default function Navbar() {
                             aria-hidden="true"
                           />
                           <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
-                          {cartItems?.length > 0 ? cartItems[0]?.items?.length || 0 : 0}
+                          {cartItems?.length > 0 ? cartItems[0]?.items?.length || null : null}
                           </span>
                         </Link>
                       </div>

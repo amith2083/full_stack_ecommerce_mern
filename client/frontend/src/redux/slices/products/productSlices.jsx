@@ -7,7 +7,7 @@ import { resetError, resetSuccess } from "../../resetError/resetError";
 //initalsState
 const initialState = {
   products: [],
-  product: {},
+  product: null,
   loading: false,
   error: null,
   isAdded: false,
@@ -101,7 +101,7 @@ export const fetchSingleProduct = createAsyncThunk(
     console.log("productid", productId);
     try {
       const response = await axiosInstance.get(`/product/${productId}`);
-      console.log("response", response.data);
+      console.log("responsefrom singleproduct", response.data);
       return response.data;
     } catch (error) {
       console.log(error);
@@ -147,7 +147,7 @@ const productSlice = createSlice({
     });
     builder.addCase(fetchProduct.fulfilled, (state, action) => {
       state.loading = false;
-      state.products = action.payload;
+      state.products = action.payload.products;
       state.isAdded = true;
     });
     builder.addCase(fetchProduct.rejected, (state, action) => {
@@ -163,8 +163,9 @@ const productSlice = createSlice({
     });
     builder.addCase(fetchSingleProduct.fulfilled, (state, action) => {
       state.loading = false;
-      state.product = action.payload;
+      state.product = action.payload.product;
       state.isAdded = true;
+      console.log('state.product',state.product)
     });
     builder.addCase(fetchSingleProduct.rejected, (state, action) => {
       state.loading = false;

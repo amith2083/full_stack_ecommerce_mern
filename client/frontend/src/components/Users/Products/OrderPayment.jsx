@@ -40,103 +40,74 @@ console.log('selected',selectedAddress)
 
   return (
     <>
-    {orderError&&<ErrorMsg message={orderError?.message}/>}
-    <div className="bg-gray-50">
-      <main className="mx-auto max-w-7xl px-4 pt-16 pb-24 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl lg:max-w-none">
-          <h1 className="sr-only">Checkout</h1>
+    <div className="bg-gray-100 min-h-screen py-12">
+      {orderError && <ErrorMsg message={orderError?.message} />}
+      <main className="max-w-7xl mx-auto px-6 lg:px-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">Checkout</h1>
+        <div className="grid lg:grid-cols-2 gap-12">
+          {/* Left Section - Shipping */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Shipping Address</h2>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="w-35 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+            >
+              Select Shipping Address
+            </button>
+            <ShippingAddressModal
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              onSelectAddress={setSelectedAddress}
+            />
+            <AddShippingAddress selectedAddress={selectedAddress} />
+          </div>
 
-          <div className="lg:grid lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16">
-            <div>
-              <div className="mt-10 border-t border-gray-200 pt-10">
-              <button
-                  onClick={() => setIsModalOpen(true)}
-                  className="mb-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                >
-                  Select Shipping Address
-                </button>
+          {/* Right Section - Order Summary */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-gray-900">Order Summary</h2>
+            <div className="mt-4 space-y-4 ">
+              {cartItems?.map((cartItem) => (
+                <div key={cartItem._id} className="border-b pb-4">
+                  {cartItem.items?.map((item) => (
+                    <div key={item._id} className="flex items-center gap-4 mb-3">
+                      <img
+                        src={item?.product.images[0]}
+                        className="w-20 h-20 object-cover rounded-md"
+                        alt="Product"
+                      />
+                      <div>
+                        <p className="text-gray-800 font-medium">{item?.product?.name}</p>
+                        <p className="text-sm text-gray-500">Size: {item?.size} | Color: {item?.color}</p>
+                        <p className="text-sm font-semibold text-gray-900">₹ {item?.totalPrice} x {item?.qty}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
 
-                {/* Shipping Address Modal */}
-                <ShippingAddressModal
-                  isOpen={isModalOpen}
-                  onClose={() => setIsModalOpen(false)}
-                  onSelectAddress={setSelectedAddress}
-                />
-                {/* shipping Address */}
-                <AddShippingAddress selectedAddress={selectedAddress} />
+            <div className="border-t pt-4 mt-4">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Taxes</span>
+                <span className="font-medium">₹0.00</span>
+              </div>
+              <div className="flex justify-between text-lg font-semibold mt-3">
+                <span>Total</span>
+                <span className="text-gray-900">₹ {sumOfTotalPrice}.00</span>
               </div>
             </div>
 
-            {/* Order summary */}
-            <div className="mt-10 lg:mt-0">
-              <h2 className="text-lg font-medium text-gray-900">
-                Order summary
-              </h2>
-
-              <div className="mt-4 rounded-lg border border-gray-200 bg-white shadow-sm">
-                <h3 className="sr-only">Items in your cart</h3>
-                <ul role="list" className="divide-y divide-gray-200">
-                  {cartItems?.map((cartItem) => (
-                    <div key={cartItem._id}>
-                    {cartItem.items?.map((item) => (
-                    <li key={item._id} className="flex py-6 px-4 sm:px-6">
-                      <div className="flex-shrink-0">
-                        <img
-                          src={item?.product.images[0]}
-                          // alt={product.imageAlt}
-                          className="w-20 rounded-md"
-                        />
-                      </div>
-
-                      <div className="ml-6 flex flex-1 flex-col">
-                        <div className="flex">
-                          <div className="min-w-0 flex-1">
-                            <p className="mt-1 text-sm text-gray-500">
-                              {item?.product?.name}
-                            </p>
-                            <p className="mt-1 text-sm text-gray-500">
-                              {item?.size}
-                            </p>
-                            <p className="mt-1 text-sm text-gray-500">
-                              {item?.color}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-1 items-end justify-between pt-2">
-                          <p className="mt-1 text-sm font-medium text-gray-900">
-                            $ {item?.totalPrice} X {item?.qty}
-                          </p>
-                        </div>
-                      </div>
-                    </li>
-                     ))}
-              
-                     </div>
-                  ))}
-                </ul>
-                <dl className="space-y-6 border-t border-gray-200 py-6 px-4 sm:px-6">
-                  <div className="flex items-center justify-between">
-                    <dt className="text-sm">Taxes</dt>
-                    <dd className="text-sm font-medium text-gray-900">$0.00</dd>
-                  </div>
-                  <div className="flex items-center justify-between border-t border-gray-200 pt-6">
-                    <dt className="text-base font-medium">Sub Total</dt>
-                    <dd className="text-base font-medium text-gray-900">
-                      $ {sumOfTotalPrice}.00
-                    </dd>
-                  </div>
-                </dl>
-
-                <div className="border-t border-gray-200 py-6 px-4 sm:px-6">
-                {orderLoading?<LoadingComponent/>: <button
-                    onClick={placeOrderHandler}
-                    className="w-full rounded-md border border-transparent bg-indigo-600 py-3 px-4 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50">
-                    Confirm Payment - ${sumOfTotalPrice}
-                  </button>}
-                 
-                </div>
-              </div>
+            <div className="mt-6">
+              {orderLoading ? (
+                <LoadingComponent />
+              ) : (
+                <button
+                  onClick={placeOrderHandler}
+                  className="w-full py-3 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition shadow-md"
+                >
+                  Confirm Payment - ₹{sumOfTotalPrice}
+                </button>
+              )}
             </div>
           </div>
         </div>

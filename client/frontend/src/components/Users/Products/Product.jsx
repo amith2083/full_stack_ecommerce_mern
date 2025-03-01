@@ -6,10 +6,12 @@ import {
   GlobeAmericasIcon,
 } from "@heroicons/react/24/outline";
 import { StarIcon } from "@heroicons/react/20/solid";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchSingleProduct } from "../../../redux/slices/products/productSlices";
+
 import { addOrderToCart, getCartItemsFromDatabase } from "../../../redux/slices/cart/cartSlices";
+import { fetchSingleProduct } from "../../../redux/slices/products/productSlices";
+// import { get } from "mongoose";
 const product = {
   name: "Basic Tee",
   price: "$35",
@@ -88,33 +90,72 @@ function classNames(...classes) {
 
 export default function Product() {
   const dispatch = useDispatch();
+  const navigate =useNavigate();
+
  
  
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const{id}= useParams();
-  console.log(id)
-  useEffect(()=>{
-    dispatch(fetchSingleProduct(id))
-  },[id,dispatch])
-   //get data from store
-   const {
+  //get data from store
+  const {
     loading,
     error,
-    product:{product}
+    product
   } = useSelector((state) => state?.products);
-  console.log(product)
-  console.log('selectedcolor',selectedColor)
-  console.log('selectedsize',selectedSize)
+  console.log('product is',product)
+  const cartItems = useSelector((state) => state?.carts?.cartItems || []);
+  console.log('cartitems',cartItems )
+  const productIds = cartItems.flatMap(cartItem => cartItem.items.map(item => item.product?._id));
+  console.log('productids',productIds)
+  const isInCart = productIds.includes(product?._id); // true if product is in cart
+  // Check if product is in cart
+  // const isInCart = cartItems.some((item) => item.product._id === product?._id);
 
+  // let isInCart
+ 
+  useEffect(()=>{
+   
+    if(id){
+      dispatch(fetchSingleProduct(id))
+    }
+   
+    
+
+   
+  },[dispatch,id])
+  
+ 
+ 
+ // Check if product is in the cart 
+//  const cartItems= useSelector((state)=>{state?.carts?.carts})
+// const cartState = useSelector((state) => state?.carts?.cartItems);
+
+// const cartItems = cartState.length > 0 ? cartState[0].items : [];
+
+ 
+
+
+
+//  const isInCart = cartItems.some((item) => item.product._id === product._id);
   //Add to cart handler
   const addToCartHandler = async() => {
-    if (!selectedSize || !selectedColor) {
-      Swal.fire({
-        icon: "error",
-        title: "Selection Required",
-        text: "Please select size and color before adding to cart.",
-      });
+   
+    if(!isInCart){
+      if (!selectedSize || !selectedColor) {
+        Swal.fire({
+          icon: "error",
+          title: "Selection Required",
+          text: "Please select size and color before adding to cart.",
+        });
+        return;
+      }
+
+    }
+   
+    if (isInCart) {
+      // If already in cart, navigate to shopping cart
+      navigate("/shopping-cart");
       return;
     }
     await dispatch(addOrderToCart({id:product?._id,selectedColor,selectedSize}))
@@ -128,7 +169,7 @@ export default function Product() {
   let productDetails = {};
   let productColor;
   let productSize;
-  let cartItems = [];
+  // let cartItems = [];
 
   return (
     <div className="bg-white">
@@ -148,7 +189,7 @@ export default function Product() {
               <h2 className="sr-only">Reviews</h2>
               <div className="flex items-center">
                 <p className="text-sm text-gray-700">
-                  {product?.reviews.length>0?product?.averageRating:0}
+                  {product?.reviews?.length>0?product?.averageRating:0}
                
                 </p>
                 <div className="ml-1 flex items-center">
@@ -202,7 +243,7 @@ export default function Product() {
                     image.primary
                       ? "lg:col-span-2 lg:row-span-2"
                       : "hidden lg:block",
-                    "rounded-lg"
+                    "rounded-lg transition-transform duration-300 ease-in-out hover:scale-150"
                   )}
                 />
               ))}
@@ -279,22 +320,23 @@ export default function Product() {
                
                className="mt-8 flex w-full items-center justify-center rounded-md border border-transparent  bg-red-300 py-3 px-8 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                Out of stock</button>:
-              <button
-                onClick={() => addToCartHandler()}
-                className="mt-8 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 py-3 px-8 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                Add to cart
-              </button>
+               <button
+               onClick={() => addToCartHandler()}
+               className="mt-8 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 py-3 px-8 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+               {isInCart ? 'Go to Cart' : 'Add to Cart'}
+             </button>
+              
               }
               
               {/* proceed to check */}
 
-              {cartItems.length > 0 && (
+              {/* {cartItems.length > 0 && (
                 <Link
                   to="/shopping-cart"
                   className="mt-8 flex w-full items-center justify-center rounded-md border border-transparent bg-green-800 py-3 px-8 text-base font-medium text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                   Proceed to checkout
                 </Link>
-              )}
+              )} */}
             </>
 
             {/* Product details */}

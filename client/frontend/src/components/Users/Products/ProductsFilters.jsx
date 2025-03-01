@@ -116,7 +116,7 @@ export default function ProductsFilters() {
   },[dispatch,category,size,brand,price,color]);
   //get data from store
   const {
-    products: { products },loading,error
+    products,loading,error
   } = useSelector((state) => state?.products);
 
   //fetching brands---------------------------------------------------------------------------------------------------------

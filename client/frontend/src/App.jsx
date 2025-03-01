@@ -40,6 +40,7 @@ import Orders from "./components/Users/userProfile/Orders";
 import ProductUpdate from "./components/Admin/Products/ProductUpdate";
 import OtpVerification from "./components/Users/Forms/OtpVerification";
 import ShippingAddressDetails from "./components/Users/userProfile/shippingAddressDetails";
+import WishList from "./components/Users/Products/WishList";
 
 
 
@@ -83,13 +84,14 @@ const App = () => {
         {/* Products */}
         <Route path="/" element={<HomePage />} />
         <Route path="/products-filters" element={<ProductsFilters />} />
-        <Route path="/products/:id" element={<Product />} />
+        <Route path="/product/:id" element={<Product />} />
         <Route path="/all-categories" element={<AllCategories />} />
         <Route path="/success" element={<ThanksForOrdering />} />
         {/* review */}
         <Route path="/add-review/:id" element={<AddReview />} />
 
-        {/* shopping cart */}
+        {/* shopping cart &wishlist */}
+        <Route path="/wishlist" element={<WishList />} />
         <Route path="/shopping-cart" element={<ShoppingCart />} />
         <Route path="/order-payment" element={<OrderPayment />} />
         {/* users */}
