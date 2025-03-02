@@ -131,6 +131,7 @@ export const verifyPayment = asyncHandler(async (req, res) => {
     const { razorpay_payment_id, razorpay_order_id, razorpay_signature,orderId } =
     req.body;
     
+    
     console.log("Order ID Type:", typeof orderId, "Value:", orderId);
 
     console.log("razorpay_order_id:", razorpay_order_id);
@@ -141,12 +142,12 @@ export const verifyPayment = asyncHandler(async (req, res) => {
   const generated_signature = hmac.digest("hex");
 
   if (generated_signature === razorpay_signature) {
-  const a=  await Order.findOneAndUpdate(
+ await Order.findOneAndUpdate(
       { _id: new mongoose.Types.ObjectId(orderId) },
       { paymentStatus: "Paid", },
       { new: true }
     );
-    console.log('neworder',a)
+    
     return res.json({ success: true, message: "Payment verified",  redirectUrl: "/success"});
   } else {
     await Order.findOneAndUpdate(
@@ -166,6 +167,59 @@ export const verifyPayment = asyncHandler(async (req, res) => {
     return res.status(500).json({ success: false, message: "Internal Server Error", error: error.message });
   }
   });
+  export const updatePaymentFailure = asyncHandler(async (req, res) => {
+    const { orderId } = req.body;
+  
+    // Find the order and update payment status
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+  
+    order.paymentStatus = "Failed"; // Update status
+    await order.save();
+  
+    res.json({ success: true, message: "Payment marked as failed." });
+  });
+
+  // Retry Payment Handler
+export const retryPayment = async (req, res) => {
+  try {
+    const { orderId,totalPrice } = req.body;
+
+    const order = await Order.findById(orderId);
+    if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+
+    if (order.paymentStatus === "Paid") {
+      return res.status(400).json({ success: false, message: "Order is already paid" });
+    }
+
+    // Create new Razorpay Order
+   
+
+  
+    const razorpayOrder = await razorpay.orders.create({
+      amount: totalPrice * 100, // Razorpay accepts amount in paisa (INR)
+      currency: "INR",
+      receipt: `order_rcptid_${order._id}`,
+      payment_capture: 1, // Auto-capture payment
+    });
+    console.log("razor", razorpayOrder);
+  
+    res.json({
+      success: true,
+      // orderId: order._id,
+      razorpayOrderId: razorpayOrder.id,
+      amount: totalPrice,
+      key: process.env.RAZORPAY_KEY_ID,
+      // navigate:navigate
+    });
+  } catch (error) {
+    console.error("Retry Payment Error:", error);
+    res.status(500).json({ success: false, message: "Failed to retry payment" });
+  }
+};
+
 
 export const getAllorders = asyncHandler(async (req, res) => {
   //find all orders
