@@ -11,6 +11,7 @@ import couponReducer from "../slices/coupon/couponSlices";
 import orderReducer from "../slices/order/orderSlices";
 import reviewReducer from "../slices/review/reviewSlices";
 import wishListReducer from "../slices/wishlist/wishListSlices";
+import walletReducer from "../slices/wallet/walletSlices";
 const store = configureStore({
     reducer:{
         users:userReducer,
@@ -22,7 +23,8 @@ const store = configureStore({
         coupons: couponReducer,
         orders:orderReducer,
         reviews:reviewReducer,
-        wishLists:wishListReducer
+        wishLists:wishListReducer,
+        wallet:walletReducer,
         }
 });
 export default store

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import OrderDetails from "./OrderDetails";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchOrders } from "../../../redux/slices/order/orderSlices";
+import { fetchOrders, retryPayment } from "../../../redux/slices/order/orderSlices";
+import { useNavigate } from "react-router-dom";
 
 const Orders = () => {
+  const navigate = useNavigate()
   const dispatch = useDispatch();
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -15,6 +17,9 @@ const Orders = () => {
   const { orders, loading } = useSelector((state) => state?.orders);
   
   console.log("Orders from Redux:", orders);
+  const handleRetryPayment =({orderId,totalPrice})=>{
+    return  dispatch(retryPayment({orderId,totalPrice,navigate}))
+  }
 
   const ordersPerPage = 2;
   const indexOfLastOrder = currentPage * ordersPerPage;
@@ -77,11 +82,32 @@ const Orders = () => {
               >
                 🔍 View
               </button>
-              <button 
+              {/* <button 
                 className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg transition transform hover:scale-110 duration-300"
               >
                 ❌ Cancel
-              </button>
+              </button> */}
+              {/* Dynamic Button Logic */}
+              {order.paymentStatus === "Failed" ? (
+                <button 
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg shadow-lg transition transform hover:scale-110 duration-300"
+                  onClick={() => handleRetryPayment({orderId:order._id,totalPrice:order.totalPrice})}
+                >
+                  🔁 Retry
+                </button>
+              ) : order.status === "Delivered" ? (
+                <button 
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg transition transform hover:scale-110 duration-300"
+                >
+                  🔄 Return
+                </button>
+              ) : (
+                <button 
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg transition transform hover:scale-110 duration-300"
+                >
+                  ❌ Cancel
+                </button>
+              )}
             </div>
           </div>
         ))}

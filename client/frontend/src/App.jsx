@@ -41,6 +41,7 @@ import ProductUpdate from "./components/Admin/Products/ProductUpdate";
 import OtpVerification from "./components/Users/Forms/OtpVerification";
 import ShippingAddressDetails from "./components/Users/userProfile/shippingAddressDetails";
 import WishList from "./components/Users/Products/WishList";
+import Wallet from "./components/Users/userProfile/Wallet";
 
 
 
@@ -104,6 +105,7 @@ const App = () => {
         {/* <Route path="/register" element={<RegisterForm />} /> */}
         <Route path="/user-profile" element={<ProfilePage />}>
   <Route path="/user-profile/orders" element={<Orders />} />
+  <Route path="/user-profile/wallet" element={<Wallet />} />
   <Route path="/user-profile/addresses" element={<ShippingAddressDetails/>} />
 </Route>
      

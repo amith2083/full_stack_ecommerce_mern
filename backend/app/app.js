@@ -18,6 +18,7 @@ import colorRoute from "../routes/colorRoute.js";
 import cartRoute from "../routes/cartRoute.js";
 import couponRoute from "../routes/couponRoute.js";
 import wishListRoute from "../routes/wishList.js";
+import walletRoute from "../routes/walletRoute.js";
 const app = express();
 
 dbConnect();
@@ -40,6 +41,7 @@ app.use("/review", reviewRoute);
 app.use("/coupon", couponRoute);
 app.use("/order", orderRoute);
 app.use("/wishlist", wishListRoute);
+app.use("/wallet", walletRoute);
 
 app.use(notFound);
 app.use(globalErrHandler);

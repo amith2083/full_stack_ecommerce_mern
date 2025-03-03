@@ -40,7 +40,7 @@ const OrderDetails = ({ order, goBack }) => {
       <div className="mt-4 grid gap-4">
         {order.orderItems.map((item) =>
           item.items.map((product, idx) => (
-            <div key={idx} className="flex items-center bg-pink-500 p-4 rounded-lg shadow-md transition transform hover:scale-105 duration-300 ease-in-out">
+            <div key={idx} className="flex items-center bg-orange-700 p-4 rounded-lg shadow-md transition transform hover:scale-105 duration-300 ease-in-out">
               <img
                 src={product.product.images.length > 0 ? product.product.images[0] : "https://via.placeholder.com/100"}
                 alt={product.product.name}

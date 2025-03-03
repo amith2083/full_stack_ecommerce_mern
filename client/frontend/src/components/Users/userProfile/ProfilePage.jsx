@@ -43,7 +43,7 @@ const ProfilePage = () => {
             <span>Orders</span>
           </Link>
           <Link
-            to="/profile/wallet"
+            to="/user-profile/wallet"
             className={`flex items-center space-x-2 p-3 rounded-lg transition-all ${
               active === "wallet" ? "bg-green-500 text-white" : "text-gray-700 hover:bg-gray-200"
             }`}

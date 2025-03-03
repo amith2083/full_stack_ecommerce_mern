@@ -11,7 +11,7 @@ const orderRoute = exppress.Router();
 
 orderRoute.post("/", isLoggedIn, createOrder);
 orderRoute.post("/payment-verify",isLoggedIn, verifyPayment);
-orderRoute.post("/payment-failed",isLoggedIn, updatePaymentFailure);
+orderRoute.put("/payment-failed",isLoggedIn, updatePaymentFailure);
 orderRoute.post("/retry-payment",isLoggedIn, retryPayment);
 orderRoute.get("/", isLoggedIn, getAllorders);
 // orderRouter.get("/sales/stats", isLoggedIn, getOrderStatsCtrl);
