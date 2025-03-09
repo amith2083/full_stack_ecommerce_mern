@@ -1,4 +1,24 @@
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getOrderStats } from "../../../redux/slices/order/orderSlices";
+
+
 export default function OrdersStats() {
+  const dispatch= useDispatch();
+  useEffect((state)=>{
+    dispatch(getOrderStats())
+  },[])
+  const{stats,loading,error}= useSelector((state)=>state?.orders)
+  console.log('stats',stats)
+//   const obj = stats?.orders
+// const statistics = Object.values(obj[0])
+// console.log('statistics',statistics)
+// Extract order statistics safely
+const orderStats = stats?.orders?.[0] || {};
+const { minimumSale, maxSale, totalSales,avgSale } = orderStats;
+const todaysales = stats?.saleToday?.[0] || {};
+
+// const {totalSales:{todayOrders}} = todaysales
   return (
     <div>
       <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -20,20 +40,20 @@ export default function OrdersStats() {
               </svg>
             </div>
             <p className="ml-16 truncate text-sm font-medium text-gray-500">
-              Order Pending
+              Min sale
             </p>
           </dt>
           <dd className="ml-16 flex items-baseline pb-6 sm:pb-7">
-            <p className="text-2xl font-semibold text-gray-900">300</p>
+            <p className="text-2xl font-semibold text-gray-900">₹{minimumSale}</p>
 
             <div className="absolute inset-x-0 bottom-0 bg-pink-900 px-4 py-4 sm:px-6">
               <div className="text-sm">
-                <a
+                {/* <a
                   href="#"
                   className="font-medium text-indigo-600 hover:text-indigo-500">
                   {" "}
                   View all
-                </a>
+                </a> */}
               </div>
             </div>
           </dd>
@@ -56,20 +76,20 @@ export default function OrdersStats() {
               </svg>
             </div>
             <p className="ml-16 truncate text-sm font-medium text-gray-500">
-              Order Cancel
+                  Max sale
             </p>
           </dt>
           <dd className="ml-16 flex items-baseline pb-6 sm:pb-7">
-            <p className="text-2xl font-semibold text-gray-900">300</p>
+            <p className="text-2xl font-semibold text-gray-900">₹{maxSale}</p>
 
             <div className="absolute inset-x-0 bottom-0 bg-pink-900 px-4 py-4 sm:px-6">
               <div className="text-sm">
-                <a
+                {/* <a
                   href="#"
                   className="font-medium text-indigo-600 hover:text-indigo-500">
                   {" "}
                   View all
-                </a>
+                </a> */}
               </div>
             </div>
           </dd>
@@ -92,20 +112,20 @@ export default function OrdersStats() {
               </svg>
             </div>
             <p className="ml-16 truncate text-sm font-medium text-gray-500">
-              Order Process
+                  Total sales
             </p>
           </dt>
           <dd className="ml-16 flex items-baseline pb-6 sm:pb-7">
-            <p className="text-2xl font-semibold text-gray-900">300</p>
+            <p className="text-2xl font-semibold text-gray-900">₹{totalSales}</p>
 
             <div className="absolute inset-x-0 bottom-0 bg-pink-900 px-4 py-4 sm:px-6">
               <div className="text-sm">
-                <a
+                {/* <a
                   href="#"
                   className="font-medium text-indigo-600 hover:text-indigo-500">
                   {" "}
                   View all
-                </a>
+                </a> */}
               </div>
             </div>
           </dd>
@@ -128,20 +148,20 @@ export default function OrdersStats() {
               </svg>
             </div>
             <p className="ml-16 truncate text-sm font-medium text-gray-500">
-              Total Income
+              Today sales
             </p>
           </dt>
           <dd className="ml-16 flex items-baseline pb-6 sm:pb-7">
-            <p className="text-2xl font-semibold text-gray-900">300</p>
+            <p className="text-2xl font-semibold text-gray-900">{ Object.keys(todaysales).length === 0?'₹ 0.00':`₹ ${todaysales?.totalSales?.toFixed(2)}`} </p>
 
             <div className="absolute inset-x-0 bottom-0 bg-pink-900 px-4 py-4 sm:px-6">
               <div className="text-sm">
-                <a
+                {/* <a
                   href="#"
                   className="font-medium text-indigo-600 hover:text-indigo-500">
                   {" "}
                   View all
-                </a>
+                </a> */}
               </div>
             </div>
           </dd>

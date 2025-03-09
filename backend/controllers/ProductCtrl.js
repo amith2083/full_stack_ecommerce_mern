@@ -260,26 +260,46 @@ export const updateProduct = asyncHandler(async (req, res) => {
     sizes,
     color,
     user,
-    normalPrice,
+    price,
     totalQty,
     brand,
+    removedImages = [], // Get removed images array from frontend
+
   } = req.body;
+  console.log('removedimages',removedImages)
   //validation
+ // Handle File Upload (if needed)
+  // Find the existing product to preserve old images if none are uploaded
+  const existingProduct = await Product.findById(req.params.id);
+   // Remove images that the user deleted
+   let updatedImages = existingProduct.images.filter(
+    (img) => !removedImages.includes(img) // Keep only images not in removedImages
+  );
+  if (req.files) {
+    const imagePaths = req.files.map((file) => file.path); // Save file paths
+    updatedImages = [...updatedImages, ...imagePaths]; // Append new images
+    
+  
+  }
+ let updatedFields = {
+  name,
+  description,
+  category,
+  sizes,
+  color,
+  user,
+  price,
+  totalQty,
+  brand,
+  images: updatedImages 
+  
+};
+
 
   //update
   const product = await Product.findByIdAndUpdate(
     req.params.id,
-    {
-      name,
-      description,
-      category,
-      sizes,
-      color,
-      user,
-      normalPrice,
-      totalQty,
-      brand,
-    },
+    updatedFields, 
     {
       new: true,
       runValidators: true,

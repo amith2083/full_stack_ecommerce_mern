@@ -95,9 +95,9 @@ const Orders = () => {
                 >
                   🔁 Retry
                 </button>
-              ) : order.status === "Delivered" ? (
+              ) : order.status === "delivered" ? (
                 <button 
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg transition transform hover:scale-110 duration-300"
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg shadow-lg transition transform hover:scale-110 duration-300"
                 >
                   🔄 Return
                 </button>

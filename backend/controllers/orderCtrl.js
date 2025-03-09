@@ -1,10 +1,7 @@
 import asyncHandler from "express-async-handler";
 import dotenv from "dotenv";
 dotenv.config();
-// import Stripe from "stripe";
 
-// console.log('RAZORPAY_KEY_ID:', process.env.RAZORPAY_KEY_ID);
-// console.log('RAZORPAY_SECRET:', process.env.RAZORPAY_KEY_SECRET);
 import mongoose from "mongoose";
 import Razorpay from "razorpay";
 import crypto from "crypto";
@@ -12,19 +9,64 @@ import Order from "../model/Order.js";
 import Product from "../model/Product.js";
 import User from "../model/User.js";
 import Cart from "../model/Cart.js";
+import Wallet from "../model/Wallet.js";
 import {
   createRazorpayOrder,
   verifyRazorpayPayment,
 } from "../utils/razorpay.js";
 
-// Initialize Razorpay
-// const razorpay = new Razorpay({
-//   key_id: process.env.RAZORPAY_KEY_ID,
-//   key_secret: process.env.RAZORPAY_KEY_SECRET,
-// });
+export const getOrderStats = asyncHandler(async (req, res) => {
+  //get order stats
+  const orders = await Order.aggregate([
+    {
+      $group: {
+        _id: null,
+        minimumSale: {
+          $min: "$totalPrice",
+        },
+        totalSales: {
+          $sum: "$totalPrice",
+        },
+        maxSale: {
+          $max: "$totalPrice",
+        },
+        avgSale: {
+          $avg: "$totalPrice",
+        },
+      },
+    },
+  ]);
+  //get the date
+  const date = new Date();
+  const today = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const saleToday = await Order.aggregate([
+    {
+      $match: {
+        createdAt: {
+          $gte: today,
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalSales: {
+          $sum: "$totalPrice",
+        },
+      },
+    },
+  ]);
+  //send response
+  res.status(200).json({
+    success: true,
+    message: "Sum of orders",
+    orders,
+    saleToday,
+  });
+});
 
 export const createOrder = asyncHandler(async (req, res) => {
-  const { orderItems, shippingAddress, totalPrice } = req.body;
+  const { orderItems, shippingAddress, totalPrice, paymentMethod } = req.body;
   console.log(req.body);
   //Find the user
   const user = await User.findById(req.userAuthId);
@@ -32,6 +74,24 @@ export const createOrder = asyncHandler(async (req, res) => {
   if (!user?.hasShippingAddress) {
     throw new Error("Please provide shipping address");
   }
+  // Restrict COD for orders above ₹1000
+  if (paymentMethod === "cod" && totalPrice > 1000) {
+    return res.status(400).json({ success: false, message: "COD is not available for orders above ₹1000. Please choose another payment method." });
+  }
+// Handle Wallet Payment First (Stop if Insufficient Balance)
+if (paymentMethod === "wallet") {
+  const wallet = await Wallet.findOne({ userId: user._id });
+  
+  if (!wallet || wallet.amount < totalPrice) {
+    return res.status(400).json({ success: false, message: "Insufficient wallet balance" });
+  }
+
+  // Deduct amount from wallet
+  // wallet.amount -= totalPrice;
+  await wallet.addTransaction("debit", totalPrice, "Order Payment");
+  await wallet.save();
+}
+
   //Place/create order - save into DB
   const order = await Order.create({
     user: user?._id,
@@ -39,6 +99,9 @@ export const createOrder = asyncHandler(async (req, res) => {
     shippingAddress,
     // totalPrice: couponFound ? totalPrice - totalPrice * discount : totalPrice,
     totalPrice,
+    paymentMethod,
+    paymentStatus:paymentMethod==='wallet'?'Paid':'Not paid',
+    status:paymentMethod === "wallet" || paymentMethod === "cod" ? "processing" : "pending",
   });
   // Extract product IDs from orderItems
   const productIds = orderItems[0].items.map((item) => item.product._id);
@@ -65,46 +128,33 @@ export const createOrder = asyncHandler(async (req, res) => {
     }
   }
 
-  //Update the product qty
-  // const products = await Product.find({ _id: { $in: orderItems } });
-  //   //Check if order is not emptydr
-
-  //   orderItems?.map(async (order) => {
-  //     const product = products?.find((product) => {
-  //       return product?._id?.toString() === order?._id?.toString();
-  //     });
-  //     console.log('++',product)
-  //     if (product) {
-  //       product.totalSold += order.qty;
-  //     }
-  //     await product.save();
-  //   });
+  
   //push order into user
   user.orders.push(order?._id);
   await user.save();
   // delete cart after placing order
   await Cart.findOneAndDelete({ user: user?._id });
 
-  // Create a Razorpay Order
-  // const razorpayOrder = await razorpay.orders.create({
-  //   amount: totalPrice * 100, // Razorpay accepts amount in paisa (INR)
-  //   currency: "INR",
-  //   receipt: `order_rcptid_${order._id}`,
-  //   payment_capture: 1, // Auto-capture payment
-  // });
-  // console.log("razor", razorpayOrder);
-  // Create Razorpay Order
-  const razorpayOrder = await createRazorpayOrder(order._id, totalPrice);
-  console.log("Razorpay Order:", razorpayOrder);
+    // Handle Razorpay Order Creation
+    if (paymentMethod === "razorpay") {
+      const razorpayOrder = await createRazorpayOrder(order._id, totalPrice);
+      console.log("Razorpay Order:", razorpayOrder);
+  
+      return res.json({
+        success: true,
+        orderId: order._id,
+        razorpayOrderId: razorpayOrder.id,
+        amount: totalPrice,
+        key: process.env.RAZORPAY_KEY_ID,
+      });
+    }
 
-  res.json({
-    success: true,
-    orderId: order._id,
-    razorpayOrderId: razorpayOrder.id,
-    amount: totalPrice,
-    key: process.env.RAZORPAY_KEY_ID,
-    // navigate:navigate
-  });
+ 
+    return res.json({
+      success: true,
+      orderId: order._id,
+      message: "Order placed successfully",
+    });
 });
 
 export const verifyPayment = asyncHandler(async (req, res) => {
@@ -130,7 +180,7 @@ export const verifyPayment = asyncHandler(async (req, res) => {
     ) {
       await Order.findByIdAndUpdate(
         { _id: new mongoose.Types.ObjectId(orderId) },
-        { paymentStatus: "Paid" },
+        { paymentStatus: "Paid" },{status:"processing"},
         { new: true }
       );
       return res.json({
@@ -150,13 +200,11 @@ export const verifyPayment = asyncHandler(async (req, res) => {
     }
   } catch (error) {
     console.error("Error in verifyPayment:", error);
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "Internal Server Error",
-        error: error.message,
-      });
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
   }
 });
 export const updatePaymentFailure = asyncHandler(async (req, res) => {
@@ -232,5 +280,36 @@ export const getAllorders = asyncHandler(async (req, res) => {
     success: true,
     message: "All orders",
     orders,
+  });
+});
+
+export const getSingleOrder = asyncHandler(async (req, res) => {
+  //get the id from params
+  const id = req.params.id;
+  const order = await Order.findById(id);
+  //send response
+  res.status(200).json({
+    success: true,
+    message: "Single order",
+    order,
+  });
+});
+export const updateOrder = asyncHandler(async (req, res) => {
+  //get the id from params
+  const id = req.params.id;
+  //update
+  const updatedOrder = await Order.findByIdAndUpdate(
+    id,
+    {
+      status: req.body.status,
+    },
+    {
+      new: true,
+    }
+  );
+  res.status(200).json({
+    success: true,
+    message: "Order updated",
+    updatedOrder,
   });
 });

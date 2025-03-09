@@ -5,6 +5,7 @@ import axios from "axios";
 import axiosInstance from "../../../utils/axiosConfig";
 import { resetError, resetSuccess } from "../../resetError/resetError";
 import { openRazorpayModal } from "../../../utils/openRazorpayModal";
+import Swal from "sweetalert2";
 //initalsState
 const initialState = {
  orders: [],
@@ -14,6 +15,7 @@ const initialState = {
   isAdded: false,
   isUpdated: false,
   isDelete: false,
+  stats:null
 };
 // export const createOrder = createAsyncThunk(
  
@@ -120,9 +122,9 @@ export const createOrder = createAsyncThunk(
   "/order/create",
   async (payload, { rejectWithValue }) => {
     try {
-      const { orderItems, shippingAddress, totalPrice, navigate } = payload;
+      const { orderItems, shippingAddress, totalPrice, navigate,paymentMethod } = payload;
 
-      const response = await axiosInstance.post(`/order`, { orderItems, shippingAddress, totalPrice });
+      const response = await axiosInstance.post(`/order`, { orderItems, shippingAddress, totalPrice,paymentMethod });
       console.log("Order Response:", response.data);
 
       if (response.data.razorpayOrderId) {
@@ -132,6 +134,16 @@ export const createOrder = createAsyncThunk(
           order_id: response.data.razorpayOrderId,
           orderId:response.data.orderId,
           navigate
+        });
+      }else{
+        Swal.fire({
+          icon: "success",
+          title: "Payment Successful",
+          text:  "Your order has been placed successfully!",
+          timer: 3000, // Auto-close after 3 seconds
+          showConfirmButton: false,
+        }).then(() => {
+          navigate( '/success');
         });
       }
       return response.data;
@@ -271,7 +283,7 @@ export const fetchOrders= createAsyncThunk(
 export const fetchOrder = createAsyncThunk(
   "/order/fetch",
   async (orderId, { rejectWithValue, getState, dispatch }) => {
-    console.log("productid", orderIdId);
+    console.log("productid", orderId);
     try {
       const response = await axiosInstance.get(`/order/${orderId}`);
       console.log("response", response.data);
@@ -283,8 +295,38 @@ export const fetchOrder = createAsyncThunk(
     }
   }
 );
+export const getOrderStats= createAsyncThunk(
+  "/orders/stats",
+  async (payload, { rejectWithValue, getState, dispatch }) => {
+  ;
+    try {
+      const response = await axiosInstance.get(`/order/sales/stats`);
+      console.log("resstats", response.data);
+      return response.data;
+    } catch (error) {
+      console.log(error);
 
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
 
+export const updateOrder = createAsyncThunk(
+  "/order/update",
+  async ({id,status}, { rejectWithValue, getState, dispatch }) => {
+   
+    try {
+      
+      const response = await axiosInstance.put(`/order/update/${id}`,{status});
+      console.log("response", response.data);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
 
 const orderSlice = createSlice({
   name: "orders",
@@ -344,6 +386,38 @@ const orderSlice = createSlice({
 
       state.order = null;
     
+      state.error = action.payload;
+    });
+     //get order statistics------------------------------------------------------------------------------------------------
+     builder.addCase(getOrderStats.pending, (state, action) => {
+      state.loading = true;
+    });
+    builder.addCase(getOrderStats.fulfilled, (state, action) => {
+      state.loading = false;
+      state.stats = action.payload;
+    
+    });
+    builder.addCase(getOrderStats.rejected, (state, action) => {
+      state.loading = false;
+
+      state.stats = null;
+     
+      state.error = action.payload;
+    });
+     //update order------------------------------------------------------------------------------------------------
+     builder.addCase(updateOrder.pending, (state, action) => {
+      state.loading = true;
+    });
+    builder.addCase(updateOrder.fulfilled, (state, action) => {
+      state.loading = false;
+      state.order = action.payload;
+    
+    });
+    builder.addCase(updateOrder.rejected, (state, action) => {
+      state.loading = false;
+
+      state.order = null;
+     
       state.error = action.payload;
     });
   },

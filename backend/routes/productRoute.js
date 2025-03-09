@@ -12,7 +12,7 @@ const productRoute = express.Router()
 productRoute.post('/', isLoggedIn, isAdmin, upload.array('files') ,createProduct);
 productRoute.get('/',getProducts)
 productRoute.get('/:id',singleProduct)
-productRoute.put('/:id',isLoggedIn,isAdmin,updateProduct)
+productRoute.put('/:id',isLoggedIn,isAdmin, upload.array("files"),updateProduct)
 productRoute.delete('/:id',isLoggedIn,isAdmin,deleteProduct)
 
 export default productRoute;

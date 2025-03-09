@@ -31,21 +31,18 @@ const OrderSchema = new Schema(
     },
     paymentMethod: {
       type: String,
-      default: "Not specified",
+      enum:['razorpay','cod','wallet']
     },
     totalPrice: {
       type: Number,
       default: 0.0,
     },
-    currency: {
-      type: String,
-      default: "Not specified",
-    },
+   
     //For admin
     status: {
       type: String,
       default: "pending",
-      enum: ["pending", "processing", "shipped", "delivered"],
+      enum: ["pending", "processing", "shipped", "delivered", "cancelled", "Refunded"],
     },
     deliveredAt: {
       type: Date,

@@ -13,7 +13,7 @@ import Navbar from "./components/Navbar/Navbar";
 import OrderHistory from "./components/Admin/Orders/ManageOrders";
 import OrderPayment from "./components/Users/Products/OrderPayment";
 import ManageCategories from "./components/Admin/Categories/ManageCategories";
-import UpdateProduct from "./components/Admin/Products/UpdateProduct";
+// import UpdateProduct from "./components/Admin/Products/UpdateProduct";
 import ManageStocks from "./components/Admin/Products/ManageStocks";
 import CategoryToAdd from "./components/Admin/Categories/CategoryToAdd";
 import AddCategory from "./components/Admin/Categories/AddCategory";
@@ -29,7 +29,7 @@ import AddReview from "./components/Users/Reviews/AddReview";
 import UpdateCategory from "./components/Admin/Categories/UpdateCategory";
 import ThanksForOrdering from "./components/Users/Products/ThanksForOrdering";
 
-import OrdersList from "./components/Admin/Orders/OdersList";
+import OrdersList from "./components/Admin/Orders/OrdersList";
 import ManageOrders from "./components/Admin/Orders/ManageOrders";
 import Customers from "./components/Admin/Orders/Customers";
 import BrandsColorsList from "./components/Admin/Categories/BrandsColorsList";
@@ -42,6 +42,7 @@ import OtpVerification from "./components/Users/Forms/OtpVerification";
 import ShippingAddressDetails from "./components/Users/userProfile/shippingAddressDetails";
 import WishList from "./components/Users/Products/WishList";
 import Wallet from "./components/Users/userProfile/Wallet";
+import UpdateOrders from "./components/Admin/Orders/UpdateOrders";
 
 
 
@@ -78,6 +79,7 @@ const App = () => {
           <Route path="all-colors" element={<BrandsColorsList />} />
           {/* Orders */}
           <Route path="manage-orders" element={<ManageOrders />} />
+          <Route path="order-details/:id" element={<UpdateOrders />} />
           <Route path="order-payment" element={<OrderPayment />} />
           <Route path="customers" element={<Customers />} />
         </Route>

@@ -20,10 +20,20 @@ export default function AddProduct() {
   //files
   const [files, setFiles] = useState([]);
   const [fileErrs, setFileErrs] = useState([]);
+  const [previewImages, setPreviewImages] = useState([]);
   const fileHandleChange = (event) => {
     const newFiles = Array.from(event.target.files);
+   
      //validation
      const newErrs = [];
+     const newPreviews = [];
+
+    // 
+  // Check if more than 3 images are selected
+  if (newFiles.length > 3) {
+    setFileErrs(["You can only upload up to 3 images."]);
+    return;
+  }
      newFiles.forEach((file) => {
        if (file?.size > 1000000) {
          newErrs.push(`${file?.name} is too large`);
@@ -31,10 +41,12 @@ export default function AddProduct() {
        if (!file?.type?.startsWith("image/")) {
          newErrs.push(`${file?.name} is not an image`);
        }
+       newPreviews.push(URL.createObjectURL(file));
       })
 
     setFiles(newFiles);
     setFileErrs(newErrs)
+    setPreviewImages(newPreviews);
   };
   //for fetch categories---------------------------------------------------------------------------------------------------------
   useEffect(() => {
@@ -290,6 +302,12 @@ export default function AddProduct() {
                           />
                         </label>
                       </div>
+                       {/* Show Preview */}
+      <div className="mt-4 flex flex-wrap gap-2">
+        {previewImages.map((img, index) => (
+          <img key={index} src={img} alt="Preview" className="w-24 h-24 object-cover rounded-md" />
+        ))}
+      </div>
                       <p className="text-xs text-gray-500">
                         PNG, JPG, GIF up to 1MB
                       </p>

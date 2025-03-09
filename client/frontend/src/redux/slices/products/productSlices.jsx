@@ -77,6 +77,70 @@ export const createProduct = createAsyncThunk(
   }
 );
 
+export const updateProduct = createAsyncThunk(
+  "/product/update",
+  async (payload, { rejectWithValue, getState, dispatch }) => {
+    console.log("payload", payload);
+    try {
+      const {
+        name,
+        description,
+        category,
+        sizes,
+        brand,
+        color,
+        price,
+        totalQty,
+        files,
+        removedImages,
+        id
+      } = payload;
+      
+
+     
+      //FormData
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("description", description);
+      formData.append("category", category);
+
+      formData.append("brand", brand);
+      formData.append("price", price);
+      formData.append("totalQty", totalQty);
+
+      sizes.forEach((size) => {
+        formData.append("sizes", size);
+      });
+      color.forEach((color) => {
+        formData.append("color", color);
+      });
+
+    // Append images
+    if (files.length > 0) {
+      files.forEach((file) => formData.append("files", file));
+    }
+
+    // Append removed images (send as an array of filenames/URLs)
+    if (removedImages.length > 0) {
+      removedImages.forEach((img) => formData.append("removedImages[]", img));
+    }
+      // Debugging FormData contents
+      console.log("FormData contents:");
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+
+      const response = await axiosInstance.put(`/product/${id}`, formData);
+      console.log("res", response.data);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
+
 //fetching products---------------------------------------------------------------------------------------------------------
 export const fetchProduct = createAsyncThunk(
   "/products/fetch",
@@ -133,9 +197,28 @@ const productSlice = createSlice({
       state.isAdded = false;
       state.error = action.payload;
     });
+//updation of product-----------------------------------------------------------------------------------------------------------------
+    builder.addCase(updateProduct.pending, (state, action) => {
+      state.loading = true;
+    });
+    builder.addCase(updateProduct.fulfilled, (state, action) => {
+      state.loading = false;
+      state.product = action.payload;
+      state.isUpdated = true;
+    });
+    builder.addCase(updateProduct.rejected, (state, action) => {
+      state.loading = false;
+
+      state.product = null;
+      state.isUpdated = false;
+      state.error = action.payload;
+    });
+
+
     //after sucess of product creation-------------------------------------------------------------------------------
     builder.addCase(resetSuccess.pending, (state, action) => {
       state.isAdded = false;
+      state.isUpdated=false
     });
 
     builder.addCase(resetError.pending, (state, action) => {

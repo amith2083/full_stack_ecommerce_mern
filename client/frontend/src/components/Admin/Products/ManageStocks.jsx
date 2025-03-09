@@ -17,7 +17,7 @@ const dispatch = useDispatch()
   },[dispatch]);
   //get data from store
   const {
-    products: { products },loading,error
+    products,loading,error
   } = useSelector((state) => state?.products);
 
 
