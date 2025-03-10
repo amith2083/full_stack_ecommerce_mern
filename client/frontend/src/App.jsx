@@ -31,7 +31,7 @@ import ThanksForOrdering from "./components/Users/Products/ThanksForOrdering";
 
 import OrdersList from "./components/Admin/Orders/OrdersList";
 import ManageOrders from "./components/Admin/Orders/ManageOrders";
-import Customers from "./components/Admin/Orders/Customers";
+
 import BrandsColorsList from "./components/Admin/Categories/BrandsColorsList";
 import AuthRoute from "./components/Authenciation/AuthRoute";
 import AdminCheck from "./components/Authenciation/AdminCheck";
@@ -43,6 +43,7 @@ import ShippingAddressDetails from "./components/Users/userProfile/shippingAddre
 import WishList from "./components/Users/Products/WishList";
 import Wallet from "./components/Users/userProfile/Wallet";
 import UpdateOrders from "./components/Admin/Orders/UpdateOrders";
+import Customers from "./components/Admin/Customers/Customers";
 
 
 

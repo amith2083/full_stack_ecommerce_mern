@@ -79,15 +79,15 @@ export default function OrdersList() {
                   <span
                     className={`px-2 py-1 rounded-md text-xs font-semibold ${
                       order.status === "pending"
-                      ? "bg-yellow-200 text-yellow-800"   // Brownish Yellow for Pending
+                      ? "bg-yellow-200 text-yellow-800"   
                       : order.status === "processing"
-                      ? "bg-blue-200 text-blue-800"      // Blue for Processing
+                      ? "bg-blue-200 text-blue-800"      
                       : order.status === "shipped"
-                      ? "bg-orange-200 text-orange-800"  // Orange for Shipped
+                      ? "bg-orange-200 text-orange-800"  
                       : order.status === "delivered"
-                      ? "bg-green-200 text-green-800"    // Green for Delivered
+                      ? "bg-green-200 text-green-800"    
                       : order.status === "cancelled"
-                      ? "bg-red-200 text-red-800"        // Red for Cancelled
+                      ? "bg-red-200 text-red-800"       
                       : "bg-gray-200 text-gray-800"      // Default color
                     }`}
                   >

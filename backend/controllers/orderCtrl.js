@@ -275,7 +275,14 @@ export const retryPayment = async (req, res) => {
 
 export const getAllorders = asyncHandler(async (req, res) => {
   //find all orders
-  const orders = await Order.find().populate("user");
+  const user = await User.findById(req.userAuthId)
+  if(user.isAdmin){
+    const orders = await Order.find().populate("user");
+
+  }else{
+    const orders = await Order.findById(req.userAuthId)
+  }
+  
   res.json({
     success: true,
     message: "All orders",

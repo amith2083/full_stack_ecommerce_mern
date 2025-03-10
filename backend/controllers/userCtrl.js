@@ -9,6 +9,7 @@ import OTP from "../model/Otp.js";
 import crypto from 'crypto'
 import oauth2client from "../utils/googleConfig.js";
 import axios from 'axios'
+import mongoose from "mongoose";
 
 // export const register = asyncHandler(async (req, res) => {
 //     const { name, email, password } = req.body;
@@ -122,6 +123,10 @@ export const resendOtp = asyncHandler(async (req, res) => {
 export const login = asyncHandler(async(req,res)=>{
     const{email,password}= req.body
     const userFound = await User.findOne({email});
+     // Check if the user is blocked
+  if (userFound.isBlocked) {
+    return res.status(403).json({ message: "Your account is blocked. Contact support." });
+  }
     if(userFound &&  await bcrypt.compare(password,userFound?.password)){
          res.status(200).json({msg:'login success',userFound,  token:generateToken(userFound?._id)})
        
@@ -146,6 +151,10 @@ let user = await User.findOne({ email });
 
 if (!user) {
   user = await User.create({ email, name, isGoogleAuth: true, });
+}
+ // If the user is blocked, prevent login
+ if (user.isBlocked) {
+  return res.status(403).json({ message: "Your account is blocked. Contact support." });
 }
 const token = await generateToken(user?._id)
 return res.status(200).json({
@@ -266,7 +275,40 @@ export const getUserProfile = asyncHandler(async (req, res) => {
     user,
   });
 });
+export const getAllUsers = asyncHandler(async (req, res) => {
+  //find the user
+  const users = await User.find()
+ 
+  res.json({
+    status: "success",
+    message: "Users fetched successfully",
+    users,
+  });
+});
 
+export const blockUnblockUser = asyncHandler(async(req,res)=>{
+  try {
+    const { userId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      console.log('wrong id......................................................................................')
+    }
+
+    // Find the user
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Toggle the isBlocked status
+    user.isBlocked = !user.isBlocked;
+    await user.save();
+
+    res.status(200).json({ message: `User ${user.isBlocked ? "Blocked" : "Unblocked"} successfully`, user });
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong", error: error.message });
+  }
+})
 // export const profilePage =asyncHandler(async(req,res)=>{
  
 //     // res.status(200).json({msg:'profile page'})

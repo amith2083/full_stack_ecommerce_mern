@@ -10,6 +10,8 @@ import {
   updateShippingAddress,
   updateUserShippingAddress,
   deleteUserShippingAddress,
+  getAllUsers,
+  blockUnblockUser,
 } from "../controllers/userCtrl.js";
 import { isLoggedIn } from "../middlewares/isLoggedIn.js";
 
@@ -21,6 +23,8 @@ userRoutes.post("/resend-otp", resendOtp);
 userRoutes.post("/login", login);
 userRoutes.get("/google/callback", googleLogin);
 userRoutes.put("/update/address", isLoggedIn, updateShippingAddress);
+userRoutes.get("/all", isLoggedIn, getAllUsers)
+userRoutes.put("/block-unblock/:userId", blockUnblockUser )
 
 userRoutes.get("/profile", isLoggedIn, getUserProfile);
 userRoutes.put(

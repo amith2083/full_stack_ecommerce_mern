@@ -16,6 +16,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import logo from "../Navbar/logo3.png";
+import adminicon from './adminicon.png'
 const ordersLinks = [
   {
     name: "Dashboard",
@@ -37,25 +38,25 @@ const ordersLinks = [
     ),
     current: true,
   },
-  {
-    name: "Manage Orders",
-    href: "manage-orders",
-    icon: () => (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={1.5}
-        stroke="currentColor"
-        className="w-6 h-6 m-1">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
-    ),
-  },
+  // {
+  //   name: "Manage Orders",
+  //   href: "manage-orders",
+  //   icon: () => (
+  //     <svg
+  //       xmlns="http://www.w3.org/2000/svg"
+  //       fill="none"
+  //       viewBox="0 0 24 24"
+  //       strokeWidth={1.5}
+  //       stroke="currentColor"
+  //       className="w-6 h-6 m-1">
+  //       <path
+  //         strokeLinecap="round"
+  //         strokeLinejoin="round"
+  //         d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+  //       />
+  //     </svg>
+  //   ),
+  // },
   {
     name: "Customers",
     href: "customers",
@@ -180,6 +181,7 @@ const brandsLinks = [
 
 export default function Example() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
 
   return (
     <>
@@ -487,7 +489,7 @@ export default function Example() {
                     <div className="flex items-center">
                       <img
                         className="hidden h-16 w-16 rounded-full sm:block"
-                        src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.6&w=256&h=256&q=80"
+                        src={adminicon}
                         alt=""
                       />
                       <div>
@@ -498,7 +500,7 @@ export default function Example() {
                             alt=""
                           />
                           <h1 className="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:leading-9">
-                            Good morning, Emilia Birch
+                            Good morning
                           </h1>
                         </div>
                         <dl className="mt-6 flex flex-col sm:ml-3 sm:mt-1 sm:flex-row sm:flex-wrap">
@@ -519,7 +521,7 @@ export default function Example() {
                             Role: Admin
                           </dd>
                           {/* Date Joined */}
-                          <dd className="mt-3 flex items-center text-sm font-medium capitalize text-gray-500 sm:mr-6 sm:mt-0">
+                          {/* <dd className="mt-3 flex items-center text-sm font-medium capitalize text-gray-500 sm:mr-6 sm:mt-0">
                             <svg
                               className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                               fill="none"
@@ -533,9 +535,9 @@ export default function Example() {
                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                             </svg>
                             Date Joined: 12/12/2020
-                          </dd>
+                          </dd> */}
                           {/* email */}
-                          <dd className="mt-3 flex items-center text-sm font-medium  text-gray-500 sm:mr-6 sm:mt-0">
+                          {/* <dd className="mt-3 flex items-center text-sm font-medium  text-gray-500 sm:mr-6 sm:mt-0">
                             <svg
                               className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                               fill="none"
@@ -549,7 +551,7 @@ export default function Example() {
                                 d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
                             </svg>
                             admin@gmail.com
-                          </dd>
+                          </dd> */}
                         </dl>
                       </div>
                     </div>
