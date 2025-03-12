@@ -6,8 +6,8 @@ import isAdmin from '../middlewares/isAdmin.js';
 const categoryRoute = express.Router()
 
 categoryRoute.post('/', isLoggedIn, isAdmin,categoryFileUpload.single('file'), createCategory)
-categoryRoute.get('/',  isLoggedIn,getAllCategories)
-categoryRoute.get('/:id', isLoggedIn, getSingleCategory)
+categoryRoute.get('/',getAllCategories)
+categoryRoute.get('/:id', getSingleCategory)
 categoryRoute.put('/:id', isLoggedIn,isAdmin, updateCategory)
 categoryRoute.delete('/:id', isLoggedIn, isAdmin,deleteCategory)
 

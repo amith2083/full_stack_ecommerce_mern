@@ -32,7 +32,7 @@ export default function ManageCoupons() {
             Manage Coupons - [{coupons?.coupons?.length}]
           </h1>
           <p className="mt-2 text-sm text-gray-700">
-            List of all coupons in the system
+            List of all coupons
           </p>
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
@@ -73,27 +73,27 @@ export default function ManageCoupons() {
                         <th
                           scope="col"
                           className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                         Status
+                        </th>
+                        <th
+                          scope="col"
+                          className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                           Start Date
                         </th>
                         <th
                           scope="col"
                           className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                          End Date
+                         End Date
                         </th>
                         <th
                           scope="col"
                           className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                          Days Left
+                        Days Left
                         </th>
                         <th
                           scope="col"
                           className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                          Edit
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                          Delete
+                        Edit
                         </th>
                       </tr>
                     </thead>

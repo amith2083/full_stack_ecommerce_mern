@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route, Routes,Outlet } from "react-router-dom";
+import { BrowserRouter, Route, Routes,Outlet, useLocation } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import AdminDashboard from "./components/Admin/AdminDashboard";
@@ -32,7 +32,7 @@ import ThanksForOrdering from "./components/Users/Products/ThanksForOrdering";
 import OrdersList from "./components/Admin/Orders/OrdersList";
 import ManageOrders from "./components/Admin/Orders/ManageOrders";
 
-import BrandsColorsList from "./components/Admin/Categories/BrandsColorsList";
+import ManageBrands from "./components/Admin/Categories/ManageBrands";
 import AuthRoute from "./components/Authenciation/AuthRoute";
 import AdminCheck from "./components/Authenciation/AdminCheck";
 import ProfilePage from "./components/Users/userProfile/ProfilePage";
@@ -44,45 +44,61 @@ import WishList from "./components/Users/Products/WishList";
 import Wallet from "./components/Users/userProfile/Wallet";
 import UpdateOrders from "./components/Admin/Orders/UpdateOrders";
 import Customers from "./components/Admin/Customers/Customers";
+import ColorLists from "./components/Admin/Categories/ColorLists";
 
 
 
+// Function to handle conditional Navbar rendering
+const Layout = ({ children }) => {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin"); // Check if route starts with /admin
 
+  return (
+    <>
+      {!isAdminRoute && <Navbar />} {/* Show Navbar only if NOT an admin route */}
+      {children}
+    </>
+  );
+};
 
 const App = () => {
+  
+  
   return (
     <BrowserRouter>
-      <Navbar />
+    <Layout>
+     
       {/* hide navbar if admin */}
       <Routes>
         {/* nested route */}
-        <Route path="admin" element={<AdminCheck>
+        <Route  path="admin" element={<AdminCheck>
           <AdminDashboard />
         </AdminCheck>}>
-          {/* products */} <Route path="" element={<OrdersList />} />
-          <Route path="add-product" element={<AddProduct />} />
-          <Route path="manage-products" element={<ManageStocks />} />
-          <Route path="products/edit/:id" element={<ProductUpdate />} />
-          {/* coupons */}
-          <Route path="add-coupon" element={<AddCoupon />} />
-          <Route path="manage-coupon" element={<ManageCoupons />} />
-          <Route path="manage-coupon/edit/:code" element={<UpdateCoupon />} />
-          {/* Category */}
-          <Route path="category-to-add" element={<CategoryToAdd />} />{" "}
-          <Route path="add-category" element={<AddCategory />} />
-          <Route path="manage-category" element={<ManageCategories />} />
-          <Route path="edit-category/:id" element={<UpdateCategory />} />
-          {/* brand category */}
-          <Route path="add-brand" element={<AddBrand />} />
-          <Route path="all-brands" element={<BrandsColorsList />} />
-          {/* color category */}
-          <Route path="add-color" element={<AddColor />} />
-          <Route path="all-colors" element={<BrandsColorsList />} />
-          {/* Orders */}
-          <Route path="manage-orders" element={<ManageOrders />} />
-          <Route path="order-details/:id" element={<UpdateOrders />} />
-          <Route path="order-payment" element={<OrderPayment />} />
-          <Route path="customers" element={<Customers />} />
+          {/* products */} 
+          <Route path="" element={<AdminCheck><OrdersList /></AdminCheck>} />
+          <Route path="add-product" element={<AdminCheck><AddProduct /></AdminCheck>} />
+<Route path="manage-products" element={<AdminCheck><ManageStocks /></AdminCheck>} />
+<Route path="products/edit/:id" element={<AdminCheck><ProductUpdate /></AdminCheck>} />
+{/* coupons */}
+<Route path="add-coupon" element={<AdminCheck><AddCoupon /></AdminCheck>} />
+<Route path="manage-coupon" element={<AdminCheck><ManageCoupons /></AdminCheck>} />
+<Route path="manage-coupon/edit/:code" element={<AdminCheck><UpdateCoupon /></AdminCheck>} />
+{/* Category */}
+<Route path="category-to-add" element={<AdminCheck><CategoryToAdd /></AdminCheck>} />
+<Route path="add-category" element={<AdminCheck><AddCategory /></AdminCheck>} />
+<Route path="manage-category" element={<AdminCheck><ManageCategories /></AdminCheck>} />
+<Route path="edit-category/:id" element={<AdminCheck><UpdateCategory /></AdminCheck>} />
+{/* brand category */}
+<Route path="add-brand" element={<AdminCheck><AddBrand /></AdminCheck>} />
+<Route path="all-brands" element={<AdminCheck><ManageBrands /></AdminCheck>} />
+{/* color category */}
+<Route path="add-color" element={<AdminCheck><AddColor /></AdminCheck>} />
+<Route path="all-colors" element={<AdminCheck><ColorLists /></AdminCheck>} />
+{/* Orders */}
+<Route path="manage-orders" element={<AdminCheck><ManageOrders /></AdminCheck>} />
+<Route path="order-details/:id" element={<AdminCheck><UpdateOrders /></AdminCheck>} />
+         
+          <Route path="customers" element={<AdminCheck><Customers /></AdminCheck>} />
         </Route>
         {/* public links */}
         {/* Products */}
@@ -92,12 +108,13 @@ const App = () => {
         <Route path="/all-categories" element={<AllCategories />} />
         <Route path="/success" element={<ThanksForOrdering />} />
         {/* review */}
-        <Route path="/add-review/:id" element={<AddReview />} />
+        <Route path="/add-review/:id" element={<AuthRoute><AddReview /></AuthRoute>} />
 
         {/* shopping cart &wishlist */}
-        <Route path="/wishlist" element={<WishList />} />
-        <Route path="/shopping-cart" element={<ShoppingCart />} />
-        <Route path="/order-payment" element={<OrderPayment />} />
+        <Route path="/wishlist" element={<AuthRoute><WishList/></AuthRoute>} />
+        
+        <Route path="/shopping-cart" element={<AuthRoute><ShoppingCart /></AuthRoute>} />
+        <Route path="/order-payment" element={<AuthRoute><OrderPayment /></AuthRoute>} />
         {/* users */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
@@ -114,6 +131,7 @@ const App = () => {
      
         <Route path="/customer-profile" element={<AuthRoute><CustomerProfile /></AuthRoute>} />
       </Routes>
+      </Layout>
     </BrowserRouter>
   );
 };

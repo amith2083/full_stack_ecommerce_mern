@@ -128,7 +128,10 @@ export const login = asyncHandler(async(req,res)=>{
     return res.status(403).json({ message: "Your account is blocked. Contact support." });
   }
     if(userFound &&  await bcrypt.compare(password,userFound?.password)){
-         res.status(200).json({msg:'login success',userFound,  token:generateToken(userFound?._id)})
+         res.status(200).json({msg:'login success', user: {
+          isAdmin: userFound.isAdmin,
+          name: userFound.name,
+        },  token:generateToken(userFound?._id)})
        
     }else{
       throw new Error('invalid login')

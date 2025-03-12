@@ -1,7 +1,7 @@
 import axiosInstance from "./axiosConfig";
 import Swal from "sweetalert2";
 
-export const openRazorpayModal = ({ key, amount, order_id, navigate,orderId,isWallet=false }) => {
+export const openRazorpayModal = ({ key, amount, order_id, navigate, orderId, isWallet = false }) => {
   const options = {
     key, // Razorpay Key ID
     amount: amount * 100, // Amount in paisa
@@ -11,40 +11,35 @@ export const openRazorpayModal = ({ key, amount, order_id, navigate,orderId,isWa
     order_id, // Razorpay Order ID
     handler: async function (response) {
       console.log("Payment Success:", response);
-      // console.log('orderid',orderId)
       try {
-         // Choose API endpoint based on whether it's a wallet payment or order payment
-         const verifyUrl = isWallet ? `/wallet/user-profile/payment-verify` : `/order/payment-verify`;
-        // Verify the payment on the backend
-        // const verifyResponse = await axiosInstance.post(verifyUrl, {
-        //   razorpay_payment_id: response.razorpay_payment_id,
-        //   razorpay_order_id: response.razorpay_order_id,
-        //   razorpay_signature: response.razorpay_signature,
-        // });
+        const verifyUrl = isWallet ? `/wallet/user-profile/payment-verify` : `/order/payment-verify`;
+        
         // Create request payload dynamically
         const payload = {
           razorpay_payment_id: response.razorpay_payment_id,
           razorpay_order_id: response.razorpay_order_id,
           razorpay_signature: response.razorpay_signature,
         };
-      // Add amount for wallet payments
-      if (isWallet) {
-        payload.amount = amount;
-      }
+        
+        // Add amount for wallet payments
+        if (isWallet) {
+          payload.amount = amount;
+        }
 
-      // Add orderId for order payments
-      if (!isWallet && orderId) {
-        payload.orderId = orderId;
-      }
-       // Verify the payment on the backend
-       const verifyResponse = await axiosInstance.post(verifyUrl, payload);
+        // Add orderId for order payments
+        if (!isWallet && orderId) {
+          payload.orderId = orderId;
+        }
+
+        // Verify the payment on the backend
+        const verifyResponse = await axiosInstance.post(verifyUrl, payload);
 
         if (verifyResponse.data.success) {
           Swal.fire({
             icon: "success",
             title: "Payment Successful",
             text: isWallet ? "Wallet funds added successfully!" : "Your order has been placed successfully!",
-            timer: 3000, // Auto-close after 3 seconds
+            timer: 3000,
             showConfirmButton: false,
           }).then(() => {
             navigate(isWallet ? '/user-profile/wallet' : '/success');
@@ -62,7 +57,6 @@ export const openRazorpayModal = ({ key, amount, order_id, navigate,orderId,isWa
         }
       } catch (error) {
         console.error("Payment verification error:", error);
-      
         Swal.fire({
           icon: "error",
           title: "Payment Verification Failed",
@@ -71,13 +65,12 @@ export const openRazorpayModal = ({ key, amount, order_id, navigate,orderId,isWa
           showConfirmButton: false,
         }).then(() => {
           navigate('/user-profile/orders');
-        });;
+        });
       }
     },
     prefill: {
       name: "Test User",
       email: "testuser@example.com",
-      
     },
     theme: {
       color: "#F37254",
@@ -85,9 +78,9 @@ export const openRazorpayModal = ({ key, amount, order_id, navigate,orderId,isWa
     modal: {
       escape: false,
       ondismiss: async function () {
-        console.log("User closed the Razorpay modal.");
+        console.log("ondismiss triggered");
+
         if (isWallet) {
-          // If it's a wallet payment, don't call the API, just show a message
           Swal.fire({
             icon: "warning",
             title: "Payment Cancelled",
@@ -95,29 +88,103 @@ export const openRazorpayModal = ({ key, amount, order_id, navigate,orderId,isWa
             timer: 3000,
             showConfirmButton: false,
           }).then(() => {
-            navigate('/user-profile/wallet'); // Redirect to wallet page
+            navigate('/user-profile/wallet');
           });
-          return; // Stop further execution
+          return;
         }
+
         try {
-          await axiosInstance.put(`/order/payment-failed`, { orderId });
-          Swal.fire({
-            icon: "warning",
-            title: "Payment Failed",
-            text: " Redirecting to orders.",
-            timer: 3000,
-            showConfirmButton: false,
-          }).then(() => {
-            navigate('/user-profile/orders');
-          });
+          const payload = {
+            razorpay_payment_id: null, // No payment ID since it was dismissed
+            razorpay_order_id: order_id,
+            razorpay_signature: null, // No signature available
+            orderId,
+            failed: true, // Mark as a failed attempt
+          };
+          const verifyResponse =await axiosInstance.post('/order/payment-verify', payload);
+          if (!verifyResponse.data.success) {
+            Swal.fire({
+              icon: "warning",
+              title: "Payment Cancelled",
+              text: "Your closed payment window. Your order was not placed",
+              timer: 3000,
+              showConfirmButton: false,
+            }).then(() => {
+              navigate('/user-profile/orders');
+            });
+          }
         } catch (error) {
           console.error("Error updating payment status:", error);
         }
-        navigate('/user-profile/orders'); // Redirect to orders page
+
+        navigate('/user-profile/orders');
       },
     },
   };
 
+  // Initialize Razorpay instance
   const rzp = new window.Razorpay(options);
+
+  // Handle Payment Failure Event
+  rzp.on("payment.failed", async function (response) {
+    console.log("Payment failed triggered:", response);
+   
+    // Check if the Razorpay instance is still valid before closing
+    if (rzp) {
+      rzp.close(); // Close modal if it's still active
+  }
+
+  // Forcefully remove any lingering Razorpay elements from the DOM
+  document.querySelectorAll('.razorpay-container').forEach(el => el.remove());
+
+    if (isWallet) {
+      Swal.fire({
+        icon: "warning",
+        title: "Payment Cancelled",
+        text: "Your wallet was not credited.",
+        timer: 3000,
+        showConfirmButton: false,
+      }).then(() => {
+        
+        // navigate('/user-profile/wallet');
+        window.location.href='/user-profile/wallet'
+      });
+      return;
+    }
+
+    try {
+      const payload = {
+        razorpay_payment_id: response.error.metadata.payment_id || null,
+        razorpay_order_id: response.error.metadata.order_id || order_id,
+        razorpay_signature: null, // No signature available for failed payments
+        orderId,
+        failed: true, // Mark as a failed attempt
+      };
+  
+
+      await axiosInstance.post('/order/payment-verify', payload);
+
+      Swal.fire({
+        icon: "error",
+        title: "Payment Failed",
+        text: "Your payment was not completed. Redirecting to your orders.",
+        timer: 3000,
+        showConfirmButton: false,
+      }).then(() => {
+      
+        // navigate('/user-profile/orders');
+        window.location.href = "/user-profile/orders";
+      });
+      return
+
+    } catch (error) {
+      console.error("Error handling failed payment:", error);
+      
+    }
+
+    // navigate('/user-profile/orders');
+  });
+
+  // Open Razorpay modal
   rzp.open();
 };

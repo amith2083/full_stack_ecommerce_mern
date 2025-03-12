@@ -164,12 +164,21 @@ export const verifyPayment = asyncHandler(async (req, res) => {
       razorpay_order_id,
       razorpay_signature,
       orderId,
+      failed
     } = req.body;
+    if (failed) {
+      await Order.findByIdAndUpdate(
+        { _id: new mongoose.Types.ObjectId(orderId) },
+        { paymentStatus: "Failed" },
+        { new: true }
+      );
+      return res.json({ success: false, message: "Payment failed" });
+    }
 
-    console.log("Order ID Type:", typeof orderId, "Value:", orderId);
+    // console.log("Order ID Type:", typeof orderId, "Value:", orderId);
 
-    console.log("razorpay_order_id:", razorpay_order_id);
-    console.log("razorpay_payment_id:", razorpay_payment_id);
+    // console.log("razorpay_order_id:", razorpay_order_id);
+    // console.log("razorpay_payment_id:", razorpay_payment_id);
 
     if (
       verifyRazorpayPayment(
@@ -180,7 +189,7 @@ export const verifyPayment = asyncHandler(async (req, res) => {
     ) {
       await Order.findByIdAndUpdate(
         { _id: new mongoose.Types.ObjectId(orderId) },
-        { paymentStatus: "Paid" },{status:"processing"},
+        { paymentStatus: "Paid", status: "processing" },
         { new: true }
       );
       return res.json({
@@ -191,7 +200,7 @@ export const verifyPayment = asyncHandler(async (req, res) => {
     } else {
       await Order.findByIdAndUpdate(
         { _id: new mongoose.Types.ObjectId(orderId) },
-        { paymentStatus: "Failed" },
+        { paymentStatus: "Failes" },
         { new: true }
       );
       return res
@@ -207,22 +216,22 @@ export const verifyPayment = asyncHandler(async (req, res) => {
     });
   }
 });
-export const updatePaymentFailure = asyncHandler(async (req, res) => {
-  const { orderId } = req.body;
+// export const updatePaymentFailure = asyncHandler(async (req, res) => {
+//   const { orderId } = req.body;
 
-  // Find the order and update payment status
-  const order = await Order.findById({
-    _id: new mongoose.Types.ObjectId(orderId),
-  });
-  if (!order) {
-    return res.status(404).json({ message: "Order not found" });
-  }
+//   // Find the order and update payment status
+//   const order = await Order.findById({
+//     _id: new mongoose.Types.ObjectId(orderId),
+//   });
+//   if (!order) {
+//     return res.status(404).json({ message: "Order not found" });
+//   }
 
-  order.paymentStatus = "Failed"; // Update status
-  await order.save();
+//   order.paymentStatus = "Failed"; // Update status
+//   await order.save();
 
-  res.json({ success: true, message: "Payment marked as failed." });
-});
+//   res.json({ success: true, message: "Payment marked as failed." });
+// });
 
 // Retry Payment Handler
 export const retryPayment = async (req, res) => {
@@ -276,11 +285,13 @@ export const retryPayment = async (req, res) => {
 export const getAllorders = asyncHandler(async (req, res) => {
   //find all orders
   const user = await User.findById(req.userAuthId)
+  let orders
   if(user.isAdmin){
-    const orders = await Order.find().populate("user");
+     orders = await Order.find().populate("user");
 
   }else{
-    const orders = await Order.findById(req.userAuthId)
+     orders = await Order.find({user:new mongoose.Types.ObjectId(req.userAuthId)} )
+   
   }
   
   res.json({

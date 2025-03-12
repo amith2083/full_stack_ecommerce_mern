@@ -30,7 +30,7 @@ const Orders = () => {
     return <p className="text-center text-lg text-blue-600 font-semibold">Loading orders...</p>;
   }
 
-  if (!orders || orders.length === 0) {
+  if (!orders?.orders || orders.orders.length === 0) {
     return <p className="text-center text-lg text-red-500 font-semibold">No orders found.</p>;
   }
 
@@ -128,10 +128,10 @@ const Orders = () => {
         <span className="text-lg font-semibold">📄 Page {currentPage}</span>
         
         <button 
-          onClick={() => setCurrentPage((prev) => (indexOfLastOrder < orders.orders.length ? prev + 1 : prev))} 
-          disabled={indexOfLastOrder >= orders.orders.length} 
+          onClick={() => setCurrentPage((prev) => (indexOfLastOrder < orders?.orders?.length ? prev + 1 : prev))} 
+          disabled={indexOfLastOrder >= orders?.orders?.length} 
           className={`px-4 py-2 rounded-lg shadow-lg transition duration-300 ${
-            indexOfLastOrder >= orders.orders.length ? "bg-gray-400 text-gray-700 cursor-not-allowed" : "bg-indigo-600 text-white hover:bg-indigo-700"
+            indexOfLastOrder >= orders?.orders?.length ? "bg-gray-400 text-gray-700 cursor-not-allowed" : "bg-indigo-600 text-white hover:bg-indigo-700"
           }`}
         >
           Next ➡️
