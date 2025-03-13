@@ -200,6 +200,36 @@ export const getProducts = asyncHandler(async (req, res) => {
       price: { $gte: priceRange[0], $lte: priceRange[1] },
     });
   }
+
+ // Sorting
+ if (req.query.sort) {
+  let sortOption = {};
+  
+  switch (req.query.sort) {
+    case "price_asc":
+      sortOption = { price: 1 }; // Ascending price
+      break;
+    case "price_desc":
+      sortOption = { price: -1 }; // Descending price
+      break;
+    case "rating_desc":
+      sortOption = { rating: -1 }; // Highest rated first
+      break;
+    case "popularity":
+      sortOption = { sold: -1 }; // Most sold first
+      break;
+    case "newest":
+      sortOption = { createdAt: -1 }; // Newest first
+      break;
+    default:
+      sortOption = { popularity: -1 }; // Default to popularity
+  }
+
+  productQuery = productQuery.sort(sortOption);
+}
+
+
+
   //pagination
   //page
   const page = parseInt(req.query.page) ? parseInt(req.query.page) : 1;

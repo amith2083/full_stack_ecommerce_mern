@@ -26,11 +26,11 @@ import ErrorMsg from "../../ErrorMsg/ErrorMsg";
 import NoDataFound from "../../NoDataFound/NoDataFound";
 
 const sortOptions = [
-  { name: "Most Popular", href: "#", current: true },
-  { name: "Best Rating", href: "#", current: false },
-  { name: "Newest", href: "#", current: false },
-  { name: "Price: Low to High", href: "#", current: false },
-  { name: "Price: High to Low", href: "#", current: false },
+  { name: "Most Popular", value: "popularity", current: true },
+  { name: "Best Rating", value: "rating", current: false },
+  { name: "Newest", value: "newest", current: false },
+  { name: "Price: Low to High", value: "price_asc", current: false },
+  { name: "Price: High to Low", value: "price_desc", current: false },
 ];
 
 const allPrice = [
@@ -89,6 +89,8 @@ export default function ProductsFilters() {
   const [price, setPrice] = useState("");
   const [brand, setBrand] = useState("");
   const [size, setSize] = useState("");
+//sort
+const [sort, setSort] = useState("popularity"); // Default sort option
 
   //fetching products------------------------------------------------------------------------------------------------
   //build up url
@@ -109,11 +111,13 @@ export default function ProductsFilters() {
   if (color) {
     productUrl = `${productUrl}&color=${color?.name}`;
   }
+  if (sort) productUrl += `&sort=${sort}`;  // Include sort option
+  console.log('sort',sort)
   console.log('brand',brand)
   console.log('color',color)
   useEffect(() => {
     dispatch(fetchProduct({ url: productUrl }));
-  },[dispatch,category,size,brand,price,color]);
+  },[dispatch,category,size,brand,price,color,sort]);
   //get data from store
   const {
     products,loading,error
@@ -361,7 +365,7 @@ export default function ProductsFilters() {
                                     className="h-4 w-4 rounded border-gray-300 cursor-pointer text-indigo-600 focus:ring-indigo-500"
                                   />
                                   <label className="ml-3 min-w-0 flex-1 text-gray-500">
-                                    $ {price?.amount}
+                                     ₹{price?.amount}
                                   </label>
                                 </div>
                               ))}
@@ -515,18 +519,18 @@ export default function ProductsFilters() {
                       {sortOptions.map((option) => (
                         <Menu.Item key={option.name}>
                           {({ active }) => (
-                            <a
-                              href={option.href}
-                              className={classNames(
-                                option.current
-                                  ? "font-medium text-gray-900"
-                                  : "text-gray-500",
-                                active ? "bg-gray-100" : "",
-                                "block px-4 py-2 text-sm"
-                              )}
-                            >
-                              {option.name}
-                            </a>
+                            <button
+                            onClick={() => {
+                              setSort(option.value); // Update sort state
+                            }}
+                            className={classNames(
+                              option.current ? "font-medium text-gray-900" : "text-gray-500",
+                              active ? "bg-gray-100" : "",
+                              "block px-4 py-2 text-sm"
+                            )}
+                          >
+                            {option.name}
+                          </button>
                           )}
                         </Menu.Item>
                       ))}
