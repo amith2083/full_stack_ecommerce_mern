@@ -5,7 +5,7 @@ import { createCoupon, deleteCoupon, getAllCoupons, updateCoupon,getCoupon } fro
 
 const couponRoute= express.Router()
 couponRoute.post('/',isLoggedIn,isAdmin,createCoupon)
-couponRoute.get('/',getAllCoupons)
+couponRoute.get('/', getAllCoupons)
 couponRoute.put('/:id',isLoggedIn,isAdmin,updateCoupon)
 couponRoute.get('/single',getCoupon)
 couponRoute.delete('/:id',isLoggedIn,isAdmin,deleteCoupon)

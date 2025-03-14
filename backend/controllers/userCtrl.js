@@ -142,12 +142,12 @@ export const login = asyncHandler(async(req,res)=>{
 export const googleLogin =asyncHandler(async(req,res)=>{
   try {
     const{code}= req.query;
-    console.log('code',code)
+    
   const googleRes = await oauth2client.getToken(code)
-  console.log(googleRes)
+ 
   oauth2client.setCredentials(googleRes.tokens)
   const userRes = await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`)
-  console.log('userres',userRes)
+ 
 const{email,name,picture}= userRes.data;
 // Check if user exists, else create new user
 let user = await User.findOne({ email });
@@ -217,8 +217,7 @@ export const updateUserShippingAddress = asyncHandler(async (req, res) => {
     const { addressId } = req.params;
     const {...updatedAddress } = req.body
     
-    console.log("Address ID:", addressId);
-    console.log("Updated Address:", updatedAddress);
+    
 
     // Find user and update the specific shipping address
     const user = await User.findOneAndUpdate(
@@ -271,7 +270,7 @@ export const deleteUserShippingAddress = asyncHandler(async (req, res) => {
 export const getUserProfile = asyncHandler(async (req, res) => {
   //find the user
   const user = await User.findById(req.userAuthId)
-  console.log('getuser',user)
+  
   res.json({
     status: "success",
     message: "User profile fetched successfully",

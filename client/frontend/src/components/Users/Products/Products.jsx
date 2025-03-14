@@ -53,38 +53,52 @@ const Products = ({ products }) => {
     <>
       {isAdded && <SuccessMsg message={"Product added to wishlist"} />}
       {isDelete && <SuccessMsg message={"Product deleted from wishlist"}/>}
-      <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:col-span-3 lg:gap-x-8">
-        {products?.map((product) => {
-          const isWishlisted = localWishlist.includes(product._id);
 
-          return (
-            <div key={product._id} className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
-              <div className="relative bg-gray-50">
-                <span className="absolute top-0 left-0 ml-6 mt-6 px-2 py-1 text-xs font-bold font-heading bg-white border-2 border-red-500 rounded-full text-red-500">
-                  -15%
-                </span>
-                <Link className="block" to={`/product/${product?.id}`}>
-                  <img className="w-full h-64 object-cover" src={product?.images[0]} alt={product?.name} />
-                </Link>
-                <div className="px-6 pb-6 mt-8">
-                  <h3 className="mb-2 text-xl font-bold font-heading">{product?.name}</h3>
-                  <p className="text-lg font-bold font-heading text-blue-500">
-                    <span>₹{product?.price}</span>
-                    <span className="text-xs text-gray-500 font-semibold font-heading line-through">₹40.99</span>
-                  </p>
-                  {/* Wishlist Button */}
-                  <button
-  onClick={() => handleWishlistClick(product?._id)}
-  className="absolute top-3 right-3 flex items-center justify-center w-12 h-12 rounded-full transition bg-gray-200 text-gray-600"
->
-  {isWishlisted ? "❤️" : "🤍"}
-</button>
-                </div>
-              </div>
+<div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:col-span-3 lg:gap-x-8">
+  {products?.map((product) => {
+    const isWishlisted = localWishlist.includes(product._id);
+
+    return (
+      <div key={product._id} className="w-full overflow-hidden rounded-lg bg-gray-100 group">
+        <div className="relative bg-white p-4 shadow-md rounded-lg">
+          {/* Discount Badge */}
+          <span className="absolute top-4 left-4 px-2 py-1 text-xs font-bold bg-white border-2 border-red-500 rounded-full text-red-500">
+            -15%
+          </span>
+
+          {/* Image Wrapper */}
+          <Link className="block w-full" to={`/product/${product?.id}`}>
+          <div className="relative w-full max-h-[300px] aspect-[4/5] overflow-hidden rounded-md">
+              <img
+                className="w-full h-full object-contain object-center"
+                src={product?.images[0]}
+                alt={product?.name}
+              />
             </div>
-          );
-        })}
+          </Link>
+
+          {/* Product Details */}
+          <div className="px-4 pb-4 mt-4">
+            <h3 className="mb-2 text-center font-bold">{product?.name}</h3>
+            <p className="text-center font-bold text-blue-500">
+              <span>₹{product?.price}</span>
+              <span className="ml-2 text-sm text-gray-500 line-through">₹40.99</span>
+            </p>
+
+            {/* Wishlist Button */}
+            <button
+              onClick={() => handleWishlistClick(product?._id)}
+              className="absolute top-4 right-4 flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-md hover:bg-gray-200 transition"
+            >
+              {isWishlisted ? "❤️" : "🤍"}
+            </button>
+          </div>
+        </div>
       </div>
+    );
+  })}
+</div>
+
     </>
   );
 };

@@ -1,25 +1,50 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import ErrorComponent from "../../ErrorMsg/ErrorMsg";
 import SuccessMsg from "../../SuccessMsg/SuccessMsg";
 import LoadingComponent from "../../LoadingComp/LoadingComponent";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchSingleCategory, updateCategory } from "../../../redux/slices/category/categorySlices";
+
 
 export default function UpdateCategory() {
+  const { id } = useParams(); // Get category ID from URL
+  const dispatch = useDispatch();
+  const navigate = useNavigate(); 
+  const { category, loading, error,isUpdated } = useSelector((state) => state?.categories);
+  console.log('cat--------------',category)
+  useEffect(() => {
+    dispatch(fetchSingleCategory(id));
+  }, [dispatch, id]);
   //---form data---
   const [formData, setFormData] = useState({
-    name: categoryName,
+    name: ""
   });
+  useEffect(()=>{
+    if(category?.category){
+      setFormData({
+        name:category?.category?.name||''
+      })
+    }
+  },[category])
   //---onChange---
   const handleOnChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  let loading, error, isUpdated, categoryName;
+  // let loading, error, isUpdated, categoryName;
 
   //onSubmit
   const handleOnSubmit = (e) => {
     e.preventDefault();
-  };
+    dispatch(updateCategory({ id, name: formData.name })).then(()=>{
+      dispatch(fetchSingleCategory(id)).then(()=>{
+        navigate('/admin/manage-category')
+      })
+    })
+    
+    };
+  
   return (
     <>
       {error && <ErrorComponent message={error?.message} />}
@@ -75,46 +100,7 @@ export default function UpdateCategory() {
               </div>
             </form>
 
-            <div className="mt-6">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="bg-white px-2 text-gray-500">Or</span>
-                </div>
-              </div>
-
-              <div className="mt-6 grid grid-cols-3 gap-3">
-                <div>
-                  <Link
-                    to="/admin/add-brand"
-                    className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50">
-                    Add Brand
-                  </Link>
-                </div>
-
-                <div>
-                  <div>
-                    <Link
-                      to="/admin/add-color"
-                      className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50">
-                      Add Color
-                    </Link>
-                  </div>
-                </div>
-
-                <div>
-                  <div>
-                    <Link
-                      to="/admin/add-category"
-                      className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50">
-                      Add Category
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
+           
           </div>
         </div>
       </div>

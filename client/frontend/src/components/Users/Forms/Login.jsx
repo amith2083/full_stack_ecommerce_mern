@@ -23,10 +23,21 @@ const Login = () => {
   //---onsubmit handler-------------------------------------------------------------------------
   const onSubmitHandler = async(e) => {
     e.preventDefault();
-    console.log(email,password)
-    await dispatch(loginUserAction({email,password}))
-    await dispatch(getCartItemsFromDatabase());
-    navigate('/')
+  
+    const response=await dispatch(loginUserAction({email,password}))
+    if (response?.payload?.message === "Your account is blocked. Contact support.") {
+      Swal.fire({
+        icon: "error",
+        title: "Account Blocked",
+        text: "Your account has been blocked. Please contact support.",
+        confirmButtonText: "OK",
+      });
+    } else {
+      await dispatch(getCartItemsFromDatabase());
+      navigate("/");
+    }
+    
+    
     
   };
 

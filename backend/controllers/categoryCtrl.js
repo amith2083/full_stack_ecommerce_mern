@@ -43,6 +43,16 @@ export const createCategory = asyncHandler(async (req, res) => {
 
   export const updateCategory = asyncHandler(async (req, res) => {
     const { name } = req.body;
+    
+    // Check if the new category name already exists (excluding the current category)
+    const existingCategory = await Category.findOne({ name });
+
+    if (existingCategory) {
+        return res.status(400).json({
+            status: "error",
+            message: "Category with this name already exists",
+        });
+    }
   
     //update
     const category = await Category.findByIdAndUpdate(

@@ -1,5 +1,6 @@
 import { getTokenFromHeader } from "../utils/getTokenFromHeader.js";
 import { verifyToken } from "../utils/verifyToken.js";
+import User from "../model/User.js";
 
 export const isLoggedIn = async (req, res, next) => {
   //get tokken from header
@@ -16,9 +17,14 @@ export const isLoggedIn = async (req, res, next) => {
     const decodedUser = verifyToken(token);
 
     if (!decodedUser) {
-      throw new Error("Token expired/invalid, please log in again.");
+      // throw new Error("Token expired/invalid, please log in again.");
+      return res.status(401).json()
     }
-
+   // Check if user is blocked
+   const user = await User.findById(decodedUser.id);
+   if (user.isBlocked) {
+    return res.status(403).json();
+  }
     // Attach user ID to the request object
     req.userAuthId = decodedUser.id;
 

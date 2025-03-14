@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getAllUsers, toggleBlockUser } from "../../../redux/slices/users/userSlices";
 import Swal from "sweetalert2";
 
@@ -10,13 +10,16 @@ import Swal from "sweetalert2";
 export default function Customers() {
   
   const dispatch = useDispatch();
+  const { users, loading, error } = useSelector((state) => state?.users);
+  console.log("users", users)
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 5;
 
-  useEffect(() => { 
+  useEffect(() => {  
     dispatch(getAllUsers());
   }, [dispatch]);
 
-  const { users, loading, error } = useSelector((state) => state?.users);
-  console.log("users", users)
+ 
   const handleBlockUnblock = (userId,isBlocked) => {
    
     dispatch(toggleBlockUser(userId))
@@ -35,6 +38,13 @@ export default function Customers() {
     );
      
   };
+    // Pagination Logic
+    const indexOfLastUser = currentPage * usersPerPage;
+    const indexOfFirstUser = indexOfLastUser - usersPerPage;
+    const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+  
+    const totalPages = Math.ceil(users.length / usersPerPage);
+  
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
@@ -85,7 +95,7 @@ export default function Customers() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
-                  {users.map((person) => (
+                  {currentUsers.map((person) => (
                     <tr key={person._id}>
                       <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
                         {person.name}
@@ -100,6 +110,8 @@ export default function Customers() {
                       </td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 lg:pr-8">
                        {/* Block/Unblock Button */}
+                        {/* Hide Block/Unblock Button for Admins */}
+                        {!person.isAdmin && (
                   <button
                    onClick={() => handleBlockUnblock(person._id, person.isBlocked)}
                     className={`px-4 py-2 text-white rounded-md ${
@@ -108,6 +120,7 @@ export default function Customers() {
                   >
                     {person.isBlocked ? "Unblock" : "Block"}
                   </button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -116,6 +129,40 @@ export default function Customers() {
             </div>
           </div>
         </div>
+         {/* Pagination Controls */}
+         <div className="mt-6 flex justify-center">
+  <nav className="inline-flex rounded-md shadow-sm">
+    <button
+      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+      disabled={currentPage === 1}
+      className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50 disabled:opacity-50"
+    >
+      Previous
+    </button>
+
+    {[...Array(totalPages)].map((_, index) => (
+      <button
+        key={index}
+        onClick={() => setCurrentPage(index + 1)}
+        className={`relative inline-flex items-center px-4 py-2 text-sm font-medium border ${
+          currentPage === index + 1
+            ? "bg-indigo-600 text-white"
+            : "bg-white text-gray-700 hover:bg-gray-50"
+        }`}
+      >
+        {index + 1}
+      </button>
+    ))}
+
+    <button
+      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+      disabled={currentPage === totalPages}
+      className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-r-md hover:bg-gray-50 disabled:opacity-50"
+    >
+      Next
+    </button>
+  </nav>
+</div>
       </div>
     </div>
   );

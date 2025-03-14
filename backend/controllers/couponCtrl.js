@@ -48,8 +48,10 @@ export const getAllCoupons = asyncHandler(async (req, res) => {
 
 
 export const getCoupon = asyncHandler(async (req, res) => {
+  console.log(req.query.code)
   const coupon = await Coupon.findOne({ code: req.query.code });
   //check if is not found
+  console.log('.......................................',coupon)
   if (coupon === null) {
     throw new Error("Coupon not found");
   }

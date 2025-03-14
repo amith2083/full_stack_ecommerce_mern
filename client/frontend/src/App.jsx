@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route, Routes,Outlet, useLocation } from "react-router-dom";
+import { BrowserRouter, Route, Routes,Outlet, useLocation, useNavigate } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import AdminDashboard from "./components/Admin/AdminDashboard";
@@ -45,6 +45,8 @@ import Wallet from "./components/Users/userProfile/Wallet";
 import UpdateOrders from "./components/Admin/Orders/UpdateOrders";
 import Customers from "./components/Admin/Customers/Customers";
 import ColorLists from "./components/Admin/Categories/ColorLists";
+import { setNavigate } from "./utils/axiosConfig";
+import { useEffect } from "react";
 
 
 
@@ -62,10 +64,15 @@ const Layout = ({ children }) => {
 };
 
 const App = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setNavigate(navigate); // Set navigate function globally
+  }, [navigate]);
   
   
   return (
-    <BrowserRouter>
+   
     <Layout>
      
       {/* hide navbar if admin */}
@@ -132,7 +139,7 @@ const App = () => {
         <Route path="/customer-profile" element={<AuthRoute><CustomerProfile /></AuthRoute>} />
       </Routes>
       </Layout>
-    </BrowserRouter>
+   
   );
 };
 
