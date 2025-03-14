@@ -1,6 +1,75 @@
 import React from "react";
+import { jsPDF } from "jspdf";
 
 const OrderDetails = ({ order, goBack }) => {
+  const generateInvoice = () => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+  
+    // Title
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("Invoice", pageWidth / 2, 20, { align: "center" });
+  
+    // Order Details
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Order Number: #${order.orderNumber}`, 20, 40);
+    doc.text(`Status: ${order.status}`, 20, 50);
+    doc.text(`Total Price: Rs ${order.totalPrice}`, 20, 60);
+    doc.text(`Payment Status: ${order.paymentStatus}`, 20, 70);
+    doc.text(`Date: ${new Date(order.createdAt).toDateString()}`, 20, 80);
+  
+    // Shipping Address
+    doc.setFont("helvetica", "bold");
+    doc.text("Shipping Address:", 20, 100);
+    doc.setFont("helvetica", "normal");
+    doc.text(`${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`, 20, 110);
+    doc.text(`${order.shippingAddress.address}, ${order.shippingAddress.city}`, 20, 120);
+    doc.text(`Postal Code: ${order.shippingAddress.postalCode}`, 20, 130);
+    if (order.shippingAddress.country) {
+      doc.text(`Country: ${order.shippingAddress.country}`, 20, 140);
+    }
+    doc.text(`Phone: ${order.shippingAddress.phone}`, 20, 150);
+  
+    // Table Headers
+    let y = 170;
+    doc.setFont("helvetica", "bold");
+    doc.text("Ordered Items:", 20, y);
+    y += 10;
+    
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Item", 20, y);
+    doc.text("Qty", 100, y);
+    doc.text("Price", 140, y);
+    doc.text("Total", 180, y);
+    y += 10;
+  
+    doc.setFont("helvetica", "normal");
+    doc.setLineWidth(0.5);
+    doc.line(20, y, pageWidth - 20, y);
+    y += 5;
+  
+    // Ordered Items Data
+    order.orderItems.forEach((item) => {
+      item.items.forEach((product) => {
+        doc.text(product.product.name, 20, y);
+        doc.text(`${product.qty}`, 100, y);
+        doc.text(`Rs ${product.product.price}`, 140, y);
+        doc.text(`Rs ${product.qty * product.product.price}`, 180, y);
+        y += 10;
+      });
+    });
+  
+    // Footer
+    y += 10;
+    doc.setFont("helvetica", "bold");
+    doc.text("Thank you for your purchase!", pageWidth / 2, y, { align: "center" });
+  
+    // Save PDF
+    doc.save(`Invoice_${order.orderNumber}.pdf`);
+  };
   return (
     <div className="p-6 bg-white rounded-lg text-white">
       <h2 className="text-3xl font-bold mb-4 text-center">Order Details</h2>
@@ -11,6 +80,14 @@ const OrderDetails = ({ order, goBack }) => {
       >
         🔙 Back
       </button>
+      {order.status === "delivered" && (
+          <button 
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 ml-2 rounded transition duration-300 ease-in-out"
+           
+         onClick={generateInvoice} >
+            📄 Download Invoice
+          </button>
+        )}
 
       {/* Order Info & Shipping Address Side by Side */}
       <div className="border border-gray-300 p-4 rounded-lg bg-white text-gray-900 shadow-md flex justify-between items-start">
