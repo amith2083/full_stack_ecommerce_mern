@@ -189,9 +189,9 @@ if (!mongoose.Types.ObjectId.isValid(objectIdProductId)) {
 //   await cartItem.save();
  // Calculate the new totalPrice for the item
  const newTotalPrice = product.price * qty;
- const cart = await Cart.findOneAndUpdate(
+ const cartItems = await Cart.findOneAndUpdate(
   { "items.product": objectIdProductId },
-  { $set: { "items.$.qty": qty, "items.$.totalPrice": qty * item.product.price } },
+  { $set: { "items.$.qty": qty, "items.$.totalPrice": newTotalPrice } },
   { new: true }
 ).populate("items.product");
 // const cartItems = await Cart.findOneAndUpdate(

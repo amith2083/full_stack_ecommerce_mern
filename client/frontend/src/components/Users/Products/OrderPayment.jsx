@@ -112,8 +112,8 @@ export default function OrderPayment() {
 
               <div className="border-t pt-4 mt-4">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Taxes</span>
-                  <span className="font-medium">₹0.00</span>
+                  {/* <span className="text-gray-600">Taxes</span>
+                  <span className="font-medium">₹0.00</span> */}
                 </div>
                 <div className="flex justify-between text-lg font-semibold mt-3">
                   <span>Total</span>

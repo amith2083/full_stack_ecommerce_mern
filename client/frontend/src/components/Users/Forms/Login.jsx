@@ -25,13 +25,14 @@ const Login = () => {
     e.preventDefault();
   
     const response=await dispatch(loginUserAction({email,password}))
-    if (response?.payload?.message === "Your account is blocked. Contact support.") {
+    if (response?.error?.message ) {
       Swal.fire({
         icon: "error",
-        title: "Account Blocked",
-        text: "Your account has been blocked. Please contact support.",
+        title: "Login Failed",
+        text: response.error.message,
         confirmButtonText: "OK",
       });
+  
     } else {
       await dispatch(getCartItemsFromDatabase());
       navigate("/");

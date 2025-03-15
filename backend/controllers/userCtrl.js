@@ -123,6 +123,15 @@ export const resendOtp = asyncHandler(async (req, res) => {
 export const login = asyncHandler(async(req,res)=>{
     const{email,password}= req.body
     const userFound = await User.findOne({email});
+     // Check if the email exists
+  if (!userFound) {
+    return res.status(404).json({ message: "Email not found. Please sign up." });
+  }
+    // Validate password
+  const isMatch = await bcrypt.compare(password, userFound.password);
+  if (!isMatch) {
+    return res.status(401).json({ message: "Incorrect password. Try again." });
+  }
      // Check if the user is blocked
   if (userFound.isBlocked) {
     return res.status(403).json({ message: "Your account is blocked. Contact support." });
