@@ -1,3 +1,3 @@
-const baseURL = "http://localhost:7000";
+const baseURL = "https://trendzcart-backend-g2yw.onrender.com";
 
 export default baseURL;
