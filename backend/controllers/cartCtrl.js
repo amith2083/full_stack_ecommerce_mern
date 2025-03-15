@@ -193,7 +193,7 @@ if (!mongoose.Types.ObjectId.isValid(objectIdProductId)) {
   { "items.product": objectIdProductId },
   { $set: { "items.$.qty": qty, "items.$.totalPrice": newTotalPrice } },
   { new: true }
-).populate("items.product");
+);
 // const cartItems = await Cart.findOneAndUpdate(
 //     { "items.product": objectIdProductId }, // Find the cart with the product
 //     {
