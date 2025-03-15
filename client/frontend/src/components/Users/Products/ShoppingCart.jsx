@@ -115,7 +115,28 @@ export default function ShoppingCart() {
                           </div>
 
                           {/* Quantity Selector */}
-                          <select
+                          {/* Quantity Selector */}
+<div className="flex items-center space-x-2">
+  <button
+    onClick={() => changeOrderItemQtyHandler(item?.product._id, Math.max(1, item.qty - 1))}
+    className="px-3 py-1 bg-gray-300 rounded-md hover:bg-gray-400"
+    disabled={item.qty <= 1} // Prevent reducing below 1
+  >
+    -
+  </button>
+  
+  <span className="text-lg font-semibold">{item.qty}</span>
+  
+  <button
+    onClick={() => changeOrderItemQtyHandler(item?.product._id, Math.min(item?.product?.qtyLeft, item.qty + 1))}
+    className="px-3 py-1 bg-gray-300 rounded-md hover:bg-gray-400"
+    disabled={item.qty >= item?.product?.qtyLeft} // Prevent exceeding stock
+  >
+    +
+  </button>
+</div>
+
+                          {/* <select
                             onChange={(e) => changeOrderItemQtyHandler(item?.product._id, e.target.value)}
                             className="rounded-md border border-gray-300 py-1 px-3 text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
                             {[...Array(item?.product?.qtyLeft)?.keys()].map((x) => (
@@ -123,7 +144,7 @@ export default function ShoppingCart() {
                                 {x + 1}
                               </option>
                             ))}
-                          </select>
+                          </select> */}
 
                           {/* Remove Button */}
                           <button

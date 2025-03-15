@@ -166,7 +166,7 @@ const cartItems = await Cart.findOneAndUpdate (
 export const updateCartItem = asyncHandler(async (req, res) => {
   const { productId } = req.params;
   const { qty } = req.body;
-  console.log("Product ID:", productId);
+ 
 // Ensure `productId` is cast to ObjectId
 
   const objectIdProductId = new mongoose.Types.ObjectId(productId);
@@ -184,21 +184,25 @@ if (!mongoose.Types.ObjectId.isValid(objectIdProductId)) {
     res.status(404);
     throw new Error("Product not found");
   }
-console.log('updateproduct',product)
+
 //   cartItem.quantity = quantity;
 //   await cartItem.save();
  // Calculate the new totalPrice for the item
  const newTotalPrice = product.price * qty;
- console.log('new',newTotalPrice)
-const cartItems = await Cart.findOneAndUpdate(
-    { "items.product": objectIdProductId }, // Find the cart with the product
-    {
-      $set: { "items.$.qty": qty }, // Update the quantity for the matched product
-      "items.$.totalPrice": newTotalPrice, // Update the totalPrice for the item
-    },
-    { new: true } // Return the updated cart document
-  );
-  console.log('cartitems',cartItems)
+ const cart = await Cart.findOneAndUpdate(
+  { "items.product": objectIdProductId },
+  { $set: { "items.$.qty": qty, "items.$.totalPrice": qty * item.product.price } },
+  { new: true }
+).populate("items.product");
+// const cartItems = await Cart.findOneAndUpdate(
+//     { "items.product": objectIdProductId }, // Find the cart with the product
+//     {
+//       $set: { "items.$.qty": qty }, // Update the quantity for the matched product
+//       "items.$.totalPrice": newTotalPrice, // Update the totalPrice for the item
+//     },
+//     { new: true } // Return the updated cart document
+//   );
+
   if (!cartItems) {
     throw new Error("Cart  not found");
   }

@@ -58,7 +58,7 @@ const RegisterForm = () => {
       console.log('auth',authResult)
     if(authResult?.code){
       const response= await axios.get(
-          `http://localhost:7000/user/google/callback?code=${authResult.code}`,
+          `https://trendzcart-backend-g2yw.onrender.com/user/google/callback?code=${authResult.code}`,
           { withCredentials: true })
           console.log('res4',response)
           console.log(response?.data)
