@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import OrderDetails from "./OrderDetails";
+import OrderDetails from "./OrderDetail";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrders, retryPayment } from "../../../redux/slices/order/orderSlices";
 import { useNavigate } from "react-router-dom";
