@@ -39,7 +39,7 @@ import ProfilePage from "./components/Users/userProfile/ProfilePage";
 import Orders from "./components/Users/userProfile/Orders";
 import ProductUpdate from "./components/Admin/Products/ProductUpdate";
 import OtpVerification from "./components/Users/Forms/OtpVerification";
-import ShippingAddressDetails from "./components/Users/userProfile/shippingAddressDetails";
+import ShippingAddressDetails from "./components/Users/userProfile/ShippingAddressDetails";
 import WishList from "./components/Users/Products/WishList";
 import Wallet from "./components/Users/userProfile/Wallet";
 import UpdateOrders from "./components/Admin/Orders/UpdateOrders";
