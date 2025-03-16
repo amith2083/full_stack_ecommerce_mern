@@ -47,13 +47,7 @@ const Login = () => {
   
   );
 
-  //redirect
- 
-  // if (userInfo?.userFound?.isAdmin) {
-  //   window.location.href = "/admin";
-  // }else{
-  //   window.location.href = "/customer-profile";
-  // }
+  
   
   return (
     <>
@@ -84,7 +78,7 @@ const Login = () => {
                         onChange={onChangeHandler}
                         className="p-5 w-full border border-gray-200 focus:ring-blue-300 focus:border-blue-300 rounded-md"
                         type="email"
-                      />
+                      required />
                     </label>
                   </div>
                   <div className="w-full md:w-1/2 px-4 mb-12">
@@ -98,7 +92,7 @@ const Login = () => {
                         onChange={onChangeHandler}
                         className="p-5 w-full border border-gray-200 focus:ring-blue-300 focus:border-blue-300 rounded-md"
                         type="password"
-                      />
+                      required/>
                     </label>
                   </div>
 

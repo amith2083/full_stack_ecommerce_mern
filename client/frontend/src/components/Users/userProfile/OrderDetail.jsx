@@ -117,18 +117,18 @@ const OrderDetails = ({ order, goBack }) => {
       <div className="mt-4 grid gap-4">
         {order.orderItems.map((item) =>
           item.items.map((product, idx) => (
-            <div key={idx} className="flex items-center bg-orange-700 p-4 rounded-lg shadow-md transition transform hover:scale-105 duration-300 ease-in-out">
+            <div key={idx} className="flex items-center bg-blue-100 p-4 rounded-lg shadow-md transition transform hover:scale-105 duration-300 ease-in-out">
               <img
                 src={product.product.images.length > 0 ? product.product.images[0] : "https://via.placeholder.com/100"}
                 alt={product.product.name}
                 className="w-16 h-16 rounded-full mr-4 border-2 border-white"
               />
               <div>
-                <h4 className="text-lg font-bold text-white">{product.product.name}</h4>
-                <p className="text-white">💰 Price: <span className="font-semibold">Rs {product.product.price}</span></p>
-                <p className="text-white">🔢 Quantity: <span className="font-semibold">{product.qty}</span></p>
-                <p className="text-white">🎨 Color: <span className="font-semibold">{product.color}</span></p>
-                <p className="text-white">📏 Size: <span className="font-semibold">{product.size}</span></p>
+              <h4 className="text-lg font-bold text-gray-800">{product.product.name}</h4>
+    <p className="text-gray-700">💰 Price: <span className="font-semibold">Rs {product.product.price}</span></p>
+    <p className="text-gray-700">🔢 Quantity: <span className="font-semibold">{product.qty}</span></p>
+    <p className="text-gray-700">🎨 Color: <span className="font-semibold">{product.color}</span></p>
+    <p className="text-gray-700">📏 Size: <span className="font-semibold">{product.size}</span></p>
               </div>
             </div>
           ))

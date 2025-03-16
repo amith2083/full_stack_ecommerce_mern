@@ -28,11 +28,7 @@ export default function WishList() {
     dispatch(removeFromWishlist(productId));
   };
 
-//   const handleRemove = (productId) => {
-   
-//     dispatch(removeFromWishlist(productId));
-//     return dispatch(fetchWishlist())
-//   };
+
 
   return (
     <>

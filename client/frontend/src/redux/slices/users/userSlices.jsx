@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import Cookies from "js-cookie";
 import axios from "axios";
-// import baseURL from '../../../utils/baseURL';
 import axiosInstance from "../../../utils/axiosConfig";
 import { resetError, resetSuccess } from "../../resetError/resetError";
 import { CornerDownLeft } from "lucide-react";
@@ -17,7 +16,7 @@ const initialState = {
     userInfo: {},
   },
   updated: false,
-  isdelete: false,
+  isDelete: false,
 };
 export const registerUserAction = createAsyncThunk(
   "user/register",
@@ -79,25 +78,16 @@ export const loginUserAction = createAsyncThunk(
     try {
       console.log("Login Payload:", { email, password });
       const token = getState()?.users?.userAuth?.userInfo?.token;
-      console.log("token", token);
-      //         const token = getState()?.users?.userAuth?.userInfo?.token;
-      //   console.log("Token from Redux state:", token); // Debugging log
-      //   const config = {
-      //     headers: {
-      //       Authorization: `Bearer ${token}`,
-      //       "Content-Type": "multipart/form-data",
-      //     },
-      //   };
+    
+     
       const response = await axiosInstance.post(`/user/login`, {
         email,
         password,
       });
-      console.log(response.data);
-      // Store user info in cookies
+    
 
       Cookies.set("user", JSON.stringify(response.data), { expires: 7 });
-      // Store the token in cookies
-      //   Cookies.set('token', response.data.token, { expires: 7 }); // Expires in 7 days
+   
       return response.data;
     } catch (error) {
       console.log(error);
@@ -285,7 +275,7 @@ const userSlice = createSlice({
     builder.addCase(deleteUserShippingAddress.fulfilled, (state, action) => {
       state.profile = action.payload;
       state.loading = false;
-      state.isdelete = true;
+      state.isDelete = true;
     });
     builder.addCase(deleteUserShippingAddress.rejected, (state, action) => {
       state.error = action.payload;
@@ -334,7 +324,7 @@ const userSlice = createSlice({
     });
     builder.addCase(resetSuccess.pending, (state) => {
       state.updated = false;
-      state.isdelete = false;
+      state.isDelete = false;
     });
   },
 });

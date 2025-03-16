@@ -18,18 +18,27 @@ export default function OrderPayment() {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const sumOfTotalPrice = location.state;
   const [selectedPayment, setSelectedPayment] = useState("razorpay");
+  
+
+  const { loading, error, profile } = useSelector((state) => state?.users);
+  const user = profile?.user?.shippingAddress;
+  const shippingAddresses = profile?.user?.shippingAddress || [];
 
   useEffect(() => {
     dispatch(getCartItemsFromDatabase());
   }, [dispatch]);
+  useEffect(() => {
+    if (shippingAddresses.length > 0 && !selectedAddress) {
+      setSelectedAddress(shippingAddresses[0]); // Use state setter
+    }
+  }, [shippingAddresses]);
   const { cartItems } = useSelector((state) => state?.carts);
   //---get cart items from store---
 
-  console.log("selected", selectedAddress);
+  // console.log("selected", selectedAddress);
   const calculateTotalDiscountedPrice = () => {};
 
-  const { loading, error, profile } = useSelector((state) => state?.users);
-  const user = profile?.user?.shippingAddress;
+
   useEffect(() => {
     dispatch(getUser());
   }, [dispatch]);
@@ -61,17 +70,23 @@ export default function OrderPayment() {
               <h2 className="text-xl font-semibold text-gray-900 mb-4">
                 Shipping Address
               </h2>
-              <button
+              {shippingAddresses.length > 0 && (
+             
+             <button
                 onClick={() => setIsModalOpen(true)}
                 className="w-35 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
               >
                 Select Shipping Address
               </button>
+              )}
               <ShippingAddressModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSelectAddress={setSelectedAddress}
               />
+              
+            
+
               <AddShippingAddress selectedAddress={selectedAddress} />
             </div>
 

@@ -6,19 +6,17 @@ const ShippingAddressModal = ({ isOpen, onClose, onSelectAddress }) => {
   const dispatch = useDispatch()
   const { profile } = useSelector((state) => state?.users);
   const shippingAddresses = profile?.user?.shippingAddress || [];
-  console.log('shipp',shippingAddresses)
+
 
   const [selectedAddress, setSelectedAddress] = useState(null);
-  console.log('selected',selectedAddress)
+
 
   const handleSelect = (address) => {
     setSelectedAddress(address);
     onSelectAddress(address); // Pass selected address to parent
     onClose(); // Close modal after selecting
   };
-// useEffect(()=>{
-//   dispatch(getUser())
-// },[dispatch])
+
   if (!isOpen) return null;
 
   return (

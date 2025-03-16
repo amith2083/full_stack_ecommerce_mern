@@ -42,7 +42,7 @@ const Wallet = () => {
     <div className="p-6 bg-white min-h-screen text-gray-800">
       <h2 className="text-3xl font-bold text-center mb-6">💰 Wallet</h2>
 
-      <div className="bg-green-100 p-6 rounded-lg shadow-lg text-center mb-6">
+      <div className="bg-blue-100 p-6 rounded-lg shadow-lg text-center mb-6">
         <h3 className="text-2xl font-semibold">Current Balance</h3>
         <p className="text-4xl font-bold text-green-600">Rs {wallet?.amount || 0}</p>
       </div>

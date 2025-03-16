@@ -7,7 +7,7 @@ import Modal from "react-modal";
 
 const ShippingAddressDetails = () => {
   const dispatch = useDispatch();
-  const { profile,updated ,isdelete} = useSelector((state) => state?.users);
+  const { profile,updated ,isDelete} = useSelector((state) => state?.users);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
 
@@ -31,9 +31,7 @@ const ShippingAddressDetails = () => {
     closeModal();
   };
   const handleDelete = (addressId) => {
-    // if (window.confirm("Are you sure you want to delete this address?")) {
-    //   dispatch(deleteUserShippingAddress({  addressId }));
-    // }
+  
     Swal.fire({
         title: "Are you sure?",
         text: "You won't be able to revert this!",
@@ -63,7 +61,7 @@ const ShippingAddressDetails = () => {
       "
         />
       )}
-       {isdelete && (
+       {isDelete && (
         <SuccessMsg
           message="
        Address deleted successfuly

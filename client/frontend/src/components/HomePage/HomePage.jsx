@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom";
 import HomeCategories from "./HomeCategories";
 import HomeProductTrending from "./HomeProductTrending";
+import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin, CreditCard } from "lucide-react";
+
 
 const offers = [
   {
     name: "Download the app",
-    description: "Get an exclusive $5 off code",
+    description: "Get an exclusive ₹5 off code",
     href: "#",
   },
   {
@@ -162,41 +164,67 @@ export default function Example() {
         <HomeProductTrending />
 
         {/* info */}
-        <section
-          aria-labelledby="perks-heading"
-          className="border-t border-gray-200 bg-gray-50">
-          <h2 id="perks-heading" className="sr-only">
-            Our perks
-          </h2>
-
-          <div className="mx-auto max-w-7xl py-24 px-4 sm:px-6 sm:py-32 lg:px-8">
-            <div className="grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-0">
-              {perks.map((perk) => (
-                <div
-                  key={perk.name}
-                  className="text-center md:flex md:items-start md:text-left lg:block lg:text-center">
-                  <div className="md:flex-shrink-0">
-                    <div className="flow-root">
-                      <img
-                        className="-my-1 mx-auto h-24 w-auto"
-                        src={perk.imageUrl}
-                        alt=""
-                      />
-                    </div>
-                  </div>
-                  <div className="mt-6 md:mt-0 md:ml-4 lg:mt-6 lg:ml-0">
-                    <h3 className="text-base font-medium text-gray-900">
-                      {perk.name}
-                    </h3>
-                    <p className="mt-3 text-sm text-gray-500">
-                      {perk.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+        <footer className="bg-gray-900 text-white py-12">
+      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
+        {/* Social Media */}
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Follow Us</h3>
+          <div className="flex space-x-4">
+            <a href="#" className="hover:text-gray-400"><Facebook size={24} /></a>
+            <a href="#" className="hover:text-gray-400"><Instagram size={24} /></a>
+            <a href="#" className="hover:text-gray-400"><Twitter size={24} /></a>
+            <a href="#" className="hover:text-gray-400"><Youtube size={24} /></a>
           </div>
-        </section>
+        </div>
+
+        {/* Quick Links */}
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+          <ul className="space-y-2">
+            <li><a href="#" className="hover:text-gray-400">About Us</a></li>
+            <li><a href="#" className="hover:text-gray-400">Contact</a></li>
+            <li><a href="#" className="hover:text-gray-400">FAQ</a></li>
+            <li><a href="#" className="hover:text-gray-400">Terms & Conditions</a></li>
+          </ul>
+        </div>
+
+        {/* Newsletter Subscription */}
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Subscribe to Our Newsletter</h3>
+          <p className="text-sm text-gray-400 mb-3">Get updates on sales, new products, and promotions.</p>
+          <div className="flex">
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="p-2 w-full text-black rounded-l-md"
+            />
+            <button className="bg-indigo-600 px-4 py-2 rounded-r-md hover:bg-indigo-500">
+              Subscribe
+            </button>
+          </div>
+        </div>
+
+        {/* Customer Support */}
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Customer Support</h3>
+          <p className="flex items-center space-x-2"><Phone size={20} /> <span>+1 234 567 890</span></p>
+          <p className="flex items-center space-x-2 mt-2"><Mail size={20} /> <span>amith143.km143@gmail.com</span></p>
+          <p className="flex items-center space-x-2 mt-2"><MapPin size={20} /> <span>123 cheruthuruthy Street, Thrissur</span></p>
+        </div>
+      </div>
+
+      {/* Payment Methods */}
+      <div className="mt-8 text-center border-t border-gray-700 pt-6">
+        <h3 className="text-lg font-semibold mb-2">We Accept</h3>
+        <div className="flex justify-center space-x-4">
+        <i className="fa-brands fa-cc-visa"></i>
+<i className="fa-brands fa-cc-mastercard"></i>
+<i className="fa-brands fa-cc-paypal"></i>
+
+        </div>
+        <p className="text-sm text-gray-400 mt-4">&copy; 2025 TRENDZCART. All rights reserved.</p>
+      </div>
+    </footer>
       </main>
     </div>
   );

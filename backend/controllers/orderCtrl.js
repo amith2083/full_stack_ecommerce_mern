@@ -67,12 +67,13 @@ export const getOrderStats = asyncHandler(async (req, res) => {
 
 export const createOrder = asyncHandler(async (req, res) => {
   const { orderItems, shippingAddress, totalPrice, paymentMethod } = req.body;
-  console.log(req.body);
+
   //Find the user
   const user = await User.findById(req.userAuthId);
   //Check if user has shipping address
-  if (!user?.hasShippingAddress) {
-    throw new Error("Please provide shipping address");
+  if (!shippingAddress) {
+    return res.status(400).json({ success: false, message: "Please provide shipping address" });
+
   }
   // Restrict COD for orders above ₹1000
   if (paymentMethod === "cod" && totalPrice > 1000) {
