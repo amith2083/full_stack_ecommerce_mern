@@ -83,7 +83,7 @@ dispatch(updateCoupon({id:coupon?.coupon?._id,
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   {/* name */}
-                  Name
+                 coupon code
                 </label>
                 <div className="mt-1">
                   <input

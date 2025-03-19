@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Offer from "./Offer.js";
 const Schema = mongoose.Schema;
 const ProductSchema = new Schema(
   {
@@ -63,7 +64,7 @@ const ProductSchema = new Schema(
     salesPrice: {
       type: Number,
       default: function () {
-        return this.normalPrice; // Set salesPrice equal to regularPrice by default
+        return this.price; // Set salesPrice equal to regularPrice by default
       },
     },
     totalQty: {
@@ -84,12 +85,12 @@ const ProductSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    // offers: [
-    //   {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Offer",
-    //   },
-    // ],
+    offers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Offer",
+      },
+    ],
   },
   {
     timestamps: true,

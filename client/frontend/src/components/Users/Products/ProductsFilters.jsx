@@ -34,30 +34,26 @@ const sortOptions = [
 ];
 
 const allPrice = [
+ 
   {
-    amount: "0 - 50",
+    amount: "100 - 500",
   },
   {
-    amount: "50 - 100",
+    amount: "500 - 1000",
   },
   {
-    amount: "100 - 150",
+    amount: "1000 - 1500",
   },
   {
-    amount: "150 - 200",
+    amount: "1500 - 2000",
   },
   {
-    amount: "200 - 250",
+    amount: "2000 - 3000",
   },
   {
-    amount: "250 - 300",
+    amount: "3000 - 3500",
   },
-  {
-    amount: "300 - 350",
-  },
-  {
-    amount: "350 - 400",
-  },
+ 
 ];
 
 function classNames(...classes) {
@@ -147,11 +143,7 @@ const [sort, setSort] = useState("popularity"); // Default sort option
   let colorsLoading;
   let colorsError;
  
-  // let setPrice;
- 
-  // let setSize;
-  // let setColor;
-  // let setBrand;
+  
   let productsLoading;
   let productsError;
 
@@ -669,7 +661,7 @@ const [sort, setSort] = useState("popularity"); // Default sort option
                                 className="h-4 w-4 rounded border-gray-300 cursor-pointer text-indigo-600 focus:ring-indigo-500"
                               />
                               <label className="ml-3 min-w-0 flex-1 text-gray-500">
-                                $ {price?.amount}
+                                ₹ {price?.amount}
                               </label>
                             </div>
                           ))}

@@ -4,26 +4,27 @@ import ErrorMsg from "../../ErrorMsg/ErrorMsg";
 import LoadingComponent from "../../LoadingComp/LoadingComponent";
 import NoDataFound from "../../NoDataFound/NoDataFound";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteCoupon, fetchCoupons } from "../../../redux/slices/coupon/couponSlices";
+
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-export default function ManageCoupons() {
+import { fetchOffers } from "../../../redux/slices/offers/OfferSlices";
+export default function ManageOffers() {
   const dispatch  = useDispatch()
   const{id}= useParams()
   const [currentPage, setCurrentPage] = useState(1); 
   const itemsPerPage = 5; 
   
   useEffect(()=>{
-    dispatch(fetchCoupons())
+    dispatch(fetchOffers())
 
   },[dispatch])
   //get coupons
-  const { coupons, loading, error } = useSelector((state)=>state?.coupons)
+  const { offers, loading, error } = useSelector((state)=>state?.offers)
  
 
   //---deleteHandler---
 
-  const deleteCouponHandler = (id) => {
+  const blockUnblockHandler = (id) => {
     Swal.fire({
       title: "Are you sure?",
       text: "This coupon will be permanently deleted!",
@@ -38,16 +39,16 @@ export default function ManageCoupons() {
           .unwrap()
           .then(() => {
             Swal.fire("Deleted!", "The coupon has been deleted.");
-            dispatch(fetchCoupons()); // Refresh coupon list after deletion
+            dispatch(fetchOffers()); // Refresh coupon list after deletion
           });
       }
     });
   };
   // Pagination 
-  const totalCoupons = coupons?.coupons?.length || 0;
-  const totalPages = Math.ceil(totalCoupons / itemsPerPage);
+  const totalOffers = offers?.offers?.length || 0;
+  const totalPages = Math.ceil(totalOffers / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentCoupons = coupons?.coupons?.slice(startIndex, startIndex + itemsPerPage);
+  const currentOffers = offers?.offers?.slice(startIndex, startIndex + itemsPerPage);
 
 
   return (
@@ -55,13 +56,13 @@ export default function ManageCoupons() {
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
           <h1 className="text-xl font-semibold text-gray-900">
-            Manage Coupons - [{totalCoupons}]
+            Manage offers - [{totalOffers}]
           </h1>
           <p className="mt-2 text-sm text-gray-700">
-            List of all coupons
+            List of all offers
           </p>
         </div>
-        
+       
       </div>
       {loading ? (
         <LoadingComponent />
@@ -69,7 +70,7 @@ export default function ManageCoupons() {
         <ErrorMsg
           message={error?.message || "Something went wrong, please try again"}
         />
-      ) : coupons?.coupons?.length <= 0 ? (
+      ) : offers?.offers?.length <= 0 ? (
         <NoDataFound />
       ) : (
         <>
@@ -83,12 +84,12 @@ export default function ManageCoupons() {
                         <th
                           scope="col"
                           className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
-                          Code
+                          offer Code
                         </th>
                         <th
                           scope="col"
                           className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                          Percentage (%)
+                          Discount (%)
                         </th>
                         <th
                           scope="col"
@@ -108,7 +109,7 @@ export default function ManageCoupons() {
                         <th
                           scope="col"
                           className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                        Days Left
+                        Applicable To
                         </th>
                         <th
                           scope="col"
@@ -118,16 +119,16 @@ export default function ManageCoupons() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 bg-white">
-                      {currentCoupons?.map((coupon) => (
-                        <tr key={coupon._id}>
+                      {currentOffers?.map((offer) => (
+                        <tr key={offer?._id}>
                           <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                            {coupon?.code}
+                            {offer?.code}
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {coupon?.discount}
+                            {offer?.offerValue}
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {coupon?.isExpired ? (
+                            {offer?.isExpired ? (
                               <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-700 text-gray-300">
                                 Expired
                               </span>
@@ -138,26 +139,30 @@ export default function ManageCoupons() {
                             )}
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {new Date(coupon.startDate)?.toLocaleDateString()}
+                            {new Date(offer.startDate)?.toLocaleDateString()}
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {new Date(coupon.endDate)?.toLocaleDateString()}
+                            {new Date(offer.endDate)?.toLocaleDateString()}
                           </td>
 
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            {coupon?.daysLeft}
+                          {offer.applicableToProduct
+        ? offer.applicableToProduct.name
+        : offer.applicableToCategory
+        ? offer.applicableToCategory.name
+        : "Not applicable"}
                           </td>
                           {/* edit icon */}
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             <Link
-                              to={`/admin/manage-coupon/edit/${coupon.code}`}>
+                              to={`/admin/manage-offer/edit/${offer.code}`}>
                               ✏️
                             </Link>
                           </td>
                           {/* delete */}
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             <button
-                              onClick={() => deleteCouponHandler(coupon?._id)}>
+                              onClick={() => blockUnblockHandlerHandler(offer?._id)}>
                              🗑️
                             </button>
                           </td>

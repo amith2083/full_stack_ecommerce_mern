@@ -1,10 +1,10 @@
 import asyncHandler from "express-async-handler";
 import Coupon from "../model/Coupon.js";
-import moment  from "moment";
+// import moment  from "moment";
 
 export const createCoupon = asyncHandler(async (req, res) => {
   const { code, startDate, endDate, discount } = req.body;
-  console.log(req.body);
+ 
    // Parse dates
   //  const parsedStartDate = moment(startDate, "DD-MM-YYYY").toDate();
   //  const parsedEndDate = moment(endDate, "DD-MM-YYYY").toDate();
@@ -48,10 +48,10 @@ export const getAllCoupons = asyncHandler(async (req, res) => {
 
 
 export const getCoupon = asyncHandler(async (req, res) => {
-  console.log(req.query.code)
+ 
   const coupon = await Coupon.findOne({ code: req.query.code });
   //check if is not found
-  console.log('.......................................',coupon)
+ 
   if (coupon === null) {
     throw new Error("Coupon not found");
   }

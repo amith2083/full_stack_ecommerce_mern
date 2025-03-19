@@ -11,29 +11,7 @@ import oauth2client from "../utils/googleConfig.js";
 import axios from 'axios'
 import mongoose from "mongoose";
 
-// export const register = asyncHandler(async (req, res) => {
-//     const { name, email, password } = req.body;
-//     const userExists = await User.findOne({ email });
-//     if (userExists) {
-//     throw new Error ("user already exists");
-//     }
-//     const salt = await bcrypt.genSalt(10)
-//     const hashedPassword = await  bcrypt.hash(password,salt)
-  
-//     const user = await User.create({
-//       name,
-//       email,
-//       password:hashedPassword,
-//     });
-//     res
-//       .status(201)
-//       .json({
-//         status: "success",
-//         msg: "user registered successfully",
-//         data: user,
-      
-//       });
-//   })
+
 
 export const register = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
@@ -64,7 +42,7 @@ export const register = asyncHandler(async (req, res) => {
 });
 export const verifyOtp = asyncHandler(async (req, res) => {
   const { email, otp } = req.body;
-  console.log('verify',email,otp)
+
 
   const storedOtp = await OTP.findOne({ email, otp });
   console.log('storedotp',storedOtp)
@@ -221,7 +199,7 @@ export const updateShippingAddress = asyncHandler(async (req, res) => {
 
 export const updateUserShippingAddress = asyncHandler(async (req, res) => {
   try {
-    console.log("Received request body:", req.body);
+  
 
     const { addressId } = req.params;
     const {...updatedAddress } = req.body
@@ -257,7 +235,7 @@ export const updateUserShippingAddress = asyncHandler(async (req, res) => {
 export const deleteUserShippingAddress = asyncHandler(async (req, res) => {
   try {
     const {  addressId } = req.params;
-    console.log("Deleting address:",  addressId);
+
 
     // Find the user and update the shipping address array
     const user = await User.findByIdAndUpdate(
@@ -300,9 +278,9 @@ export const getAllUsers = asyncHandler(async (req, res) => {
 export const blockUnblockUser = asyncHandler(async(req,res)=>{
   try {
     const { userId } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      console.log('wrong id......................................................................................')
-    }
+    // if (!mongoose.Types.ObjectId.isValid(userId)) {
+  
+    // }
 
     // Find the user
     const user = await User.findById(userId);
@@ -320,13 +298,3 @@ export const blockUnblockUser = asyncHandler(async(req,res)=>{
     res.status(500).json({ message: "Something went wrong", error: error.message });
   }
 })
-// export const profilePage =asyncHandler(async(req,res)=>{
- 
-//     // res.status(200).json({msg:'profile page'})
-    
-//   res.json({
-//     status: "success",
-//     message: "User profile fetched successfully",
-//     user,
-//   });
-// })

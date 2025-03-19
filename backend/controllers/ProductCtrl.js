@@ -2,6 +2,7 @@ import Product from "../model/Product.js";
 import Brand from "../model/Brand.js";
 import Category from "../model/Category.js";
 import asyncHandler from "express-async-handler";
+import { calculateAndUpdateSalesPrice } from "../utils/offerHelper.js";
 
 export const createProduct = asyncHandler(async (req, res) => {
   try {
@@ -15,9 +16,7 @@ export const createProduct = asyncHandler(async (req, res) => {
       price,
       totalQty,
     } = req.body;
-    console.log("Request Body:", req.body);
-    console.log("Uploaded files:", req.files);
-    console.log(req.body.brand);
+   
     const productExists = await Product.findOne({ name });
 
     if (productExists) {
@@ -25,12 +24,12 @@ export const createProduct = asyncHandler(async (req, res) => {
     }
     //create product
     const convertedImages = req.files.map((file) => file.path);
-    console.log(convertedImages);
+    
     //find the brand
     const brandFound = await Brand.findOne({
       name:brand,
     });
-    console.log(brandFound);
+    
 
     if (!brandFound) {
       throw new Error(
@@ -153,8 +152,8 @@ export const createProduct = asyncHandler(async (req, res) => {
 // });
 
 export const getProducts = asyncHandler(async (req, res) => {
-  console.log(req.query);
-  //query
+  
+  
   let productQuery = Product.find();
 
   //search by name
@@ -258,9 +257,16 @@ export const getProducts = asyncHandler(async (req, res) => {
       limit,
     };
   }
-
+  
   //await the query
   const products = await productQuery.populate("reviews");
+   // Update `salesPrice` for each product with an offer
+   for (const product of products) {
+   
+    const updatedSalesPrice = await calculateAndUpdateSalesPrice(product._id);
+    console.log('..............',updatedSalesPrice)
+    product.salesPrice = updatedSalesPrice;
+  }
   res.json({
     status: "success",
     total,
@@ -296,9 +302,8 @@ export const updateProduct = asyncHandler(async (req, res) => {
     removedImages = [], // Get removed images array from frontend
 
   } = req.body;
-  console.log('removedimages',removedImages)
-  //validation
- // Handle File Upload (if needed)
+ 
+
   // Find the existing product to preserve old images if none are uploaded
   const existingProduct = await Product.findById(req.params.id);
    // Remove images that the user deleted

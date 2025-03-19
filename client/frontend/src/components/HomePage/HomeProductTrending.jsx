@@ -32,7 +32,7 @@ const HomeProductTrending = () => {
           <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-4 md:gap-y-0 lg:gap-x-8">
             {products?.slice(0, 8).map((product) => (
               <Link
-                to={`/products/${product._id}`}
+                to={`/product/${product._id}`}
                 key={product._id}
                 className="group relative">
                 <div className=" h-56 w-full overflow-hidden rounded-md group-hover:opacity-75 lg:h-72 xl:h-80">

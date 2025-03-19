@@ -6,8 +6,8 @@ import axiosInstance from "../../../utils/axiosConfig";
 import { resetError, resetSuccess } from "../../resetError/resetError";
 //initalsState
 const initialState = {
-  coupons: [],
-  coupon: null,
+  offers: [],
+  offer: null,
   loading: false,
   error: null,
   isAdded: false,
@@ -15,21 +15,39 @@ const initialState = {
   isDelete: false,
 };
 
-//create coupon---------------------------------------------------------------------------------------------------------
-export const createCoupon = createAsyncThunk(
-  "/coupon/create",
+//create offer---------------------------------------------------------------------------------------------------------
+export const createOffer = createAsyncThunk(
+  "/offer/create",
   async (
-    { code, discount, startDate, endDate },
+    {
+      code,
+      offerType,
+      offerValue,
+      startDate,
+      endDate,
+      description,
+      applicableTo,
+      applicableToProduct,
+      applicableToCategory,
+      usageLimit,
+    },
     { rejectWithValue, getState, dispatch }
   ) => {
+   
     try {
-      // const { name } = payload;
+     
 
-      const response = await axiosInstance.post(`/coupon`, {
+      const response = await axiosInstance.post(`/offer`, {
         code,
-        discount,
+        offerType,
+        offerValue,
         startDate,
         endDate,
+        description,
+        applicableTo,
+        applicableToProduct,
+        applicableToCategory,
+        usageLimit,
       });
       return response.data;
     } catch (error) {
@@ -39,12 +57,12 @@ export const createCoupon = createAsyncThunk(
     }
   }
 );
-//fetch coupons--------------------------------------------------------------------------------------------------------------------
-export const fetchCoupons = createAsyncThunk(
-  "/coupons/fetch",
+//fetch offers--------------------------------------------------------------------------------------------------------------------
+export const fetchOffers = createAsyncThunk(
+  "/offers/fetch",
   async (payload, { rejectWithValue, getState, dispatch }) => {
     try {
-      const response = await axiosInstance.get(`/coupon`);
+      const response = await axiosInstance.get(`/offer`);
       return response.data;
     } catch (error) {
       console.log(error);
@@ -53,12 +71,12 @@ export const fetchCoupons = createAsyncThunk(
     }
   }
 );
-//fetch single coupon--------------------------------------------------------------------------------------------------------------------
-export const fetchCoupon = createAsyncThunk(
-  "/coupon/fetch",
+//fetch single offer--------------------------------------------------------------------------------------------------------------------
+export const fetchOffer = createAsyncThunk(
+  "/offer/fetch",
   async (code, { rejectWithValue, getState, dispatch }) => {
     try {
-      const response = await axiosInstance.get(`/coupon/single?code=${code}`);
+      const response = await axiosInstance.get(`/offer/single?code=${code}`);
       return response.data;
     } catch (error) {
       console.log(error);
@@ -67,8 +85,8 @@ export const fetchCoupon = createAsyncThunk(
     }
   }
 );
-export const updateCoupon = createAsyncThunk(
-  "/coupon/update",
+export const updateOffer = createAsyncThunk(
+  "/offer/update",
   async (
     { code, discount, startDate, endDate, id },
     { rejectWithValue, getState, dispatch }
@@ -77,7 +95,7 @@ export const updateCoupon = createAsyncThunk(
       // const { name } = payload;
       console.log("pay", code, discount, id, startDate, endDate);
 
-      const response = await axiosInstance.put(`/coupon/${id}`, {
+      const response = await axiosInstance.put(`/offer/${id}`, {
         code,
         discount,
         startDate,
@@ -92,12 +110,12 @@ export const updateCoupon = createAsyncThunk(
   }
 );
 
-//delete coupon--------------------------------------------------------------------------------------------------------------------
-export const deleteCoupon = createAsyncThunk(
-  "/coupon/delete",
+//block/unblock offer--------------------------------------------------------------------------------------------------------------------
+export const deleteOffer = createAsyncThunk(
+  "/offer/delete",
   async (id, { rejectWithValue, getState, dispatch }) => {
     try {
-      const response = await axiosInstance.delete(`/coupon/${id}`);
+      const response = await axiosInstance.delete(`/offer/${id}`);
       return response.data;
     } catch (error) {
       console.log(error);
@@ -107,77 +125,77 @@ export const deleteCoupon = createAsyncThunk(
   }
 );
 
-const couponSlice = createSlice({
-  name: "coupon",
+const offerSlice = createSlice({
+  name: "offer",
   initialState,
   extraReducers: (builder) => {
-    builder.addCase(createCoupon.pending, (state, action) => {
+    builder.addCase(createOffer.pending, (state, action) => {
       state.loading = true;
     });
-    builder.addCase(createCoupon.fulfilled, (state, action) => {
+    builder.addCase(createOffer.fulfilled, (state, action) => {
       console.log("Payload:", action.payload);
       state.loading = false;
-      state.coupon = action.payload;
+      state.offer = action.payload;
       state.isAdded = true;
     });
-    builder.addCase(createCoupon.rejected, (state, action) => {
+    builder.addCase(createOffer.rejected, (state, action) => {
       state.loading = false;
-      state.coupon = null;
+      state.offer = null;
       state.isAdded = false;
       state.error = action.payload;
     });
-    builder.addCase(fetchCoupons.pending, (state, action) => {
+    builder.addCase(fetchOffers.pending, (state, action) => {
       state.loading = true;
     });
-    builder.addCase(fetchCoupons.fulfilled, (state, action) => {
+    builder.addCase(fetchOffers.fulfilled, (state, action) => {
       state.loading = false;
-      state.coupons = action.payload;
+      state.offers = action.payload;
     });
-    builder.addCase(fetchCoupons.rejected, (state, action) => {
+    builder.addCase(fetchOffers.rejected, (state, action) => {
       state.loading = false;
-      state.coupons = null;
+      state.offers = null;
       state.error = action.payload;
     });
-    //for single coupon-------------------------------------------------------------------------------------------------------
-    builder.addCase(fetchCoupon.pending, (state, action) => {
+    //for single offer-------------------------------------------------------------------------------------------------------
+    builder.addCase(fetchOffer.pending, (state, action) => {
       state.loading = true;
     });
-    builder.addCase(fetchCoupon.fulfilled, (state, action) => {
+    builder.addCase(fetchOffer.fulfilled, (state, action) => {
       state.loading = false;
-      state.coupon = action.payload;
+      state.offer = action.payload;
     });
-    builder.addCase(fetchCoupon.rejected, (state, action) => {
+    builder.addCase(fetchOffer.rejected, (state, action) => {
       state.loading = false;
-      state.coupon = null;
+      state.offer = null;
       state.error = action.payload;
     });
 
-    //update coupon
-    builder.addCase(updateCoupon.pending, (state, action) => {
+    //update offer
+    builder.addCase(updateOffer.pending, (state, action) => {
       state.loading = true;
     });
-    builder.addCase(updateCoupon.fulfilled, (state, action) => {
+    builder.addCase(updateOffer.fulfilled, (state, action) => {
       console.log("Payload:", action.payload);
       state.loading = false;
-      state.coupon = action.payload;
+      state.offer = action.payload;
       state.isUpdated = true;
     });
-    builder.addCase(updateCoupon.rejected, (state, action) => {
+    builder.addCase(updateOffer.rejected, (state, action) => {
       state.loading = false;
-      state.coupon = null;
+      state.offer = null;
       state.isUpdated = false;
       state.error = action.payload;
     });
     //delete coupon
-    builder.addCase(deleteCoupon.pending, (state, action) => {
+    builder.addCase(deleteOffer.pending, (state, action) => {
       state.loading = true;
     });
-    builder.addCase(deleteCoupon.fulfilled, (state, action) => {
+    builder.addCase(deleteOffer.fulfilled, (state, action) => {
       console.log("Payload:", action.payload);
       state.loading = false;
       state.isDelete = true;
     });
-    builder.addCase(deleteCoupon.rejected, (state, action) => {
+    builder.addCase(deleteOffer.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
@@ -185,16 +203,15 @@ const couponSlice = createSlice({
     builder.addCase(resetError.pending, (state, action) => {
       state.isAdded = false;
       state.error = null;
-      state.isUpdated= false
+      state.isUpdated = false;
     });
     //reset success action
     builder.addCase(resetSuccess.pending, (state, action) => {
       state.isAdded = false;
       state.error = null;
-      state.isUpdated= false
-      
+      state.isUpdated = false;
     });
   },
 });
-const couponReducer = couponSlice.reducer;
-export default couponReducer;
+const offerReducer = offerSlice.reducer;
+export default offerReducer;

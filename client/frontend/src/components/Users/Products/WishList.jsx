@@ -4,6 +4,7 @@ import { fetchWishlist, removeFromWishlist, } from "../../../redux/slices/wishli
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import SuccessMsg from "../../SuccessMsg/SuccessMsg";
 import LoadingComponent from "../../LoadingComp/LoadingComponent";
+import { Link } from "react-router-dom";
 
 export default function WishList() {
   const dispatch = useDispatch();
@@ -51,12 +52,15 @@ export default function WishList() {
                   key={product._id}
                   className="bg-white p-5 rounded-lg shadow-lg transition transform hover:scale-105"
                 >
+                  
                   <div className="relative">
+                    <Link to={`/product/${product?._id}`}>
                     <img
                       src={product.images[0]}
                       alt={product.name}
                       className="h-48 w-full object-cover rounded-md"
                     />
+                    </Link>
                     <span className="absolute top-2 left-2 bg-indigo-500 text-white px-3 py-1 text-xs font-semibold rounded-full">
                       {product.category}
                     </span>

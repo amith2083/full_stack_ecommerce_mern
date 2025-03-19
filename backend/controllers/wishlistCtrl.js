@@ -11,7 +11,7 @@ export const getWishlist = asyncHandler(async (req, res) => {
     const wishlist = await Wishlist.findOne({ user: req.userAuthId }).populate(
       "products"
     );
-    console.log('wishlist',wishlist)
+  
 
     // If no wishlist found or empty, send an empty array for products
     const products = wishlist ? wishlist.products : [];

@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 
 export const addToCart = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  let { quantity, size, color } = req.body; // Ensure quantity is passed in the request body
+  let { quantity, size, color } = req.body; 
   // Set a default quantity if undefined or invalid
   quantity = quantity && quantity > 0 ? parseInt(quantity, 10) : 1;
 
@@ -98,7 +98,7 @@ export const getCart = asyncHandler(async (req, res) => {
 // Remove item from cart
 export const removeFromCart = asyncHandler(async (req, res) => {
   const { productId } = req.params;
-  console.log("cartItemId", productId);
+
   const objectIdProductId = new mongoose.Types.ObjectId(productId);
 
   if (!mongoose.Types.ObjectId.isValid(objectIdProductId)) {

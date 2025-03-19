@@ -5,6 +5,8 @@ import ErrorMsg from "../../ErrorMsg/ErrorMsg";
 import LoadingComponent from "../../LoadingComp/LoadingComponent";
 import { useNavigate } from "react-router-dom";
 import { getCartItemsFromDatabase } from "../../../redux/slices/cart/cartSlices";
+import Swal from "sweetalert2";
+
 
 const Login = () => {
   const dispatch = useDispatch()

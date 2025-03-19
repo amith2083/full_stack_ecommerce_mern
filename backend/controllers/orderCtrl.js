@@ -106,12 +106,11 @@ if (paymentMethod === "wallet") {
   });
   // Extract product IDs from orderItems
   const productIds = orderItems[0].items.map((item) => item.product._id);
-  console.log("productIDS", productIds);
+
 
   // Find products in the database
   const products = await Product.find({ _id: { $in: productIds } });
-  console.log("products", products);
-
+ 
   if (!products.length) {
     console.log("No products found");
   }
@@ -121,7 +120,7 @@ if (paymentMethod === "wallet") {
     const product = products.find(
       (prod) => prod._id.toString() === orderItem.product._id.toString()
     );
-    console.log("product", product);
+    
 
     if (product) {
       product.totalSold += orderItem.qty;
@@ -264,7 +263,7 @@ export const retryPayment = async (req, res) => {
     // console.log("razor", razorpayOrder);
     // Create new Razorpay Order
     const razorpayOrder = await createRazorpayOrder(order._id, totalPrice);
-    console.log("Retry Razorpay Order:", razorpayOrder);
+ 
 
     res.json({
       success: true,

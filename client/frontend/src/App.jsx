@@ -47,6 +47,8 @@ import Customers from "./components/Admin/Customers/Customers";
 import ColorLists from "./components/Admin/Categories/ColorLists";
 import { setNavigate } from "./utils/axiosConfig";
 import { useEffect } from "react";
+import AddOffer from "./components/Admin/Offers/AddOffer";
+import ManageOffers from "./components/Admin/Offers/ManageOffers";
 
 
 
@@ -90,6 +92,10 @@ const App = () => {
 <Route path="add-coupon" element={<AdminCheck><AddCoupon /></AdminCheck>} />
 <Route path="manage-coupon" element={<AdminCheck><ManageCoupons /></AdminCheck>} />
 <Route path="manage-coupon/edit/:code" element={<AdminCheck><UpdateCoupon /></AdminCheck>} />
+{/* offers */}
+<Route path="add-offer" element={<AdminCheck><AddOffer /></AdminCheck>} />
+<Route path="manage-offer" element={<AdminCheck><ManageOffers /></AdminCheck>} />
+
 {/* Category */}
 <Route path="category-to-add" element={<AdminCheck><CategoryToAdd /></AdminCheck>} />
 <Route path="add-category" element={<AdminCheck><AddCategory /></AdminCheck>} />

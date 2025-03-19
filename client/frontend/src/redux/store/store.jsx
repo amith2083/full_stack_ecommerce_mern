@@ -12,6 +12,7 @@ import orderReducer from "../slices/order/orderSlices";
 import reviewReducer from "../slices/review/reviewSlices";
 import wishListReducer from "../slices/wishlist/wishListSlices";
 import walletReducer from "../slices/wallet/walletSlices";
+import offerReducer from "../slices/offers/OfferSlices";
 const store = configureStore({
     reducer:{
         users:userReducer,
@@ -25,6 +26,7 @@ const store = configureStore({
         reviews:reviewReducer,
         wishLists:wishListReducer,
         wallet:walletReducer,
+        offers:offerReducer
         }
 });
 export default store

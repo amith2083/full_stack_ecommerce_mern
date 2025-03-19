@@ -19,6 +19,7 @@ import ErrorMsg from "../../ErrorMsg/ErrorMsg";
 import SuccessMsg from "../../SuccessMsg/SuccessMsg";
 import { current } from "@reduxjs/toolkit";
 
+
 export default function ShoppingCart() {
   const dispatch = useDispatch();
   const [couponCode, setCouponCode] = useState(null);
@@ -95,11 +96,14 @@ export default function ShoppingCart() {
                     <div key={cartItem._id}>
                       {cartItem.items?.map((item) => (
                         <li key={item._id} className="flex py-6 items-center">
+                         
+                          <Link to={`/product/${item?.product?._id}`}>
                           <img
                             src={item.product.images[0]}
                             alt={item?.product?.name || "Product Image"}
                             className="h-24 w-24 rounded-lg object-cover shadow-md"
                           />
+                          </Link>
                           <div className="ml-6 flex-1">
                             <h3 className="text-lg font-medium text-gray-700">
                               {item.product.name}

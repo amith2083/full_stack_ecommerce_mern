@@ -38,25 +38,7 @@ const ordersLinks = [
     ),
     current: true,
   },
-  // {
-  //   name: "Manage Orders",
-  //   href: "manage-orders",
-  //   icon: () => (
-  //     <svg
-  //       xmlns="http://www.w3.org/2000/svg"
-  //       fill="none"
-  //       viewBox="0 0 24 24"
-  //       strokeWidth={1.5}
-  //       stroke="currentColor"
-  //       className="w-6 h-6 m-1">
-  //       <path
-  //         strokeLinecap="round"
-  //         strokeLinejoin="round"
-  //         d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-  //       />
-  //     </svg>
-  //   ),
-  // },
+  
   {
     name: "Customers",
     href: "customers",
@@ -148,6 +130,51 @@ const couponsLinks = [
     ),
   },
 ];
+const offerLinks = [
+  {
+    name: "Add Offer ",
+    href: "add-offer",
+    icon: () => (
+     
+       <svg
+       xmlns="http://www.w3.org/2000/svg"
+       fill="none"
+       viewBox="0 0 24 24"
+       strokeWidth={1.5}
+       stroke="currentColor"
+       className="w-6 h-6 m-1">
+       <path
+         strokeLinecap="round"
+         strokeLinejoin="round"
+         d="M12 3v18m-9-9h18"
+       />
+     </svg>
+    ),
+    current: false,
+  },
+  {
+    name: "Manage Offer",
+    href: "manage-offer",
+    icon: () => (
+      <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+      className="w-6 h-6 m-1">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3 10.5L10.5 3l10.5 10.5L13.5 21 3 10.5zM12 12l-3 3m0-3l3 3"
+      />
+    </svg>
+     
+    ),
+    current: false,
+  },
+];
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -291,6 +318,23 @@ export default function Example() {
                         ))}
                       </div>
                     </div>
+
+                    <div className="mt-6 pt-6">
+                      <div className="space-y-1 px-2">
+                        {offerLinks.map((item) => (
+                          <Link
+                            key={item.name}
+                            to={item.href}
+                            className="group flex items-center rounded-md px-2 py-2 text-sm font-medium leading-6 text-cyan-100 hover:bg-cyan-600 hover:text-white">
+                            <item.icon
+                              className="mr-4 h-6 w-6 text-cyan-200"
+                              aria-hidden="true"
+                            />
+                            {item.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
                     {/* Categories mobile */}
                     <div className="mt-3 pt-3">
                       <div className="space-y-1 px-2">
@@ -401,6 +445,22 @@ export default function Example() {
               <div className="mt-6 pt-6">
                 <div className="space-y-1 px-2">
                   {couponsLinks.map((item) => (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      className="group flex items-center rounded-md px-2 py-2 text-sm font-medium leading-6 text-cyan-100 hover:bg-cyan-600 hover:text-white">
+                      <item.icon
+                        className="mr-4 h-6 w-6 text-cyan-200"
+                        aria-hidden="true"
+                      />
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+              <div className="mt-6 pt-6">
+                <div className="space-y-1 px-2">
+                  {offerLinks.map((item) => (
                     <Link
                       key={item.name}
                       to={item.href}

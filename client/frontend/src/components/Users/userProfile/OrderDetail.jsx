@@ -1,5 +1,6 @@
 import React from "react";
 import { jsPDF } from "jspdf";
+import { Link } from "react-router-dom";
 
 const OrderDetails = ({ order, goBack }) => {
   const generateInvoice = () => {
@@ -118,11 +119,13 @@ const OrderDetails = ({ order, goBack }) => {
         {order.orderItems.map((item) =>
           item.items.map((product, idx) => (
             <div key={idx} className="flex items-center bg-blue-100 p-4 rounded-lg shadow-md transition transform hover:scale-105 duration-300 ease-in-out">
+              <Link to={`/product/${product?.product?._id}`}>
               <img
                 src={product.product.images.length > 0 ? product.product.images[0] : "https://via.placeholder.com/100"}
                 alt={product.product.name}
                 className="w-16 h-16 rounded-full mr-4 border-2 border-white"
               />
+              </Link>
               <div>
               <h4 className="text-lg font-bold text-gray-800">{product.product.name}</h4>
     <p className="text-gray-700">💰 Price: <span className="font-semibold">Rs {product.product.price}</span></p>

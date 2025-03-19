@@ -25,8 +25,7 @@ export default function Navbar() {
   const navigate = useNavigate()
   useEffect(()=>{
     dispatch(fetchCategory())
-    // const userCookie = Cookies.get('user');
-    // setIsLoggedIn(userCookie && JSON.parse(userCookie)?.token ? true : false);
+    
   },[dispatch])
   const {categories}=useSelector((state)=>state?.categories)
   
@@ -71,8 +70,7 @@ export default function Navbar() {
   const userCookie = Cookies.get('user');
   const user = userCookie ? JSON.parse(userCookie) : null;
   const isLoggedIn = user?.token ? true : false;
-  console.log('cookie', user)
-  console.log('islogged',isLoggedIn)
+
   return (
     <div className="bg-white">
       {/* Mobile menu */}
