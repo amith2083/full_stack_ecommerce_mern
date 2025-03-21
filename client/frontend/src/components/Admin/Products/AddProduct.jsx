@@ -11,12 +11,14 @@ import { fetchBrand } from "../../../redux/slices/brand/brandSlices";
 import { fetchColor } from "../../../redux/slices/color/colorSlices";
 
 import { createProduct } from "../../../redux/slices/products/productSlices";
+import { useNavigate } from "react-router-dom";
 
 //animated components for react-select
 const animatedComponents = makeAnimated();
 
 export default function AddProduct() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   //files
   const [files, setFiles] = useState([]);
   const [fileErrs, setFileErrs] = useState([]);
@@ -64,7 +66,7 @@ export default function AddProduct() {
     dispatch(fetchColor());
   }, [dispatch]);
   const { colors } = useSelector((state) => state?.colors?.colors);
-  console.log("colorinfrontend is ", colors);
+  
 
   //for size--------------------------------------------------------------------------------------------------------------------
   const sizes = ["M", "S", "L", "XL"];
@@ -88,19 +90,16 @@ export default function AddProduct() {
     };
   });
   const handleColorChange = (colors) => {
-    console.log('Selected colors:', colors);
+    
     setColorOption(colors);
   };
-  console.log('coloroption' ,colorOption)
-
+ 
   let // categories,
     //   sizeOptionsConverted,
     //   handleSizeChange,
     colorOptionsCoverted,
     handleColorChangeOption
-    // loading,
-    // error,
-    // isAdded;
+    
 
   //---form data---
   const [formData, setFormData] = useState({
@@ -118,7 +117,7 @@ export default function AddProduct() {
   //onChange
   const handleOnChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    console.log('formdata',setFormData)
+  
   };
   //get data from store
   const{product, isAdded,error,loading}= useSelector((state)=>state?.products)
@@ -126,7 +125,7 @@ export default function AddProduct() {
   //onSubmit
   const handleOnSubmit = (e) => {
     e.preventDefault();
-    console.log('files',files)
+   
     //reset form data
     setFormData({
       name: "",
@@ -141,7 +140,10 @@ export default function AddProduct() {
     });
     dispatch(createProduct({...formData,files,
       color: colorOption?.map((color) => color?.label),
-      sizes: sizeOption?.map((size) => size?.label),}))
+      sizes: sizeOption?.map((size) => size?.label),})).then(()=>{
+        navigate('/admin/manage-products')
+      })
+
   };
 
   return (

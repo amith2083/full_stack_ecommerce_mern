@@ -9,9 +9,9 @@ export const calculateAndUpdateSalesPrice = async (productId) => {
    
     console.log(`Starting sales price calculation for product: ${productId}`);
     const product = await Product.findById(productId)
-    console.log("Populated product:", product);
+    
     const category = await Category.findOne({ products: productId });
-    console.log('catgory.....',category)
+    
     
     const now = new Date();
     console.log('Current Time:', now);
@@ -24,7 +24,7 @@ export const calculateAndUpdateSalesPrice = async (productId) => {
       // });
     // Debugging: Print out all offers to verify data
     const productOffersCheck = await Offer.find({ applicableToProduct: product._id });
-    console.log('Offers linked to this product:', productOffersCheck);
+   
  
     // Finding active offers for the product
     const productOffers = await Offer.find({
@@ -33,7 +33,7 @@ export const calculateAndUpdateSalesPrice = async (productId) => {
       startDate: { $lte: now },  // This ensures offers that started in the past are included
       endDate: { $gte: now }
     });
-    console.log('==============productoffers',productOffers)
+    
   
     // Finding active offers for the category of the product
     let categoryOffers=[]

@@ -6,6 +6,12 @@ import { addToWishlist, fetchWishlist, removeFromWishlist, } from "../../../redu
 import SuccessMsg from "../../SuccessMsg/SuccessMsg";
 
 const Products = ({ products }) => {
+  // const [page, setPage] = useState(1);
+  // const limit = 10; // Adjust based on requirement
+
+  // useEffect(() => {
+  //   dispatch(fetchProduct({ url: "/products", page, limit }));
+  // }, [dispatch, page]);
   const [localWishlist, setLocalWishlist] = useState([]);
   const dispatch = useDispatch()
 
@@ -71,6 +77,9 @@ const Products = ({ products }) => {
 
           {/* Product Details */}
           <div className="px-4 pb-4 mt-4">
+          <h3 className="mb-2 text-center font-bold font-heading">
+                      {product?.name}
+                    </h3>
           <p className="text-center font-bold text-blue-500">
                     {product.salesPrice && product.salesPrice < product.price ? (
                       <>

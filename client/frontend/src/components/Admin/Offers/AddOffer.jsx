@@ -12,6 +12,7 @@ export default function AddOffer() {
   const [endDate, setEndDate] = useState(new Date());
   const [applicableTo, setApplicableTo] = useState("");
   const [selectedItem, setSelectedItem] = useState("");
+  console.log('selected',selectedItem)
  
   
   // Get products & categories from Redux store

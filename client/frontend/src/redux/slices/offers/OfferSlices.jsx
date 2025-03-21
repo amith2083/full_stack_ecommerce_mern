@@ -33,8 +33,19 @@ export const createOffer = createAsyncThunk(
     },
     { rejectWithValue, getState, dispatch }
   ) => {
+    
    
     try {
+        console.log('+++++',code,
+            offerType,
+            offerValue,
+            startDate,
+            endDate,
+            description,
+            applicableTo,
+            applicableToProduct,
+            applicableToCategory,
+            usageLimit,)
      
 
       const response = await axiosInstance.post(`/offer`, {

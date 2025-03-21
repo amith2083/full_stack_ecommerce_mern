@@ -51,8 +51,14 @@ export const createOffer = asyncHandler(async (req, res) => {
       applicableToCategory,
       usageLimit,
     } = req.body;
- 
+    console.log('.........',req.body)
 
+
+    console.log(typeof applicableToProduct); 
+console.log(typeof applicableToCategory);
+
+console.log(mongoose.Types.ObjectId.isValid(applicableToProduct)); // Expected: true
+console.log(mongoose.Types.ObjectId.isValid(applicableToCategory))
 
     // Validate inputs
     if (
@@ -108,9 +114,13 @@ export const createOffer = asyncHandler(async (req, res) => {
       // Update the sales price for the specific product
       // await product.updateSalesPriceWithOffers();
     } else if (applicableTo === "Category" && applicableToCategory) {
+      const categoryExists = await Category.findById(applicableToCategory);
+      if (!categoryExists) {
+        return res.status(404).json({ message: "Category not found" });
+    }
       // Apply offer to all products in the category
       const products = await Product.updateMany(
-        { category: applicableToCategory },
+        { category:  categoryExists.name },
         { $addToSet: { offers: savedOffer._id } }
       );
 

@@ -188,8 +188,8 @@ export default function Navbar() {
           {/* Top navigation  desktop*/}
           <div className="bg-gray-900">
             <div className="mx-auto flex h-10 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-              <p className="flex-1 text-center text-sm font-medium text-white lg:flex-none">
-               {latestCoupon?`${latestCoupon?.code}-${latestCoupon?.discount}%`:'No Flash Sale'}
+              <p className="flex-1 text-center text-sm font-medium text-white lg:flex-none ">
+               {latestCoupon?`🎉${latestCoupon?.code}-${latestCoupon?.discount}%🎉`:'No Flash Sale'}
               </p>
 
               <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">

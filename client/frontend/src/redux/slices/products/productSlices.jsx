@@ -8,6 +8,7 @@ import { resetError, resetSuccess } from "../../resetError/resetError";
 const initialState = {
   products: [],
   product: null,
+  pagination:{},
   loading: false,
   error: null,
   isAdded: false,
@@ -131,7 +132,7 @@ export const updateProduct = createAsyncThunk(
       }
 
       const response = await axiosInstance.put(`/product/${id}`, formData);
-      console.log("res", response.data);
+     
       return response.data;
     } catch (error) {
       console.log(error);
@@ -144,11 +145,11 @@ export const updateProduct = createAsyncThunk(
 //fetching products---------------------------------------------------------------------------------------------------------
 export const fetchProduct = createAsyncThunk(
   "/products/fetch",
-  async ({url}, { rejectWithValue, getState, dispatch }) => {
-    console.log("url1", url);
+  async ({url,page = 1, limit = 10}, { rejectWithValue, getState, dispatch }) => {
+  
     try {
-      const response = await axiosInstance.get(`${url}`);
-      console.log("res", response.data);
+      const response = await axiosInstance.get(`${url}?page=${page}&limit=${limit}`);
+      
       return response.data;
     } catch (error) {
       console.log(error);
@@ -231,6 +232,7 @@ const productSlice = createSlice({
     builder.addCase(fetchProduct.fulfilled, (state, action) => {
       state.loading = false;
       state.products = action.payload.products;
+      
       // state.isAdded = true;
     });
     builder.addCase(fetchProduct.rejected, (state, action) => {

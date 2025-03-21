@@ -78,78 +78,7 @@ export const createProduct = asyncHandler(async (req, res) => {
   }
 });
 
-// export const getProducts = asyncHandler(async (req, res) => {
-//   let products = await Product.find();
 
-//   //search by name
-//   if (req.query.name) {
-//     products = await Product.find({
-//       name: { $regex: req.query.name, $options: "i" },
-//     });
-//   }
-//   //filtering
-//   if (req.query.brand) {
-//     products = await Product.find({
-//       brand: { $regex: req.query.brand, $options: "i" },
-//     });
-//   }
-//   if (req.query.category) {
-//     products = await Product.find({
-//       category: { $regex: req.query.category, $options: "i" },
-//     });
-//   }
-//   if (req.query.color) {
-//     products = await Product.find({
-//       color: { $regex: req.query.color, $options: "i" },
-//     });
-//   }
-//   if (req.query.sizes) {
-//     products = await Product.find({
-//       sizes: { $regex: req.query.sizes, $options: "i" },
-//     });
-//   }
-//   //filter by price range
-//   if (req.query.price) {
-//     const priceRange = await req.query.price.split("-");
-//     console.log(priceRange);
-//     products = await Product.find({
-//       normalPrice: { $gte: priceRange[0], $lte: priceRange[1] },
-//     });
-//   }
-//   //pagination
-//   const page = parseInt(req.query.page) ? parseInt(req.query.page) : 1;
-//   const limit = parseInt(req.query.limit) ? parseInt(req.query.limit) : 10;
-//   const startIndex = (page - 1) * limit;
-//   const endIndex = page * limit;
-//   const total = await Product.countDocuments();
-//   const pagination = {};
-//   if (endIndex < total) {
-//     //it means there's a next page available.
-//     pagination.next = {
-//       page: page + 1,
-//       limit,
-//     };
-//   }
-//   if (startIndex > 0) {
-//     //it means there's a previous page available.
-//     pagination.prev = {
-//       page: page - 1,
-//       limit,
-//     };
-//   }
-//   products = await Product.find().populate('reviews').skip(startIndex).limit(limit);
-
-//   if (products) {
-//     res.json({
-//       status: "success",
-//       total,
-//       pagination,
-//       results: products.length,
-//       msg: "products fetched",
-//       products,
-//     });
-//   }
-// });
 
 export const getProducts = asyncHandler(async (req, res) => {
   
@@ -168,13 +97,16 @@ export const getProducts = asyncHandler(async (req, res) => {
     productQuery = productQuery.find({
       brand: { $regex: req.query.brand, $options: "i" },
     });
+    
   }
 
   //filter by category
   if (req.query.category) {
+   
     productQuery = productQuery.find({
-      category: { $regex: req.query.category, $options: "i" },
+      category: new RegExp(`^${req.query.category}$`, "i"), // Exact match
     });
+    
   }
 
   //filter by color
@@ -233,7 +165,7 @@ export const getProducts = asyncHandler(async (req, res) => {
   //page
   const page = parseInt(req.query.page) ? parseInt(req.query.page) : 1;
   //limit
-  const limit = parseInt(req.query.limit) ? parseInt(req.query.limit) : 10;
+  const limit = parseInt(req.query.limit) ? parseInt(req.query.limit) : 5;
   //startIdx
   const startIndex = (page - 1) * limit;
   //endIdx
@@ -260,13 +192,19 @@ export const getProducts = asyncHandler(async (req, res) => {
   
   //await the query
   const products = await productQuery.populate("reviews");
+
    // Update `salesPrice` for each product with an offer
-   for (const product of products) {
+  //  for (const product of products) {
    
-    const updatedSalesPrice = await calculateAndUpdateSalesPrice(product._id);
-    console.log('..............',updatedSalesPrice)
-    product.salesPrice = updatedSalesPrice;
-  }
+  //   const updatedSalesPrice = await calculateAndUpdateSalesPrice(product._id);
+    
+  //   product.salesPrice = updatedSalesPrice;
+  // }
+  await Promise.all(
+    products.map(async (product) => {
+      product.salesPrice = await calculateAndUpdateSalesPrice(product._id);
+    })
+  );
   res.json({
     status: "success",
     total,

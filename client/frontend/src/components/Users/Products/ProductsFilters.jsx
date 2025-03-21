@@ -79,7 +79,8 @@ export default function ProductsFilters() {
   //get query string
   const [params, setParams] = useSearchParams();
   const category = params.get("category");
-  console.log('categoryfilteris',category);
+  const [page, setPage] = useState(1);
+  const limit = 10; // Number of products per page
   //filters
   const [color, setColor] = useState("");
   const [price, setPrice] = useState("");
@@ -107,10 +108,11 @@ const [sort, setSort] = useState("popularity"); // Default sort option
   if (color) {
     productUrl = `${productUrl}&color=${color?.name}`;
   }
+  if (page) {
+    productUrl += `&page=${page}&limit=${limit}`;
+  }
   if (sort) productUrl += `&sort=${sort}`;  // Include sort option
-  console.log('sort',sort)
-  console.log('brand',brand)
-  console.log('color',color)
+ 
   useEffect(() => {
     dispatch(fetchProduct({ url: productUrl }));
   },[dispatch,category,size,brand,price,color,sort]);
