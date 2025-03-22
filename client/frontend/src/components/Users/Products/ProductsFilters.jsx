@@ -80,7 +80,7 @@ export default function ProductsFilters() {
   const [params, setParams] = useSearchParams();
   const category = params.get("category");
   const [page, setPage] = useState(1);
-  const limit = 10; // Number of products per page
+  const limit = 5; // Number of products per page
   //filters
   const [color, setColor] = useState("");
   const [price, setPrice] = useState("");
@@ -91,11 +91,11 @@ const [sort, setSort] = useState("popularity"); // Default sort option
 
   //fetching products------------------------------------------------------------------------------------------------
   //build up url
-  let productUrl = `/product`;
+  let productUrl = `/product?page=${page}&limit=${limit}`;
   if(category){
     productUrl=`/product?category=${category}`
   }
-  console.log('producturl',productUrl)
+ 
   if(brand){
     productUrl=`${productUrl}&brand=${brand}`
   }
@@ -115,11 +115,12 @@ const [sort, setSort] = useState("popularity"); // Default sort option
  
   useEffect(() => {
     dispatch(fetchProduct({ url: productUrl }));
-  },[dispatch,category,size,brand,price,color,sort]);
+  },[dispatch,category,size,brand,price,color,sort,page]);
   //get data from store
   const {
-    products,loading,error
-  } = useSelector((state) => state?.products);
+    products,loading,error,pagination,
+    } = useSelector((state) => state?.products);
+    console.log('>>>', pagination)
 
   //fetching brands---------------------------------------------------------------------------------------------------------
   useEffect(() => {
@@ -137,11 +138,26 @@ const [sort, setSort] = useState("popularity"); // Default sort option
   const {
     colors: { colors },
   } = useSelector((state) => state?.colors);
-
-
+  useEffect(() => {
+    setPage(1);  // Reset page to 1 when category changes
+    setColor("");
+  setBrand("");
+  setSize("");
+  setPrice("");
+  }, [category])
 
  
+  const handleNextPage = () => {
+    if (pagination?.next) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  };
 
+  const handlePrevPage = () => {
+    if (pagination?.prev) {
+      setPage((prevPage) => prevPage - 1);
+    }
+  };
   let colorsLoading;
   let colorsError;
  
@@ -779,6 +795,23 @@ const [sort, setSort] = useState("popularity"); // Default sort option
              {loading? <LoadingComponent/>:error?<ErrorMsg/>:products?.length<=0?<NoDataFound/>: <Products products={products} />}
             </div>
           </section>
+         {/* Pagination Controls */}
+      <div className="flex justify-center mt-4">
+        <button
+          onClick={handlePrevPage}
+          disabled={!pagination?.prev}
+          className={`px-4 py-2 mx-2 border rounded ${!pagination?.prev ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-200"}`}
+        >
+          Previous
+        </button>
+        <button
+          onClick={handleNextPage}
+          disabled={!pagination?.next}
+          className={`px-4 py-2 mx-2 border rounded ${!pagination?.next ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-200"}`}
+        >
+          Next
+        </button>
+      </div>
         </main>
       </div>
     </div>
