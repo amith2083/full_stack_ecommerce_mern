@@ -8,7 +8,7 @@ const categoryRoute = express.Router()
 categoryRoute.post('/', isLoggedIn, isAdmin,categoryFileUpload.single('file'), createCategory)
 categoryRoute.get('/',getAllCategories)
 categoryRoute.get('/:id', getSingleCategory)
-categoryRoute.put('/:id', isLoggedIn,isAdmin, updateCategory)
+categoryRoute.put('/:id', isLoggedIn,isAdmin,categoryFileUpload.single('file'),  updateCategory)
 categoryRoute.delete('/:id', isLoggedIn, isAdmin,deleteCategory)
 
 export default categoryRoute

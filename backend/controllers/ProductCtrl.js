@@ -16,7 +16,7 @@ export const createProduct = asyncHandler(async (req, res) => {
       price,
       totalQty,
     } = req.body;
-   
+
     const productExists = await Product.findOne({ name });
 
     if (productExists) {
@@ -24,12 +24,11 @@ export const createProduct = asyncHandler(async (req, res) => {
     }
     //create product
     const convertedImages = req.files.map((file) => file.path);
-    
+
     //find the brand
     const brandFound = await Brand.findOne({
-      name:brand,
+      name: brand,
     });
-    
 
     if (!brandFound) {
       throw new Error(
@@ -55,7 +54,7 @@ export const createProduct = asyncHandler(async (req, res) => {
       price,
       totalQty,
       user: req.userAuthId,
-        images: convertedImages,
+      images: convertedImages,
     });
     //push the product into category
     categoryFound.products.push(product._id);
@@ -78,11 +77,7 @@ export const createProduct = asyncHandler(async (req, res) => {
   }
 });
 
-
-
 export const getProducts = asyncHandler(async (req, res) => {
-  
-  
   let productQuery = Product.find();
 
   //search by name
@@ -97,16 +92,13 @@ export const getProducts = asyncHandler(async (req, res) => {
     productQuery = productQuery.find({
       brand: { $regex: req.query.brand, $options: "i" },
     });
-    
   }
 
   //filter by category
   if (req.query.category) {
-   
     productQuery = productQuery.find({
       category: new RegExp(`^${req.query.category}$`, "i"), // Exact match
     });
-    
   }
 
   //filter by color
@@ -132,40 +124,38 @@ export const getProducts = asyncHandler(async (req, res) => {
     });
   }
 
- // Sorting
- if (req.query.sort) {
-  let sortOption = {};
-  
-  switch (req.query.sort) {
-    case "price_asc":
-      sortOption = { price: 1 }; // Ascending price
-      break;
-    case "price_desc":
-      sortOption = { price: -1 }; // Descending price
-      break;
-    case "rating_desc":
-      sortOption = { rating: -1 }; // Highest rated first
-      break;
-    case "popularity":
-      sortOption = { sold: -1 }; // Most sold first
-      break;
-    case "newest":
-      sortOption = { createdAt: -1 }; // Newest first
-      break;
-    default:
-      sortOption = { popularity: -1 }; // Default to popularity
+  // Sorting
+  if (req.query.sort) {
+    let sortOption = {};
+
+    switch (req.query.sort) {
+      case "price_asc":
+        sortOption = { price: 1 }; // Ascending price
+        break;
+      case "price_desc":
+        sortOption = { price: -1 }; // Descending price
+        break;
+      case "rating_desc":
+        sortOption = { rating: -1 }; // Highest rated first
+        break;
+      case "popularity":
+        sortOption = { sold: -1 }; // Most sold first
+        break;
+      case "newest":
+        sortOption = { createdAt: -1 }; // Newest first
+        break;
+      default:
+        sortOption = { popularity: -1 }; // Default to popularity
+    }
+
+    productQuery = productQuery.sort(sortOption);
   }
-
-  productQuery = productQuery.sort(sortOption);
-}
-
-
 
   //pagination
   //page
   const page = parseInt(req.query.page) ? parseInt(req.query.page) : 1;
   //limit
-  const limit = parseInt(req.query.limit) ? parseInt(req.query.limit) : 5;
+  const limit = parseInt(req.query.limit) ? parseInt(req.query.limit) : 8;
   //startIdx
   const startIndex = (page - 1) * limit;
   //endIdx
@@ -189,15 +179,15 @@ export const getProducts = asyncHandler(async (req, res) => {
       limit,
     };
   }
-  
+
   //await the query
   const products = await productQuery.populate("reviews");
 
-   // Update `salesPrice` for each product with an offer
+  // Update `salesPrice` for each product with an offer
   //  for (const product of products) {
-   
+
   //   const updatedSalesPrice = await calculateAndUpdateSalesPrice(product._id);
-    
+
   //   product.salesPrice = updatedSalesPrice;
   // }
   await Promise.all(
@@ -215,7 +205,10 @@ export const getProducts = asyncHandler(async (req, res) => {
   });
 });
 export const singleProduct = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id).populate({path:'reviews',populate:{path:'user',select:'name'}});
+  const product = await Product.findById(req.params.id).populate({
+    path: "reviews",
+    populate: { path: "user", select: "name" },
+  });
   if (!product) {
     throw new Error("Product not found");
   }
@@ -238,41 +231,35 @@ export const updateProduct = asyncHandler(async (req, res) => {
     totalQty,
     brand,
     removedImages = [], // Get removed images array from frontend
-
   } = req.body;
- 
 
   // Find the existing product to preserve old images if none are uploaded
   const existingProduct = await Product.findById(req.params.id);
-   // Remove images that the user deleted
-   let updatedImages = existingProduct.images.filter(
+  // Remove images that the user deleted
+  let updatedImages = existingProduct.images.filter(
     (img) => !removedImages.includes(img) // Keep only images not in removedImages
   );
   if (req.files) {
     const imagePaths = req.files.map((file) => file.path); // Save file paths
     updatedImages = [...updatedImages, ...imagePaths]; // Append new images
-    
-  
   }
- let updatedFields = {
-  name,
-  description,
-  category,
-  sizes,
-  color,
-  user,
-  price,
-  totalQty,
-  brand,
-  images: updatedImages 
-  
-};
-
+  let updatedFields = {
+    name,
+    description,
+    category,
+    sizes,
+    color,
+    user,
+    price,
+    totalQty,
+    brand,
+    images: updatedImages,
+  };
 
   //update
   const product = await Product.findByIdAndUpdate(
     req.params.id,
-    updatedFields, 
+    updatedFields,
     {
       new: true,
       runValidators: true,
@@ -285,11 +272,30 @@ export const updateProduct = asyncHandler(async (req, res) => {
   });
 });
 
-export const deleteProduct = asyncHandler(async (req, res) => {
-  await Product.findByIdAndDelete(req.params.id);
-  res.json({
-    status: "success",
-    message: "Product deleted successfully",
-  });
-});
+export const listUnListProduct = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.params;
 
+    const product = await Product.findById(id);
+
+    if (!product) {
+      return res.status(404).json({ message: "product not found" });
+    }
+
+    product.status = !product.status;
+    await product.save();
+
+    res
+      .status(200)
+      .json({
+        message: `Product ${
+          product.status ? "Blocked" : "Unblocked"
+        } successfully`,
+        product,
+      });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Something went wrong", error: error.message });
+  }
+});

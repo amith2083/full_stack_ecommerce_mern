@@ -166,7 +166,7 @@ export const fetchSingleProduct = createAsyncThunk(
     console.log("productid", productId);
     try {
       const response = await axiosInstance.get(`/product/${productId}`);
-      console.log("responsefrom singleproduct", response.data);
+  
       return response.data;
     } catch (error) {
       console.log(error);
@@ -175,7 +175,16 @@ export const fetchSingleProduct = createAsyncThunk(
     }
   }
 );
-
+//unlist/list product---------------------------------------------------------------------------------------------------------
+export const unlistListProduct = createAsyncThunk("unlistList/", async (productId, { rejectWithValue, getState, dispatch  }) => {
+  try {
+    
+    const response = await axiosInstance.put(`/product/list-unlist/${productId}`);
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(error.response.data);
+  }
+});
 
 
 const productSlice = createSlice({
@@ -251,7 +260,7 @@ const productSlice = createSlice({
       state.loading = false;
       state.product = action.payload.product;
       state.isAdded = true;
-      console.log('state.product',state.product)
+     
     });
     builder.addCase(fetchSingleProduct.rejected, (state, action) => {
       state.loading = false;
@@ -259,6 +268,18 @@ const productSlice = createSlice({
       state.product = null;
       state.isAdded = false;
       state.error = action.payload;
+    });
+    //list-unlist products----------------------------------------------------------------------------------------------------
+    builder.addCase(unlistListProduct.pending, (state, action) => {
+      state.loading = true;
+    });
+    builder.addCase(unlistListProduct.fulfilled, (state, action) => {
+      state.product = action.payload;
+      state.loading = false;
+    });
+    builder.addCase(unlistListProduct.rejected, (state, action) => {
+      state.error = action.payload;
+      state.loading = false;
     });
   },
 });

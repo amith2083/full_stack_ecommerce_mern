@@ -1,5 +1,12 @@
 import React from "react";
-import { BrowserRouter, Route, Routes,Outlet, useLocation, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  Outlet,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import AdminDashboard from "./components/Admin/AdminDashboard";
@@ -13,9 +20,9 @@ import Navbar from "./components/Navbar/Navbar";
 import OrderHistory from "./components/Admin/Orders/ManageOrders";
 import OrderPayment from "./components/Users/Products/OrderPayment";
 import ManageCategories from "./components/Admin/Categories/ManageCategories";
-// import UpdateProduct from "./components/Admin/Products/UpdateProduct";
+
 import ManageStocks from "./components/Admin/Products/ManageStocks";
-import CategoryToAdd from "./components/Admin/Categories/CategoryToAdd";
+
 import AddCategory from "./components/Admin/Categories/AddCategory";
 import AddBrand from "./components/Admin/Categories/AddBrand";
 import AddColor from "./components/Admin/Categories/AddColor";
@@ -50,8 +57,6 @@ import { useEffect } from "react";
 import AddOffer from "./components/Admin/Offers/AddOffer";
 import ManageOffers from "./components/Admin/Offers/ManageOffers";
 
-
-
 // Function to handle conditional Navbar rendering
 const Layout = ({ children }) => {
   const location = useLocation();
@@ -59,7 +64,8 @@ const Layout = ({ children }) => {
 
   return (
     <>
-      {!isAdminRoute && <Navbar />} {/* Show Navbar only if NOT an admin route */}
+      {!isAdminRoute && <Navbar />}{" "}
+      {/* Show Navbar only if NOT an admin route */}
       {children}
     </>
   );
@@ -71,47 +77,182 @@ const App = () => {
   useEffect(() => {
     setNavigate(navigate); // Set navigate function globally
   }, [navigate]);
-  
-  
+
   return (
-   
     <Layout>
-     
       {/* hide navbar if admin */}
       <Routes>
         {/* nested route */}
-        <Route  path="admin" element={<AdminCheck>
-          <AdminDashboard />
-        </AdminCheck>}>
-          {/* products */} 
-          <Route path="" element={<AdminCheck><OrdersList /></AdminCheck>} />
-          <Route path="add-product" element={<AdminCheck><AddProduct /></AdminCheck>} />
-<Route path="manage-products" element={<AdminCheck><ManageStocks /></AdminCheck>} />
-<Route path="products/edit/:id" element={<AdminCheck><ProductUpdate /></AdminCheck>} />
-{/* coupons */}
-<Route path="add-coupon" element={<AdminCheck><AddCoupon /></AdminCheck>} />
-<Route path="manage-coupon" element={<AdminCheck><ManageCoupons /></AdminCheck>} />
-<Route path="manage-coupon/edit/:code" element={<AdminCheck><UpdateCoupon /></AdminCheck>} />
-{/* offers */}
-<Route path="add-offer" element={<AdminCheck><AddOffer /></AdminCheck>} />
-<Route path="manage-offer" element={<AdminCheck><ManageOffers /></AdminCheck>} />
+        <Route
+          path="admin"
+          element={
+            <AdminCheck>
+              <AdminDashboard />
+            </AdminCheck>
+          }
+        >
+          {/* products */}
+          <Route
+            path=""
+            element={
+              <AdminCheck>
+                <OrdersList />
+              </AdminCheck>
+            }
+          />
+          <Route
+            path="add-product"
+            element={
+              <AdminCheck>
+                <AddProduct />
+              </AdminCheck>
+            }
+          />
+          <Route
+            path="manage-products"
+            element={
+              <AdminCheck>
+                <ManageStocks />
+              </AdminCheck>
+            }
+          />
+          <Route
+            path="products/edit/:id"
+            element={
+              <AdminCheck>
+                <ProductUpdate />
+              </AdminCheck>
+            }
+          />
+          {/* coupons */}
+          <Route
+            path="add-coupon"
+            element={
+              <AdminCheck>
+                <AddCoupon />
+              </AdminCheck>
+            }
+          />
+          <Route
+            path="manage-coupon"
+            element={
+              <AdminCheck>
+                <ManageCoupons />
+              </AdminCheck>
+            }
+          />
+          <Route
+            path="manage-coupon/edit/:code"
+            element={
+              <AdminCheck>
+                <UpdateCoupon />
+              </AdminCheck>
+            }
+          />
+          {/* offers */}
+          <Route
+            path="add-offer"
+            element={
+              <AdminCheck>
+                <AddOffer />
+              </AdminCheck>
+            }
+          />
+          <Route
+            path="manage-offer"
+            element={
+              <AdminCheck>
+                <ManageOffers />
+              </AdminCheck>
+            }
+          />
 
-{/* Category */}
-<Route path="category-to-add" element={<AdminCheck><CategoryToAdd /></AdminCheck>} />
-<Route path="add-category" element={<AdminCheck><AddCategory /></AdminCheck>} />
-<Route path="manage-category" element={<AdminCheck><ManageCategories /></AdminCheck>} />
-<Route path="edit-category/:id" element={<AdminCheck><UpdateCategory /></AdminCheck>} />
-{/* brand category */}
-<Route path="add-brand" element={<AdminCheck><AddBrand /></AdminCheck>} />
-<Route path="all-brands" element={<AdminCheck><ManageBrands /></AdminCheck>} />
-{/* color category */}
-<Route path="add-color" element={<AdminCheck><AddColor /></AdminCheck>} />
-<Route path="all-colors" element={<AdminCheck><ColorLists /></AdminCheck>} />
-{/* Orders */}
-<Route path="manage-orders" element={<AdminCheck><ManageOrders /></AdminCheck>} />
-<Route path="order-details/:id" element={<AdminCheck><UpdateOrders /></AdminCheck>} />
-         
-          <Route path="customers" element={<AdminCheck><Customers /></AdminCheck>} />
+          {/* Category */}
+          {/* <Route path="category-to-add" element={<AdminCheck><CategoryToAdd /></AdminCheck>} /> */}
+          <Route
+            path="add-category"
+            element={
+              <AdminCheck>
+                <AddCategory />
+              </AdminCheck>
+            }
+          />
+          <Route
+            path="manage-category"
+            element={
+              <AdminCheck>
+                <ManageCategories />
+              </AdminCheck>
+            }
+          />
+          <Route
+            path="edit-category/:id"
+            element={
+              <AdminCheck>
+                <UpdateCategory />
+              </AdminCheck>
+            }
+          />
+          {/* brand category */}
+          <Route
+            path="add-brand"
+            element={
+              <AdminCheck>
+                <AddBrand />
+              </AdminCheck>
+            }
+          />
+          <Route
+            path="all-brands"
+            element={
+              <AdminCheck>
+                <ManageBrands />
+              </AdminCheck>
+            }
+          />
+          {/* color category */}
+          <Route
+            path="add-color"
+            element={
+              <AdminCheck>
+                <AddColor />
+              </AdminCheck>
+            }
+          />
+          <Route
+            path="all-colors"
+            element={
+              <AdminCheck>
+                <ColorLists />
+              </AdminCheck>
+            }
+          />
+          {/* Orders */}
+          <Route
+            path="manage-orders"
+            element={
+              <AdminCheck>
+                <ManageOrders />
+              </AdminCheck>
+            }
+          />
+          <Route
+            path="order-details/:id"
+            element={
+              <AdminCheck>
+                <UpdateOrders />
+              </AdminCheck>
+            }
+          />
+
+          <Route
+            path="customers"
+            element={
+              <AdminCheck>
+                <Customers />
+              </AdminCheck>
+            }
+          />
         </Route>
         {/* public links */}
         {/* Products */}
@@ -121,31 +262,75 @@ const App = () => {
         <Route path="/all-categories" element={<AllCategories />} />
         <Route path="/success" element={<ThanksForOrdering />} />
         {/* review */}
-        <Route path="/add-review/:id" element={<AuthRoute><AddReview /></AuthRoute>} />
+        <Route
+          path="/add-review/:id"
+          element={
+            <AuthRoute>
+              <AddReview />
+            </AuthRoute>
+          }
+        />
 
         {/* shopping cart &wishlist */}
-        <Route path="/wishlist" element={<AuthRoute><WishList/></AuthRoute>} />
-        
-        <Route path="/shopping-cart" element={<AuthRoute><ShoppingCart /></AuthRoute>} />
-        <Route path="/order-payment" element={<AuthRoute><OrderPayment /></AuthRoute>} />
+        <Route
+          path="/wishlist"
+          element={
+            <AuthRoute>
+              <WishList />
+            </AuthRoute>
+          }
+        />
+
+        <Route
+          path="/shopping-cart"
+          element={
+            <AuthRoute>
+              <ShoppingCart />
+            </AuthRoute>
+          }
+        />
+        <Route
+          path="/order-payment"
+          element={
+            <AuthRoute>
+              <OrderPayment />
+            </AuthRoute>
+          }
+        />
         {/* users */}
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+        <Route
+          path="/register"
+          element={
+            <GoogleOAuthProvider
+              clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
+            >
               <RegisterForm />
-            </GoogleOAuthProvider>} />
+            </GoogleOAuthProvider>
+          }
+        />
         <Route path="/verify-otp" element={<OtpVerification />} />
 
         {/* <Route path="/register" element={<RegisterForm />} /> */}
         <Route path="/user-profile" element={<ProfilePage />}>
-  <Route path="/user-profile/orders" element={<Orders />} />
-  <Route path="/user-profile/wallet" element={<Wallet />} />
-  <Route path="/user-profile/addresses" element={<ShippingAddressDetails/>} />
-</Route>
-     
-        <Route path="/customer-profile" element={<AuthRoute><CustomerProfile /></AuthRoute>} />
+          <Route path="/user-profile/orders" element={<Orders />} />
+          <Route path="/user-profile/wallet" element={<Wallet />} />
+          <Route
+            path="/user-profile/addresses"
+            element={<ShippingAddressDetails />}
+          />
+        </Route>
+
+        <Route
+          path="/customer-profile"
+          element={
+            <AuthRoute>
+              <CustomerProfile />
+            </AuthRoute>
+          }
+        />
       </Routes>
-      </Layout>
-   
+    </Layout>
   );
 };
 

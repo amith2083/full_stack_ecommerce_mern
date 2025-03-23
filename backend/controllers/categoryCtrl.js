@@ -3,6 +3,7 @@ import Category from "../model/Category.js";
 
 export const createCategory = asyncHandler(async (req, res) => {
     const { name } = req.body;
+ 
     //category exists
     const categoryFound = await Category.findOne({ name });
     if (categoryFound) {
@@ -43,27 +44,41 @@ export const createCategory = asyncHandler(async (req, res) => {
 
   export const updateCategory = asyncHandler(async (req, res) => {
     const { name } = req.body;
+    console.log(req.body)
     
-    // Check if the new category name already exists (excluding the current category)
-    const existingCategory = await Category.findOne({ name });
+    let updateData = { name };
+    
 
-    if (existingCategory) {
-        return res.status(400).json({
-            status: "error",
-            message: "Category with this name already exists",
-        });
+    if (req.file) {
+      updateData.image = req.file.path; // Assuming the path of the uploaded file is stored in the database
     }
-  
-    //update
+
+    // const category = await Category.findByIdAndUpdate(req.params.id,{name,image},{new:true});
     const category = await Category.findByIdAndUpdate(
       req.params.id,
-      {
-        name,
-      },
+      updateData,
       {
         new: true,
       }
     );
+
+    // if (existingCategory) {
+    //     return res.status(400).json({
+    //         status: "error",
+    //         message: "Category with this name already exists",
+    //     });
+    // }
+  
+    //update
+    // const category = await Category.findByIdAndUpdate(
+    //   req.params.id,
+    //   {
+    //     name,
+    //   },
+    //   {
+    //     new: true,
+    //   }
+    // );
     res.json({
       status: "success",
       message: "category updated successfully",

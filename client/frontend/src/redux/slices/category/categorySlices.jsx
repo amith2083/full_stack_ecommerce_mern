@@ -71,12 +71,12 @@ export const fetchSingleCategory = createAsyncThunk(
   }
 );
 
-// update category
+// update category-----------------------------------------------------------------------------------------------------------
 export const updateCategory = createAsyncThunk(
   "/category/update",
-  async ({ id, name }, { rejectWithValue, getState, dispatch }) => {
+  async ({ id, updatedFormData}, { rejectWithValue, getState, dispatch }) => {
     try {
-      const response = await axiosInstance.put(`/category/${id}`, { name });
+      const response = await axiosInstance.put(`/category/${id}`, updatedFormData);
       return response.data;
     } catch (error) {
       console.log(error);
@@ -84,6 +84,7 @@ export const updateCategory = createAsyncThunk(
     }
   }
 );
+
 
 
 

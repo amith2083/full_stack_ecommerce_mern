@@ -80,7 +80,7 @@ export default function ProductsFilters() {
   const [params, setParams] = useSearchParams();
   const category = params.get("category");
   const [page, setPage] = useState(1);
-  const limit = 5; // Number of products per page
+  const limit = 8; // Number of products per page
   //filters
   const [color, setColor] = useState("");
   const [price, setPrice] = useState("");

@@ -1,13 +1,14 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import ErrorMsg from "../../ErrorMsg/ErrorMsg";
 import LoadingComponent from "../../LoadingComp/LoadingComponent";
 import NoDataFound from "../../NoDataFound/NoDataFound";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { fetchProduct } from "../../../redux/slices/products/productSlices";
-
+import { fetchProduct, unlistListProduct } from "../../../redux/slices/products/productSlices";
+import Swal from 'sweetalert2'
 export default function ManageStocks() {
 const dispatch = useDispatch()
+const navigate = useNavigate()
   // Pagination state
  
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,8 +35,40 @@ const dispatch = useDispatch()
 
   // let products, loading, error;
 
-  //delete product handler
-  const deleteProductHandler = (id) => {};
+  //list/unlist product handler--------------------------------------------------------------------------
+  const handleListUnList = (productId, status) => {
+    Swal.fire({
+      title: `Are you sure you want to ${status ? "list" : "unlist"} this product?`,
+      text: status
+        ? "The product will be visible to customers."
+        : "The product will be  hidden from customers.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: `Yes, ${status ? "list" : "unlist"} it!`,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(unlistListProduct(productId))
+          .unwrap()
+          .then(() => {
+            Swal.fire({
+              icon: "success",
+              title: "Status updated",
+              text: status
+                ? "Product listed successfully"
+                : "Product unlisted successfully",
+              timer: 3000,
+              showConfirmButton: false,
+            });
+          })
+          .then(() => {
+            dispatch(fetchProduct({ url: productUrl }));
+          });
+      }
+    });
+  };
+  
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
@@ -186,14 +219,14 @@ const dispatch = useDispatch()
                         </td>
                         {/* delete */}
                         <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                          <button
-                            onClick={() => deleteProductHandler(product._id)}
-                            className="text-indigo-600 hover:text-indigo-900">
-                             🗑️
-
-                         
-                          </button>
-                        </td>
+  <button
+    onClick={() => handleListUnList(product._id,product.status)}
+    className={`${
+      product.status ? "text-red-600 hover:text-red-900" : "text-green-600 hover:text-green-900"
+    }`}>
+    {product.status ? "List" : "unlist"}
+  </button>
+</td>
                       </tr>
                     ))}
                   </tbody>
