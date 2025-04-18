@@ -30,6 +30,7 @@ export const calculateAndUpdateSalesPrice = async (productId) => {
     const productOffers = await Offer.find({
       applicableToProduct:product._id,
       status: 'active',
+      isBlocked:false,
       startDate: { $lte: now },  // This ensures offers that started in the past are included
       endDate: { $gte: now }
     });
@@ -41,6 +42,7 @@ export const calculateAndUpdateSalesPrice = async (productId) => {
          categoryOffers = await Offer.find({
             applicableToCategory: category._id,
             status: 'active',
+            isBlocked:false,
             startDate: { $lte: now },
             endDate: { $gte: now }
           });

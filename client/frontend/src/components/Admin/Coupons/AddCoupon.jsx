@@ -6,9 +6,11 @@ import ErrorMsg from "../../ErrorMsg/ErrorMsg";
 import SuccessMsg from "../../SuccessMsg/SuccessMsg";
 import { useDispatch, useSelector } from "react-redux";
 import { createCoupon } from "../../../redux/slices/coupon/couponSlices";
+import { useNavigate } from "react-router-dom";
 
 export default function AddCoupon() {
-  const dispatch  = useDispatch()
+  const dispatch = useDispatch();
+  const navigate = useNavigate()
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
 
@@ -24,18 +26,31 @@ export default function AddCoupon() {
   //---onHandleSubmit---
   const onHandleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form Start Date Before Sending:", formData.startDate);
-    dispatch(createCoupon({code:formData.code,discount:formData.discount,startDate,endDate}))
+
+    dispatch(
+      createCoupon({
+        code: formData.code,
+        discount: formData.discount,
+        startDate,
+        endDate,
+      })
+    )
+      .unwrap()
+      .then(() => {
+        navigate("/admin/manage-coupon");
+      });
 
     //reset form
-    setFormData({
-      code: "",
-      discount: "",
-    });
+    // setFormData({
+    //   code: "",
+    //   discount: "",
+    // });
   };
   //---coupon from store---
-  const { loading, isAdded, error,coupon } = useSelector((state)=>state?.coupons)
-  console.log('coupon',loading,isAdded,error,coupon)
+  const { loading, isAdded, error, coupon } = useSelector(
+    (state) => state?.coupons
+  );
+  console.log("coupon", loading, isAdded, error, coupon);
   return (
     <>
       {error && <ErrorMsg message={error?.message} />}
@@ -115,7 +130,8 @@ export default function AddCoupon() {
               ) : (
                 <button
                   type="submit"
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
                   Add Coupon
                 </button>
               )}

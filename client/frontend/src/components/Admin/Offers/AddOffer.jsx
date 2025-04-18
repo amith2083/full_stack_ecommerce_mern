@@ -57,9 +57,8 @@ export default function AddOffer() {
     
       dispatch(createOffer(offerData))
         .unwrap()
-        .then((response) => {
-          console.log("Offer created successfully", response);
-          // Optionally, show a success message or navigate to another page
+        .then(() => {
+          navigate("/admin/manage-offer");
         })
         .catch((error) => {
           console.error("Failed to create offer", error);

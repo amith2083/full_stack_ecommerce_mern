@@ -39,11 +39,9 @@ CouponSchema.virtual("isExpired").get(function () {
 });
 
 CouponSchema.virtual("daysLeft").get(function () {
-  const daysLeft =
-    Math.ceil((this.endDate - Date.now()) / (1000 * 60 * 60 * 24)) +
-    " " +
-    "Days left";
-  return daysLeft;
+  const days = Math.ceil((this.endDate - Date.now()) / (1000 * 60 * 60 * 24));
+  const safeDays = days > 0 ? days : 0;
+  return `${safeDays} Days left`;
 });
 
 //validation
@@ -76,8 +74,8 @@ CouponSchema.pre("validate", function (next) {
   const startDate = new Date(this.startDate);
   startDate.setUTCHours(0, 0, 0, 0); // Convert startDate to UTC midnight
 
-  console.log("Start Date (UTC):", startDate);
-  console.log("Today (UTC):", today);
+  // console.log("Start Date (UTC):", startDate);
+  // console.log("Today (UTC):", today);
 
   if (startDate < today) {
     return next(new Error("Start date cannot be less than today"));
@@ -93,8 +91,8 @@ CouponSchema.pre("validate", function (next) {
 });
 
 CouponSchema.pre("validate", function (next) {
-  if (this.discount <= 0 || this.discount > 100) {
-    next(new Error("Discount cannot be less than 0 or greater than 100"));
+  if (this.discount <= 0 || this.discount > 80) {
+    next(new Error("Discount cannot be less than 0 or greater than 90"));
   }
   next();
 });

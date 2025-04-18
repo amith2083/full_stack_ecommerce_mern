@@ -52,6 +52,10 @@ const offerSchema = new mongoose.Schema(
       enum: ["active", "inactive", "expired"],
       default: "inactive",
     },
+    isBlocked:{
+      type:Boolean,
+      default:false
+    }
   },
   {
     timestamps: true,
@@ -66,8 +70,11 @@ offerSchema.pre("save", function (next) {
   if (this.endDate < this.startDate) {
     return next(new Error("End date cannot be before start date"));
   }
-  if (this.startDate < currentDate) {
-    return next(new Error("Start date cannot be in the past"));
+  // Only apply validation on creation (not update)
+  if (this.isNew) {
+    if (this.startDate < currentDate) {
+      return next(new Error("Start date cannot be in the past"));
+    }
   }
   if (
     this.offerType === "percentage" &&

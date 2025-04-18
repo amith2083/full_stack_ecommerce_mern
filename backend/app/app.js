@@ -24,7 +24,7 @@ const app = express();
 
 dbConnect();
 app.use(express.json());
-// app.use(cors());
+
 app.use(
   cors({
     origin: "https://trendzcart.vercel.app", // Allow only your frontend
@@ -43,7 +43,7 @@ app.use("/coupon", couponRoute);
 app.use("/order", orderRoute);
 app.use("/wishlist", wishListRoute);
 app.use("/wallet", walletRoute);
-app.use("/offer",offerRoute)
+app.use("/offer", offerRoute);
 
 app.use(notFound);
 app.use(globalErrHandler);
@@ -53,5 +53,3 @@ const PORT = process.env.PORT || 7001;
 app.listen(PORT, () => {
   console.log(`server is running on port no: ${PORT}`);
 });
-
-//

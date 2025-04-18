@@ -20,7 +20,7 @@ import { fetchWishlist } from "../../redux/slices/wishlist/wishListSlices";
 
 
 export default function Navbar() {
-  // const categoriesToDisplay =[];
+ 
   const dispatch = useDispatch()
   const navigate = useNavigate()
   useEffect(()=>{
@@ -51,7 +51,7 @@ export default function Navbar() {
 
   },[dispatch])
   const {cartItems,}=useSelector((state)=>state?.carts)
-  console.log('cart',cartItems)
+  
   const { wishLists } = useSelector((state) => state?.wishLists);
  
   
@@ -61,7 +61,9 @@ export default function Navbar() {
   },[dispatch])
   //get coupons
   const { coupons, loading, error } = useSelector((state)=>state?.coupons)
+
   const latestCoupon = coupons?.coupons?.[coupons?.coupons?.length-1]
+ 
  
   
 
@@ -189,7 +191,7 @@ export default function Navbar() {
           <div className="bg-gray-900">
             <div className="mx-auto flex h-10 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
               <p className="flex-1 text-center text-sm font-medium text-white lg:flex-none ">
-               {latestCoupon?`🎉${latestCoupon?.code}-${latestCoupon?.discount}%🎉`:'No Flash Sale'}
+               {latestCoupon ?`🎉${latestCoupon?.code}-${latestCoupon?.discount}%🎉`:'No Flash Sale'}
               </p>
 
               <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">

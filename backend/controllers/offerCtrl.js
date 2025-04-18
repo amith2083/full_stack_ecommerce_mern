@@ -37,6 +37,22 @@ export const getAllOffers = asyncHandler(async (req, res) => {
   });
 });
 
+export const getOffer = asyncHandler(async (req, res) => {
+ 
+  const offer = await Offer.findOne({ code: req.query.code });
+  //check if is not found
+ 
+  if (offer === null) {
+    throw new Error("offer not found");
+  }
+ 
+  res.json({
+    status: "success",
+    message: "offer fetched",
+    offer,
+  });
+});
+
 export const createOffer = asyncHandler(async (req, res) => {
   try {
     const {
@@ -51,14 +67,14 @@ export const createOffer = asyncHandler(async (req, res) => {
       applicableToCategory,
       usageLimit,
     } = req.body;
-    console.log('.........',req.body)
+//     console.log('.........',req.body)
 
 
-    console.log(typeof applicableToProduct); 
-console.log(typeof applicableToCategory);
+//     console.log(typeof applicableToProduct); 
+// console.log(typeof applicableToCategory);
 
-console.log(mongoose.Types.ObjectId.isValid(applicableToProduct)); // Expected: true
-console.log(mongoose.Types.ObjectId.isValid(applicableToCategory))
+// console.log(mongoose.Types.ObjectId.isValid(applicableToProduct)); // Expected: true
+// console.log(mongoose.Types.ObjectId.isValid(applicableToCategory))
 
     // Validate inputs
     if (
@@ -153,34 +169,120 @@ console.log(mongoose.Types.ObjectId.isValid(applicableToCategory))
   }
 });
 
-export const blockOffer = asyncHandler(async (req, res) => {
+
+export const updateOffer = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  console.log(id)
+  
+  const {
+    code,
+    offerType,
+    offerValue,
+    startDate,
+    endDate,
+    description,
+  } = req.body;
+ 
+
+ 
+
+  const offer = await Offer.findById(new mongoose.Types.ObjectId(id));
+  console.log(offer)
+  if (!offer) {
+    return res.status(404).json({
+      status: "error",
+      message: "Offer not found",
+    });
+  }
+
+
+  const upperCaseCode = code.toUpperCase();
+
+  // Check for duplicate code (if changed)
+  if (offer.code !== upperCaseCode) {
+    const existing = await Offer.findOne({ code: upperCaseCode });
+    if (existing) {
+      return res.status(400).json({
+        status: "error",
+        message: "Offer code already exists",
+      });
+    }
+  }
+
+  // Update offer fields
+  offer.code = upperCaseCode;
+  // offer.offerType = offerType;
+  offer.offerValue = offerValue;
+  offer.startDate = startDate;
+  offer.endDate = endDate;
+  offer.description = description || "";
+  // offer.applicableTo = applicableTo;
+  // offer.applicableToProduct =
+  //   applicableTo === "Product" ? applicableToProduct : null;
+  // offer.applicableToCategory =
+  //   applicableTo === "Category" ? applicableToCategory : null;
+  // offer.usageLimit = usageLimit;
+
+  const updatedOffer = await offer.save();
+
+  // Clear offer from all products (clean-up before reapplying)
+  // await Product.updateMany(
+  //   { offers: offer._id },
+  //   { $pull: { offers: offer._id } }
+  // );
+
+  // // Re-apply the offer to selected target
+  // if (applicableTo === "Product" && applicableToProduct) {
+  //   const product = await Product.findByIdAndUpdate(applicableToProduct, {
+  //     $addToSet: { offers: offer._id },
+  //   });
+  //   if (!product) {
+  //     return res.status(404).json({ message: "Product not found" });
+  //   }
+  // } else if (applicableTo === "Category" && applicableToCategory) {
+  //   const category = await Category.findById(applicableToCategory);
+  //   if (!category) {
+  //     return res.status(404).json({ message: "Category not found" });
+  //   }
+
+  //   await Product.updateMany(
+  //     { category: category.name },
+  //     { $addToSet: { offers: offer._id } }
+  //   );
+  // }
+
+  res.status(200).json({
+    status: "success",
+    message: "Offer updated successfully",
+    offer: updatedOffer,
+  });
+});
+
+
+export const listUnListOffer = asyncHandler(async (req, res) => {
   try {
     const { id } = req.params;
-    await Offer.findByIdAndUpdate(id, { status: "inactive" }, { new: true });
 
-    // res.redirect('/admin/add-offer-product'); // Redirect to the offer list page
-    return res
+    const offer = await Offer.findById(id);
+
+    if (!offer) {
+      return res.status(404).json({ message: "offer not found" });
+    }
+
+    offer.isBlocked = !offer.isBlocked;
+    await offer.save();
+
+    res
       .status(200)
-      .json({ success: true, message: "Offer blocked successfully" });
+      .json({
+        message: `Offer${
+          offer.isBlocked ? "Blocked" : "Unblocked"
+        } successfully`,
+        offer,
+      });
   } catch (error) {
-    console.error("Error blocking offer:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    res
+      .status(500)
+      .json({ message: "Something went wrong", error: error.message });
   }
-});
-export const unblockOffer = asyncHandler(async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    // Find the offer by ID and update its status to 'active'
-    await Offer.findByIdAndUpdate(id, { status: "active" }, { new: true });
-
-    // Redirect to the offer list page
-    // res.redirect('/admin/add-offer-product');
-    return res
-      .status(200)
-      .json({ success: true, message: "Offer unblocked successfully" });
-  } catch (error) {
-    console.error("Error unblocking offer:", error);
-    res.status(500).json({ success: false, message: "Server error" });
-  }
-});
+})

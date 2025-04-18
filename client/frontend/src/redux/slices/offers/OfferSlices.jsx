@@ -87,7 +87,7 @@ export const fetchOffer = createAsyncThunk(
   "/offer/fetch",
   async (code, { rejectWithValue, getState, dispatch }) => {
     try {
-      const response = await axiosInstance.get(`/offer/single?code=${code}`);
+      const response = await axiosInstance.get(`/offer/single?code=${encodeURIComponent(code)}`);
       return response.data;
     } catch (error) {
       console.log(error);
@@ -99,18 +99,13 @@ export const fetchOffer = createAsyncThunk(
 export const updateOffer = createAsyncThunk(
   "/offer/update",
   async (
-    { code, discount, startDate, endDate, id },
+    {  updatedData, id },
     { rejectWithValue, getState, dispatch }
   ) => {
     try {
-      // const { name } = payload;
-      console.log("pay", code, discount, id, startDate, endDate);
-
+     
       const response = await axiosInstance.put(`/offer/${id}`, {
-        code,
-        discount,
-        startDate,
-        endDate,
+       ...updatedData
       });
       return response.data;
     } catch (error) {
@@ -121,20 +116,16 @@ export const updateOffer = createAsyncThunk(
   }
 );
 
-//block/unblock offer--------------------------------------------------------------------------------------------------------------------
-export const deleteOffer = createAsyncThunk(
-  "/offer/delete",
-  async (id, { rejectWithValue, getState, dispatch }) => {
-    try {
-      const response = await axiosInstance.delete(`/offer/${id}`);
-      return response.data;
-    } catch (error) {
-      console.log(error);
-
-      return rejectWithValue(error?.response?.data);
-    }
+//unlist/list offer---------------------------------------------------------------------------------------------------------
+export const unlistListOffer = createAsyncThunk("unlistList/", async (offerId, { rejectWithValue, getState, dispatch  }) => {
+  try {
+    
+    const response = await axiosInstance.put(`/offer/list-unlist/${offerId}`);
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(error.response.data);
   }
-);
+});
 
 const offerSlice = createSlice({
   name: "offer",
@@ -186,7 +177,7 @@ const offerSlice = createSlice({
       state.loading = true;
     });
     builder.addCase(updateOffer.fulfilled, (state, action) => {
-      console.log("Payload:", action.payload);
+   
       state.loading = false;
       state.offer = action.payload;
       state.isUpdated = true;
@@ -197,19 +188,19 @@ const offerSlice = createSlice({
       state.isUpdated = false;
       state.error = action.payload;
     });
-    //delete coupon
-    builder.addCase(deleteOffer.pending, (state, action) => {
-      state.loading = true;
-    });
-    builder.addCase(deleteOffer.fulfilled, (state, action) => {
-      console.log("Payload:", action.payload);
-      state.loading = false;
-      state.isDelete = true;
-    });
-    builder.addCase(deleteOffer.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    });
+  //list-unlist offer----------------------------------------------------------------------------------------------------
+     builder.addCase(unlistListOffer.pending, (state, action) => {
+       state.loading = true;
+     });
+     builder.addCase(unlistListOffer.fulfilled, (state, action) => {
+       state.offer = action.payload;
+       state.loading = false;
+     });
+     builder.addCase(unlistListOffer.rejected, (state, action) => {
+       state.error = action.payload;
+       state.loading = false;
+     });
+  
     //reset error action
     builder.addCase(resetError.pending, (state, action) => {
       state.isAdded = false;

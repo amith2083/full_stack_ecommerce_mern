@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { fetchOffers } from "../../../redux/slices/offers/OfferSlices";
+import { fetchOffers, unlistListOffer } from "../../../redux/slices/offers/OfferSlices";
 export default function ManageOffers() {
   const dispatch  = useDispatch()
   const{id}= useParams()
@@ -22,28 +22,41 @@ export default function ManageOffers() {
   const { offers, loading, error } = useSelector((state)=>state?.offers)
  
 
-  //---deleteHandler---
+  //---unlist/listHandler---
+  const handleListUnList =(offerId,isBlocked)=>{
+     Swal.fire({
+          title: `Are you sure you want to ${isBlocked? "list" : "unlist"} this product?`,
+          text: isBlocked
+            ? "The product will be visible to customers."
+            : "The product will be  hidden from customers.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: `Yes, ${isBlocked ? "list" : "unlist"} it!`,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            dispatch(unlistListOffer(offerId))
+              .unwrap()
+              .then(() => {
+                Swal.fire({
+                  icon: "success",
+                  title: "Status updated",
+                  text: isBlocked
+                    ? "offer listed successfully"
+                    : "offer unlisted successfully",
+                  timer: 3000,
+                  showConfirmButton: false,
+                });
+              })
+              .then(() => {
+                dispatch(fetchOffers());
+              });
+          }
+        });
+  }
 
-  const blockUnblockHandler = (id) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "This coupon will be permanently deleted!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(deleteCoupon(id))
-          .unwrap()
-          .then(() => {
-            Swal.fire("Deleted!", "The coupon has been deleted.");
-            dispatch(fetchOffers()); // Refresh coupon list after deletion
-          });
-      }
-    });
-  };
+  
   // Pagination 
   const totalOffers = offers?.offers?.length || 0;
   const totalPages = Math.ceil(totalOffers / itemsPerPage);
@@ -161,10 +174,13 @@ export default function ManageOffers() {
                           </td>
                           {/* delete */}
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                            <button
-                              onClick={() => blockUnblockHandlerHandler(offer?._id)}>
-                             🗑️
-                            </button>
+                          <button
+    onClick={() => handleListUnList(offer._id,offer.isBlocked)}
+    className={`${
+      offer.isBlocked ? "text-red-600 hover:text-red-900" : "text-green-600 hover:text-green-900"
+    }`}>
+    {offer.isBlocked ? "List" : "unlist"}
+  </button>
                           </td>
                         </tr>
                       ))}

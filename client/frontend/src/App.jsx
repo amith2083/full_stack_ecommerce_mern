@@ -56,6 +56,7 @@ import { setNavigate } from "./utils/axiosConfig";
 import { useEffect } from "react";
 import AddOffer from "./components/Admin/Offers/AddOffer";
 import ManageOffers from "./components/Admin/Offers/ManageOffers";
+import UpdateOffer from "./components/Admin/Offers/UpdateOffer";
 
 // Function to handle conditional Navbar rendering
 const Layout = ({ children }) => {
@@ -163,6 +164,14 @@ const App = () => {
             element={
               <AdminCheck>
                 <ManageOffers />
+              </AdminCheck>
+            }
+          />
+           <Route
+            path="manage-offer/edit/:code"
+            element={
+              <AdminCheck>
+                <UpdateOffer/>
               </AdminCheck>
             }
           />

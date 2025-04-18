@@ -59,12 +59,11 @@ dispatch(updateCoupon({id:coupon?.coupon?._id,
   discount:formData?.discount,
   startDate,
   endDate
-}))
-    //reset
-    setFormData({
-      code: "",
-      discount: "",
-    });
+})).unwrap()
+.then(() => {
+  navigate("/admin/manage-coupon");
+});
+  
   };
   return (
     <>
