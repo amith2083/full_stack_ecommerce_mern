@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import google from "./google.png";
+import baseURL from "../../../utils/baseURL";
 
 const RegisterForm = () => {
   const dispatch = useDispatch();
@@ -45,7 +46,7 @@ const RegisterForm = () => {
     try {
       if (authResult?.code) {
         const response = await axios.get(
-          `https://trendzcart-backend-g2yw.onrender.com/user/google/callback?code=${authResult.code}`,
+          `${baseURL}/user/google/callback?code=${authResult.code}`,
           { withCredentials: true }
         );
 
