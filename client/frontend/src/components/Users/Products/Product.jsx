@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+
 import { RadioGroup } from "@headlessui/react";
 import {
   CurrencyDollarIcon,
@@ -9,67 +10,71 @@ import { StarIcon } from "@heroicons/react/20/solid";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { addOrderToCart, getCartItemsFromDatabase } from "../../../redux/slices/cart/cartSlices";
+import {
+  addOrderToCart,
+  getCartItemsFromDatabase,
+} from "../../../redux/slices/cart/cartSlices";
 import { fetchSingleProduct } from "../../../redux/slices/products/productSlices";
+
 // import { get } from "mongoose";
-const product = {
-  name: "Basic Tee",
-  price: "$35",
-  href: "#",
-  breadcrumbs: [
-    { id: 1, name: "Women", href: "#" },
-    { id: 2, name: "Clothing", href: "#" },
-  ],
-  images: [
-    {
-      id: 1,
-      imageSrc:
-        "https://tailwindui.com/img/ecommerce-images/product-page-01-featured-product-shot.jpg",
-      imageAlt: "Back of women's Basic Tee in black.",
-      primary: true,
-    },
-    {
-      id: 2,
-      imageSrc:
-        "https://tailwindui.com/img/ecommerce-images/product-page-01-product-shot-01.jpg",
-      imageAlt: "Side profile of women's Basic Tee in black.",
-      primary: false,
-    },
-    {
-      id: 3,
-      imageSrc:
-        "https://tailwindui.com/img/ecommerce-images/product-page-01-product-shot-02.jpg",
-      imageAlt: "Front of women's Basic Tee in black.",
-      primary: false,
-    },
-  ],
-  colors: [
-    { name: "Black", bgColor: "bg-gray-900", selectedColor: "ring-gray-900" },
-    {
-      name: "Heather Grey",
-      bgColor: "bg-gray-400",
-      selectedColor: "ring-gray-400",
-    },
-  ],
-  sizes: [
-    { name: "XXS", inStock: true },
-    { name: "XS", inStock: true },
-    { name: "S", inStock: true },
-    { name: "M", inStock: true },
-    { name: "L", inStock: true },
-    { name: "XL", inStock: false },
-  ],
-  description: `
-    <p>The Basic tee is an honest new take on a classic. The tee uses super soft, pre-shrunk cotton for true comfort and a dependable fit. They are hand cut and sewn locally, with a special dye technique that gives each tee it's own look.</p>
-    <p>Looking to stock your closet? The Basic tee also comes in a 3-pack or 5-pack at a bundle discount.</p>
-  `,
-  details: [
-    "Only the best materials",
-    "Ethically and locally made",
-    "Pre-washed and pre-shrunk",
-    "Machine wash cold with similar colors",
-  ],
-};
+// const product = {
+//   name: "Basic Tee",
+//   price: "$35",
+//   href: "#",
+//   breadcrumbs: [
+//     { id: 1, name: "Women", href: "#" },
+//     { id: 2, name: "Clothing", href: "#" },
+//   ],
+//   images: [
+//     {
+//       id: 1,
+//       imageSrc:
+//         "https://tailwindui.com/img/ecommerce-images/product-page-01-featured-product-shot.jpg",
+//       imageAlt: "Back of women's Basic Tee in black.",
+//       primary: true,
+//     },
+//     {
+//       id: 2,
+//       imageSrc:
+//         "https://tailwindui.com/img/ecommerce-images/product-page-01-product-shot-01.jpg",
+//       imageAlt: "Side profile of women's Basic Tee in black.",
+//       primary: false,
+//     },
+//     {
+//       id: 3,
+//       imageSrc:
+//         "https://tailwindui.com/img/ecommerce-images/product-page-01-product-shot-02.jpg",
+//       imageAlt: "Front of women's Basic Tee in black.",
+//       primary: false,
+//     },
+//   ],
+//   colors: [
+//     { name: "Black", bgColor: "bg-gray-900", selectedColor: "ring-gray-900" },
+//     {
+//       name: "Heather Grey",
+//       bgColor: "bg-gray-400",
+//       selectedColor: "ring-gray-400",
+//     },
+//   ],
+//   sizes: [
+//     { name: "XXS", inStock: true },
+//     { name: "XS", inStock: true },
+//     { name: "S", inStock: true },
+//     { name: "M", inStock: true },
+//     { name: "L", inStock: true },
+//     { name: "XL", inStock: false },
+//   ],
+//   description: `
+//     <p>The Basic tee is an honest new take on a classic. The tee uses super soft, pre-shrunk cotton for true comfort and a dependable fit. They are hand cut and sewn locally, with a special dye technique that gives each tee it's own look.</p>
+//     <p>Looking to stock your closet? The Basic tee also comes in a 3-pack or 5-pack at a bundle discount.</p>
+//   `,
+//   details: [
+//     "Only the best materials",
+//     "Ethically and locally made",
+//     "Pre-washed and pre-shrunk",
+//     "Machine wash cold with similar colors",
+//   ],
+// };
 
 const policies = [
   {
@@ -90,58 +95,57 @@ function classNames(...classes) {
 
 export default function Product() {
   const dispatch = useDispatch();
-  const navigate =useNavigate();
+  const navigate = useNavigate();
 
- 
- 
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
-  const{id}= useParams();
+  const { id } = useParams();
   //get data from store
-  const {
-    loading,
-    error,
-    product
-  } = useSelector((state) => state?.products);
-  console.log('product is',product)
+  const { loading, error, product } = useSelector((state) => state?.products);
+
   const cartItems = useSelector((state) => state?.carts?.cartItems || []);
-  console.log('cartitems',cartItems )
-  const productIds = cartItems.flatMap(cartItem => cartItem.items.map(item => item.product?._id));
-  console.log('productids',productIds)
+
+  const productIds = cartItems.flatMap((cartItem) =>
+    cartItem.items.map((item) => item.product?._id)
+  );
+
   const isInCart = productIds.includes(product?._id); // true if product is in cart
   // Check if product is in cart
   // const isInCart = cartItems.some((item) => item.product._id === product?._id);
 
   // let isInCart
- 
-  useEffect(()=>{
-   
-    if(id){
-      dispatch(fetchSingleProduct(id))
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchSingleProduct(id));
     }
-   
-    
+  }, [dispatch, id]);
 
-   
-  },[dispatch,id])
-  
- 
- 
- // Check if product is in the cart 
-//  const cartItems= useSelector((state)=>{state?.carts?.carts})
-// const cartState = useSelector((state) => state?.carts?.cartItems);
+  // Check if product is in the cart
+  //  const cartItems= useSelector((state)=>{state?.carts?.carts})
+  // const cartState = useSelector((state) => state?.carts?.cartItems);
 
-// const cartItems = cartState.length > 0 ? cartState[0].items : [];
+  // const cartItems = cartState.length > 0 ? cartState[0].items : [];
 
- 
-
-
-
-//  const isInCart = cartItems.some((item) => item.product._id === product._id);
+  //  const isInCart = cartItems.some((item) => item.product._id === product._id);
   //Add to cart handler
-  const addToCartHandler = async() => {
-   
-    if(!isInCart){
+  const addToCartHandler = async () => {
+    // 1. Check login
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "Please login to use Cart",
+        confirmButtonText: "Go to Login",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/login");
+        }
+      });
+      return;
+    }
+    if (!isInCart) {
       if (!selectedSize || !selectedColor) {
         Swal.fire({
           icon: "error",
@@ -150,21 +154,22 @@ export default function Product() {
         });
         return;
       }
-
     }
-   
+
     if (isInCart) {
       // If already in cart, navigate to shopping cart
       navigate("/shopping-cart");
       return;
     }
-    await dispatch(addOrderToCart({id:product?._id,selectedColor,selectedSize}))
-   Swal.fire({
+    await dispatch(
+      addOrderToCart({ id: product?._id, selectedColor, selectedSize })
+    );
+    Swal.fire({
       icon: "success",
       title: "Good Job",
       text: "Product added to cart successfully",
     });
-    return dispatch(getCartItemsFromDatabase())
+    return dispatch(getCartItemsFromDatabase());
   };
   let productDetails = {};
   let productColor;
@@ -189,8 +194,7 @@ export default function Product() {
               <h2 className="sr-only">Reviews</h2>
               <div className="flex items-center">
                 <p className="text-sm text-gray-700">
-                  {product?.reviews?.length>0?product?.averageRating:0}
-               
+                  {product?.reviews?.length > 0 ? product?.averageRating : 0}
                 </p>
                 <div className="ml-1 flex items-center">
                   {[0, 1, 2, 3, 4].map((rating) => (
@@ -208,11 +212,13 @@ export default function Product() {
                 </div>
                 <div
                   aria-hidden="true"
-                  className="ml-4 text-sm text-gray-300"></div>
+                  className="ml-4 text-sm text-gray-300"
+                ></div>
                 <div className="ml-4 flex">
                   <a
                     href="#"
-                    className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                    className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+                  >
                     {productDetails?.product?.totalReviews} total reviews
                   </a>
                 </div>
@@ -268,7 +274,8 @@ export default function Product() {
                               !active && checked ? "ring-2" : "",
                               "-m-0.5 relative p-0.5 rounded-full flex items-center justify-center cursor-pointer focus:outline-none"
                             )
-                          }>
+                          }
+                        >
                           <RadioGroup.Label as="span" className="sr-only">
                             {color.name}
                           </RadioGroup.Label>
@@ -294,7 +301,8 @@ export default function Product() {
                 <RadioGroup
                   value={selectedSize}
                   onChange={setSelectedSize}
-                  className="mt-2">
+                  className="mt-2"
+                >
                   {/* Choose size */}
                   <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
                     {product?.sizes?.map((size) => (
@@ -308,7 +316,8 @@ export default function Product() {
                               : "bg-white border-gray-200 text-gray-900 hover:bg-gray-50",
                             "border rounded-md py-3 px-3 flex items-center justify-center text-sm font-medium uppercase sm:flex-1 cursor-pointer"
                           );
-                        }}>
+                        }}
+                      >
                         <RadioGroup.Label as="span">{size}</RadioGroup.Label>
                       </RadioGroup.Option>
                     ))}
@@ -316,18 +325,23 @@ export default function Product() {
                 </RadioGroup>
               </div>
               {/* add to cart */}
-              {product?.qtyLeft<=0? <button disabled style={{cursor:'not-allowed'}}
-               
-               className="mt-8 flex w-full items-center justify-center rounded-md border border-transparent  bg-red-300 py-3 px-8 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-               Out of stock</button>:
-               <button
-               onClick={() => addToCartHandler()}
-               className="mt-8 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 py-3 px-8 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-               {isInCart ? 'Go to Cart' : 'Add to Cart'}
-             </button>
-              
-              }
-              
+              {product?.qtyLeft <= 0 ? (
+                <button
+                  disabled
+                  style={{ cursor: "not-allowed" }}
+                  className="mt-8 flex w-full items-center justify-center rounded-md border border-transparent  bg-red-300 py-3 px-8 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                >
+                  Out of stock
+                </button>
+              ) : (
+                <button
+                  onClick={() => addToCartHandler()}
+                  className="mt-8 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 py-3 px-8 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                >
+                  {isInCart ? "Go to Cart" : "Add to Cart"}
+                </button>
+              )}
+
               {/* proceed to check */}
 
               {/* {cartItems.length > 0 && (
@@ -357,7 +371,8 @@ export default function Product() {
                 {policies.map((policy) => (
                   <div
                     key={policy.name}
-                    className="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center">
+                    className="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center"
+                  >
                     <dt>
                       <policy.icon
                         className="mx-auto h-6 w-6 flex-shrink-0 text-gray-400"
@@ -381,7 +396,8 @@ export default function Product() {
         <section aria-labelledby="reviews-heading" className="mt-16 sm:mt-24">
           <h2
             id="reviews-heading"
-            className="text-lg font-medium text-gray-900">
+            className="text-lg font-medium text-gray-900"
+          >
             Recent reviews
           </h2>
 
@@ -389,7 +405,8 @@ export default function Product() {
             {product?.reviews.map((review) => (
               <div
                 key={review._id}
-                className="pt-10 lg:grid lg:grid-cols-12 lg:gap-x-8">
+                className="pt-10 lg:grid lg:grid-cols-12 lg:gap-x-8"
+              >
                 <div className="lg:col-span-8 lg:col-start-5 xl:col-span-9 xl:col-start-4 xl:grid xl:grid-cols-3 xl:items-start xl:gap-x-8">
                   <div className="flex items-center xl:col-span-1">
                     <div className="flex items-center">
@@ -425,11 +442,14 @@ export default function Product() {
                 </div>
 
                 <div className="mt-6 flex items-center text-sm lg:col-span-4 lg:col-start-1 lg:row-start-1 lg:mt-0 lg:flex-col lg:items-start xl:col-span-3">
-                  <p className="font-medium text-gray-900">{review?.user?.name}</p>
+                  <p className="font-medium text-gray-900">
+                    {review?.user?.name}
+                  </p>
                   <time
                     dateTime={review.datetime}
-                    className="ml-4 border-l border-gray-200 pl-4 text-gray-500 lg:ml-0 lg:mt-2 lg:border-0 lg:pl-0">
-                      {new Date(review.createdAt).toLocaleDateString()}
+                    className="ml-4 border-l border-gray-200 pl-4 text-gray-500 lg:ml-0 lg:mt-2 lg:border-0 lg:pl-0"
+                  >
+                    {new Date(review.createdAt).toLocaleDateString()}
                   </time>
                 </div>
               </div>

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addToWishlist, fetchWishlist, removeFromWishlist, } from "../../../redux/slices/wishlist/wishListSlices";
-
+import Swal from "sweetalert2";
 import SuccessMsg from "../../SuccessMsg/SuccessMsg";
 
 const Products = ({ products }) => {
-  
+  const navigate = useNavigate()
   const [localWishlist, setLocalWishlist] = useState([]);
   const dispatch = useDispatch()
 
@@ -27,6 +27,21 @@ const Products = ({ products }) => {
     const wishlistProductIds = wishLists?.map((item)=>item._id)
    
   const handleWishlistClick = (productId) => {
+    // 1. Check login
+  const token = localStorage.getItem("token"); 
+  
+  if (!token) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Please login to use wishlist',
+      confirmButtonText: 'Go to Login',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        navigate("/login");
+      }
+    });
+    return;
+  }
     if (localWishlist.includes(productId)) {
       setLocalWishlist((prev) => prev.filter((id) => id !== productId)); // Update local state instantly
       dispatch(removeFromWishlist(productId));
