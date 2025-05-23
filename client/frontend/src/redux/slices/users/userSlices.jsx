@@ -45,7 +45,7 @@ export const registerUserAction = createAsyncThunk(
 export const verifyOtp = createAsyncThunk(
   "user/verifyOtp",
   async ({ email, otp }, { rejectWithValue }) => {
-    console.log("verify", email, otp);
+    console.log("sliceverify", email, otp);
     try {
       const response = await axiosInstance.post(`/user/verify-otp`, {
         email,

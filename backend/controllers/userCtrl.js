@@ -1,5 +1,4 @@
-import dotenv from "dotenv";
-dotenv.config();
+
 import User from "../model/User.js";
 import asyncHandler from "express-async-handler";
 import bcrypt from "bcrypt";
@@ -12,6 +11,7 @@ import crypto from "crypto";
 import oauth2client from "../utils/googleConfig.js";
 import axios from "axios";
 import mongoose from "mongoose";
+
 
 export const register = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
@@ -42,6 +42,7 @@ export const register = asyncHandler(async (req, res) => {
 });
 export const verifyOtp = asyncHandler(async (req, res) => {
   const { email, otp } = req.body;
+  console.log('email&otpis',email,otp)
 
   const storedOtp = await OTP.findOne({ email, otp });
   console.log("storedotp", storedOtp);
@@ -133,31 +134,44 @@ export const login = asyncHandler(async (req, res) => {
 export const googleLogin = asyncHandler(async (req, res) => {
   try {
     const { code } = req.query;
+     
 
-    // const googleRes = await oauth2client.getToken(code)
+    
+
     const googleRes = await oauth2client.getToken({
       code,
-      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+      
     });
 
     oauth2client.setCredentials(googleRes.tokens);
     const userRes = await axios.get(
       `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`
     );
-
+ 
+  
     const { email, name, picture } = userRes.data;
     // Check if user exists, else create new user
     let user = await User.findOne({ email });
 
-    if (!user) {
-      user = await User.create({ email, name, isGoogleAuth: true });
-    }
-    // If the user is blocked, prevent login
-    if (user.isBlocked) {
-      return res
-        .status(403)
-        .json({ message: "Your account is blocked. Contact support." });
-    }
+  if (user) {
+  // User exists - check if they're allowed to log in via Google
+  if (user.isBlocked) {
+    return res.status(403).json({ message: "Your account is blocked. Contact support." });
+  }
+
+  // Handle case where user signed up with email/password but now tries to log in with Google
+  if (!user.isGoogleAuth) {
+    // You can either:
+    // 1. Allow login and mark it as a Google-linked account
+    // 2. Or ask them to log in via password for security
+    user.isGoogleAuth = true;
+    await user.save();
+  }
+} else {
+  // First-time Google login - create new user
+  user = await User.create({ email, name, isGoogleAuth: true });
+}
+    
     const token = await generateToken(user?._id);
     return res.status(200).json({
       message: "success",

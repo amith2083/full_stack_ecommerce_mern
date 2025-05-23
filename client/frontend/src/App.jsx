@@ -307,7 +307,7 @@ const App = () => {
           }
         />
         {/* users */}
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID} ><Login /></GoogleOAuthProvider>} />
         <Route
           path="/register"
           element={

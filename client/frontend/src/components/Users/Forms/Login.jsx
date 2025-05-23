@@ -7,6 +7,9 @@ import { useNavigate } from "react-router-dom";
 import { getCartItemsFromDatabase } from "../../../redux/slices/cart/cartSlices";
 import Swal from "sweetalert2";
 
+import google from "./google.png";
+import useGoogleAuth from "../../../utils/useGoogleAuth";
+
 
 const Login = () => {
   const dispatch = useDispatch()
@@ -43,7 +46,7 @@ const Login = () => {
     
     
   };
-
+const googleLogin = useGoogleAuth()
   //select store data
   const { loading,error, userInfo } = useSelector((state)=> state?.users?.userAuth
   
@@ -98,16 +101,36 @@ const Login = () => {
                     </label>
                   </div>
 
-                  <div className="w-full px-4">
+                  <div className="w-full px-4 flex justify-center">
                     {loading ? (
                       <LoadingComponent />
                     ) : (
-                      <button className="bg-blue-800 hover:bg-blue-900 text-white font-bold font-heading py-5 px-8 rounded-md uppercase">
+                      <button className="bg-blue-800  hover:bg-blue-900 w-1/2 text-white font-bold font-heading py-5 px-8 rounded-md uppercase">
                         Login
                       </button>
+
+
+
+
+                    
                     )}
                   </div>
                 </form>
+                <div className="w-full px-4 mt-6">
+                   <div className="flex items-center my-6">
+                  <div className="flex-1 border-t border-gray-300"></div>
+                  <p className="mx-4 text-gray-500 text-sm">or sign in with</p>
+                  <div className="flex-1 border-t border-gray-300"></div>
+                </div>
+  <button
+    type="button"
+    onClick={() => googleLogin()}
+    className="w-full flex items-center justify-center gap-3 py-4 px-6 border border-gray-300 rounded-md shadow-sm bg-white hover:bg-gray-100 transition duration-200"
+  >
+    <img src={google} alt="Google" className="w-5 h-5" />
+    <span className="text-gray-700 font-medium">Continue with Google</span>
+  </button>
+</div>
               </div>
             </div>
             <div

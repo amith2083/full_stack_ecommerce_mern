@@ -48,7 +48,7 @@ app.use("/offer", offerRoute);
 app.use(notFound);
 app.use(globalErrHandler);
 
-const PORT = process.env.PORT || 7001;
+const PORT = process.env.PORT || 7002;
 
 app.listen(PORT, () => {
   console.log(`server is running on port no: ${PORT}`);

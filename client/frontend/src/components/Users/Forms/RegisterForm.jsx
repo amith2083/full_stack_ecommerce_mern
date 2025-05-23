@@ -5,12 +5,14 @@ import { registerUserAction } from "../../../redux/slices/users/userSlices";
 import LoadingComponent from "../../LoadingComp/LoadingComponent";
 import ErrorMsg from "../../ErrorMsg/ErrorMsg";
 import { useNavigate } from "react-router-dom";
-import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import google from "./google.png";
-import baseURL from "../../../utils/baseURL";
+import useGoogleAuth from "../../../utils/useGoogleAuth";
+
+
 
 const RegisterForm = () => {
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -42,34 +44,8 @@ const RegisterForm = () => {
 
   const { user, error, loading } = useSelector((state) => state?.users);
 
-  const responseGoogle = async (authResult) => {
-    try {
-      if (authResult?.code) {
-        const response = await axios.get(
-          `${baseURL}/user/google/callback?code=${authResult.code}`,
-          { withCredentials: true }
-        );
-
-        Cookies.set("user", JSON.stringify(response.data), { expires: 7 });
-        navigate("/");
-      }
-
-      // await googleAuth(authResult['code'])
-    } catch (error) {
-      console.error("error while requesting google code", error);
-    }
-  };
-  const googleLogin = useGoogleLogin({
-    onSuccess: (response) => {
-      responseGoogle(response); // Call your handler function
-    },
-    onError: (error) => {
-      console.log("Google Login Failed:", error);
-    },
-
-    flow: "auth-code",
-    //  redirect_uri: 'http://localhost:7000/user/google/callback'
-  });
+ 
+  const googleLogin = useGoogleAuth()
 
   return (
     <>
@@ -117,7 +93,7 @@ const RegisterForm = () => {
                   {loading ? (
                     <LoadingComponent />
                   ) : (
-                    <button className="mt-12 md:mt-16 bg-blue-800 hover:bg-blue-900 text-white font-bold font-heading py-5 px-8 rounded-md uppercase">
+                    <button className="mt-12 md:mt-16 w-3/4 bg-blue-800 hover:bg-blue-900 text-white font-bold font-heading py-5 px-8 rounded-md uppercase">
                       Register
                     </button>
                   )}
