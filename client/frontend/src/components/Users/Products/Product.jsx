@@ -15,6 +15,8 @@ import {
   getCartItemsFromDatabase,
 } from "../../../redux/slices/cart/cartSlices";
 import { fetchSingleProduct } from "../../../redux/slices/products/productSlices";
+import getToken from "../../../utils/getToken";
+
 
 // import { get } from "mongoose";
 // const product = {
@@ -131,7 +133,7 @@ export default function Product() {
   //Add to cart handler
   const addToCartHandler = async () => {
     // 1. Check login
-    const token = localStorage.getItem("token");
+   const token = getToken()
 
     if (!token) {
       Swal.fire({

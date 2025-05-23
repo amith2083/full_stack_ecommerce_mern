@@ -4,6 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToWishlist, fetchWishlist, removeFromWishlist, } from "../../../redux/slices/wishlist/wishListSlices";
 import Swal from "sweetalert2";
 import SuccessMsg from "../../SuccessMsg/SuccessMsg";
+import getToken from "../../../utils/getToken";
+
+
 
 const Products = ({ products }) => {
   const navigate = useNavigate()
@@ -28,7 +31,8 @@ const Products = ({ products }) => {
    
   const handleWishlistClick = (productId) => {
     // 1. Check login
-  const token = localStorage.getItem("token"); 
+ const token = getToken()
+ 
   
   if (!token) {
     Swal.fire({

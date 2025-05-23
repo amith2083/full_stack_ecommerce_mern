@@ -1,11 +1,11 @@
-// utils/axiosConfig.js
+
 import axios from "axios";
 import Cookies from "js-cookie";
 import baseURL from "./baseURL";
 import Swal from "sweetalert2";
 
 // Create an Axios instance
-console.log("base", baseURL);
+
 const axiosInstance = axios.create({
   baseURL: baseURL, // Replace with your API base URL
 });
