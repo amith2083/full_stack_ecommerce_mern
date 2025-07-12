@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchWallet, addMoneyToWallet } from "../../../redux/slices/wallet/walletSlices";
 import { useLocation, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const Wallet = () => {
   const dispatch = useDispatch();
@@ -20,9 +21,16 @@ const Wallet = () => {
   const { wallet, loading } = useSelector((state) => state?.wallet);
 
   const handleAddMoney = async () => {
-    if (!amount || amount <= 0) return alert("Enter a valid amount");
+    if (!amount || amount <= 0 ||!Number.isInteger(amount)) 
+      return Swal.fire({
+      icon: "warning",
+      title: "Invalid Amount",
+      text: "Please enter a valid amount ",
+      confirmButtonColor: "#3085d6",
+    });
     await dispatch(addMoneyToWallet({ amount, navigate }));
     dispatch(fetchWallet());
+    setAmount(""); // Reset field
   };
 
   // Pagination Logic
@@ -54,7 +62,12 @@ const Wallet = () => {
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           placeholder="Enter amount"
-          className="border p-2 w-full mb-4 rounded-md"
+           min="1"
+  step="1" // 👈 prevents decimals
+          className="border p-2 w-full mb-4 rounded-md appearance-none 
+             [&::-webkit-outer-spin-button]:appearance-none 
+             [&::-webkit-inner-spin-button]:appearance-none 
+             focus:outline-none"
         />
         <button
           onClick={handleAddMoney}

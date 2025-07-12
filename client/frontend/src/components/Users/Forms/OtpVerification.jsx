@@ -67,7 +67,7 @@ const OtpVerification = () => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     if (!otp) return;
-    console.log('---front',email,otp)
+   
 
     const res = await dispatch(verifyOtp({ email, otp }));
 

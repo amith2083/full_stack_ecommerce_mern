@@ -61,7 +61,7 @@ export const verifyOtp = createAsyncThunk(
 export const resendOtp = createAsyncThunk(
   "user/resendOtp",
   async ({ email }, { rejectWithValue }) => {
-    console.log("Resend OTP for:", email);
+    
     try {
       const response = await axiosInstance.post(`/user/resend-otp`, { email });
       console.log("Resend OTP Response:", response);

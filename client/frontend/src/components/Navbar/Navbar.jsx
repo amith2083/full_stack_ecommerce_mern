@@ -68,7 +68,7 @@ export default function Navbar() {
   
 
   //get cart items from local storage
-  let cartItemsFromLocalStorage;
+ 
   const userCookie = Cookies.get('user');
   const user = userCookie ? JSON.parse(userCookie) : null;
   const isLoggedIn = user?.token ? true : false;
@@ -122,8 +122,8 @@ export default function Navbar() {
                       </a>
                     </div>
                   ))} */}
-                  {categoriesToDisplay?.length <= 0 ? (
-                    <>
+                  
+                    
                       <Link
                         to= '/product?category=clothing'
                         className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-800">
@@ -131,31 +131,19 @@ export default function Navbar() {
                       </Link>
 
                       <Link
-                        to="/"
-                        className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-800">
-                        Men
-                      </Link>
+    to="/"
+    className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-800">
+    Home
+  </Link>
 
-                      <Link
-                        to="/"
-                        className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-800">
-                        Women
-                      </Link>
-                    </>
-                  ) : (
-                    categoriesToDisplay?.map((category) => {
-                      return (
-                        <>
-                          <Link
-                            key={category?._id}
-                            to={`/products-filters?category=${category?.name}`}
-                            className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-800">
-                            {category?.name}
-                          </Link>
-                        </>
-                      );
-                    })
-                  )}
+  {categoriesToDisplay?.map((category) => (
+    <Link
+      key={category?._id}
+      to={`/products-filters?category=${category?.name}`}
+      className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-800">
+      {category?.name}
+    </Link>
+  ))}
                 </div>
 
                 {/* mobile links register/login */}
@@ -233,40 +221,21 @@ export default function Navbar() {
                     {/*  menus links*/}
                     <Popover.Group className="ml-8">
                       <div className="flex h-full justify-center space-x-8">
-                        {categoriesToDisplay?.length <= 0 ? (
-                          <>
-                           <Link
-                        to= '/product?category=clothing'
-                        className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-800">
-                      Home
-                      </Link>
+                          <Link
+    to="/"
+    className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-800">
+    Home
+  </Link>
 
-                      <Link
-                        to="/"
-                        className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-800">
-                        Men
-                      </Link>
-
-                      <Link
-                        to="/"
-                        className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-800">
-                        Women
-                      </Link>
-                          </>
-                        ) : (
-                          categoriesToDisplay?.map((category) => {
-                            return (
-                              <>
-                                <Link
-                                  key={category?._id}
-                                  to={`/products-filters?category=${category?.name}`}
-                                  className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-800">
-                                  {category?.name}
-                                </Link>
-                              </>
-                            );
-                          })
-                        )}
+  {categoriesToDisplay?.map((category) => (
+    <Link
+      key={category?._id}
+      to={`/products-filters?category=${category?.name}`}
+      className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-800">
+      {category?.name}
+    </Link>
+  ))}
+                        
                       </div>
                     </Popover.Group>
                   </div>

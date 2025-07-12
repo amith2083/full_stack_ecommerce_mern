@@ -8,7 +8,6 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import ManageCoupons from "./components/Admin/Coupons/ManageCoupons";
 import AddCoupon from "./components/Admin/Coupons/AddCoupon";
@@ -20,9 +19,7 @@ import Navbar from "./components/Navbar/Navbar";
 import OrderHistory from "./components/Admin/Orders/ManageOrders";
 import OrderPayment from "./components/Users/Products/OrderPayment";
 import ManageCategories from "./components/Admin/Categories/ManageCategories";
-
 import ManageStocks from "./components/Admin/Products/ManageStocks";
-
 import AddCategory from "./components/Admin/Categories/AddCategory";
 import AddBrand from "./components/Admin/Categories/AddBrand";
 import AddColor from "./components/Admin/Categories/AddColor";
@@ -35,10 +32,8 @@ import CustomerProfile from "./components/Users/Profile/CustomerProfile";
 import AddReview from "./components/Users/Reviews/AddReview";
 import UpdateCategory from "./components/Admin/Categories/UpdateCategory";
 import ThanksForOrdering from "./components/Users/Products/ThanksForOrdering";
-
 import OrdersList from "./components/Admin/Orders/OrdersList";
 import ManageOrders from "./components/Admin/Orders/ManageOrders";
-
 import ManageBrands from "./components/Admin/Categories/ManageBrands";
 import AuthRoute from "./components/Authenciation/AuthRoute";
 import AdminCheck from "./components/Authenciation/AdminCheck";

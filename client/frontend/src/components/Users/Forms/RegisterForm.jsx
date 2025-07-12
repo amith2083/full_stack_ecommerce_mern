@@ -8,6 +8,9 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import google from "./google.png";
 import useGoogleAuth from "../../../utils/useGoogleAuth";
+import { validateRegisterForm } from "../../../utils/validations/registrationValidation";
+import Swal from "sweetalert2";
+
 
 
 
@@ -30,13 +33,21 @@ const RegisterForm = () => {
   //---onsubmit handler----------------------------------------------------------------------------------------
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+      const validationError = validateRegisterForm({ name, email, password });
+  if (validationError) {
+    return Swal.fire({
+      icon: "error",
+      title: "Validation Error",
+      text: validationError,
+    });
+  }
     localStorage.setItem("email", email);
     const resultAction = await dispatch(
       registerUserAction({ email, password, name })
     );
 
     if (registerUserAction.fulfilled.match(resultAction)) {
-      // Navigate only if the user is newly registered
+      
       navigate("/verify-otp");
     }
   };

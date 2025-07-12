@@ -7,7 +7,7 @@ import Modal from "react-modal";
 
 const ShippingAddressDetails = () => {
   const dispatch = useDispatch();
-  const { profile,updated ,isDelete} = useSelector((state) => state?.users);
+  const { profile,updated ,isDelete,loading} = useSelector((state) => state?.users);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
 
@@ -46,7 +46,9 @@ const ShippingAddressDetails = () => {
   };
 })
   };
-  
+  if (loading) {
+  return <p className="text-center text-lg text-gray-500 font-semibold">Loading shipping addresses...</p>;
+}
 
   if (!profile?.user || !profile?.user.shippingAddress || profile?.user.shippingAddress.length === 0) {
     return <p className="text-center text-lg text-red-500 font-semibold">No shipping addresses found.</p>;
