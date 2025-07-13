@@ -130,11 +130,6 @@ export default function Navbar() {
                       Home
                       </Link>
 
-                      <Link
-    to="/"
-    className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-800">
-    Home
-  </Link>
 
   {categoriesToDisplay?.map((category) => (
     <Link

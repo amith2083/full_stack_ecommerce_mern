@@ -21,14 +21,18 @@ const Wallet = () => {
   const { wallet, loading } = useSelector((state) => state?.wallet);
 
   const handleAddMoney = async () => {
-    if (!amount || amount <= 0 ||!Number.isInteger(amount)) 
-      return Swal.fire({
+  const numericAmount = Number(amount);
+
+  if (!numericAmount || numericAmount <= 0 || !Number.isInteger(numericAmount)) {
+    return Swal.fire({
       icon: "warning",
       title: "Invalid Amount",
-      text: "Please enter a valid amount ",
+      text: "Please enter a valid amount",
       confirmButtonColor: "#3085d6",
     });
-    await dispatch(addMoneyToWallet({ amount, navigate }));
+  }
+
+  await dispatch(addMoneyToWallet({ amount: numericAmount, navigate }));
     dispatch(fetchWallet());
     setAmount(""); // Reset field
   };

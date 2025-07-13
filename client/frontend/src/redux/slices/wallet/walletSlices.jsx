@@ -12,7 +12,7 @@ const initialState = {
   isAdded: false,
 };
 
-// **Async Thunk to Fetch Wallet Details**
+// Async Thunk to Fetch Wallet Details
 export const fetchWallet = createAsyncThunk(
   "wallet/fetchWallet",
   async (_, { rejectWithValue }) => {
@@ -25,7 +25,7 @@ export const fetchWallet = createAsyncThunk(
   }
 );
 
-// **Async Thunk to Add Money to Wallet**
+// Async Thunk to Add Money to Wallet
 export const addMoneyToWallet = createAsyncThunk(
   "wallet/addMoney",
   async ({ amount, navigate }, { rejectWithValue }) => {
@@ -60,7 +60,6 @@ export const addMoneyToWallet = createAsyncThunk(
     //   }
     return response.data
     } catch (error) {
-        console.error(error);
       return rejectWithValue(error?.response?.data);
     }
   }

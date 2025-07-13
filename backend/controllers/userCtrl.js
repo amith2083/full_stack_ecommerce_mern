@@ -29,7 +29,7 @@ export const register = asyncHandler(async (req, res) => {
   await OTP.create({ email, otp, name, password: hashedPassword });
 
   // Send OTP to user email
-  await sendEmail(email,  `Your OTP is ${otp}`);
+  await sendEmail(email, `Your OTP is ${otp}`);
 
   res.status(201).json({
     status: "success",
@@ -73,7 +73,7 @@ export const verifyOtp = asyncHandler(async (req, res) => {
 // Resend OTP
 export const resendOtp = asyncHandler(async (req, res) => {
   const { email } = req.body;
-  console.log("resend", email);
+
 
   // Check if user exists
   const user = await OTP.findOne({ email });
@@ -126,53 +126,48 @@ export const login = asyncHandler(async (req, res) => {
   });
 });
 export const googleLogin = asyncHandler(async (req, res) => {
-  try {
-    const { code } = req.query;
+  const { code } = req.query;
 
-    const googleRes = await oauth2client.getToken({
-      code,
-    });
+  const googleRes = await oauth2client.getToken({
+    code,
+  });
 
-    oauth2client.setCredentials(googleRes.tokens);
-    const userRes = await axios.get(
-      `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`
-    );
+  oauth2client.setCredentials(googleRes.tokens);
+  const userRes = await axios.get(
+    `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`
+  );
 
-    const { email, name, picture } = userRes.data;
-    // Check if user exists, else create new user
-    let user = await User.findOne({ email });
+  const { email, name, picture } = userRes.data;
+  // Check if user exists, else create new user
+  let user = await User.findOne({ email });
 
-    if (user) {
-      // User exists - check if they're allowed to log in via Google
-      if (user.isBlocked) {
-        return res
-          .status(403)
-          .json({ message: "Your account is blocked. Contact support." });
-      }
-
-      // Handle case where user signed up with email/password but now tries to log in with Google
-      if (!user.isGoogleAuth) {
-        // You can either:
-        // 1. Allow login and mark it as a Google-linked account
-        // 2. Or ask them to log in via password for security
-        user.isGoogleAuth = true;
-        await user.save();
-      }
-    } else {
-      // First-time Google login - create new user
-      user = await User.create({ email, name, isGoogleAuth: true });
+  if (user) {
+    // User exists - check if they're allowed to log in via Google
+    if (user.isBlocked) {
+      return res
+        .status(403)
+        .json({ message: "Your account is blocked. Contact support." });
     }
 
-    const token = await generateToken(user?._id);
-    return res.status(200).json({
-      message: "success",
-      user,
-      token,
-    });
-  } catch (error) {
-    console.error("Google Login Error:", error);
-    res.status(500).json({ message: "Authentication failed" });
+    // Handle case where user signed up with email/password but now tries to log in with Google
+    if (!user.isGoogleAuth) {
+   
+      user.isGoogleAuth = true;
+      await user.save();
+    }
+  } else {
+    // First-time Google login - create new user
+    user = await User.create({ email, name, isGoogleAuth: true });
   }
+
+  const token = await generateToken(user?._id);
+  return res.status(200).json({
+    message: "success",
+    user,
+    token,
+  });
+
+  res.status(500).json({ message: "Authentication failed" });
 });
 export const updateShippingAddress = asyncHandler(async (req, res) => {
   const { firstName, lastName, address, city, postalCode, phone, country } =
@@ -197,7 +192,7 @@ export const updateShippingAddress = asyncHandler(async (req, res) => {
       new: true,
     }
   );
-  //send response
+ 
   res.json({
     status: "success",
     message: "User shipping address updated successfully",
@@ -206,55 +201,51 @@ export const updateShippingAddress = asyncHandler(async (req, res) => {
 });
 
 export const updateUserShippingAddress = asyncHandler(async (req, res) => {
-  try {
-    const { addressId } = req.params;
-    const { ...updatedAddress } = req.body;
+  const { addressId } = req.params;
+  const { ...updatedAddress } = req.body;
 
-    // Find user and update the specific shipping address
-    const user = await User.findOneAndUpdate(
-      { _id: req.userAuthId, "shippingAddress._id": addressId },
-      {
-        $set: {
-          "shippingAddress.$.firstName": updatedAddress.firstName,
-          "shippingAddress.$.lastName": updatedAddress.lastName,
-          "shippingAddress.$.address": updatedAddress.address,
-          "shippingAddress.$.city": updatedAddress.city,
-          "shippingAddress.$.postalCode": updatedAddress.postalCode,
-          "shippingAddress.$.phone": updatedAddress.phone,
-          // "shippingAddress.$.country": updatedAddress.country,
-        },
+  // Find user and update the specific shipping address
+  const user = await User.findOneAndUpdate(
+    { _id: req.userAuthId, "shippingAddress._id": addressId },
+    {
+      $set: {
+        "shippingAddress.$.firstName": updatedAddress.firstName,
+        "shippingAddress.$.lastName": updatedAddress.lastName,
+        "shippingAddress.$.address": updatedAddress.address,
+        "shippingAddress.$.city": updatedAddress.city,
+        "shippingAddress.$.postalCode": updatedAddress.postalCode,
+        "shippingAddress.$.phone": updatedAddress.phone,
+        // "shippingAddress.$.country": updatedAddress.country,
       },
-      { new: true } // Return updated user
-    );
+    },
+    { new: true } 
+  );
 
-    if (!user) {
-      return res.status(404).json({ message: "User or address not found" });
-    }
-
-    res.status(200).json({ message: "Shipping address updated", user });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+  if (!user) {
+    return res.status(404).json({ message: "User or address not found" });
   }
+
+  res.status(200).json({ message: "Shipping address updated", user });
+
+  // res.status(500).json({ message: "Server error", error: error.message });
 });
 export const deleteUserShippingAddress = asyncHandler(async (req, res) => {
-  try {
-    const { addressId } = req.params;
+  const { addressId } = req.params;
 
-    // Find the user and update the shipping address array
-    const user = await User.findByIdAndUpdate(
-      req.userAuthId,
-      { $pull: { shippingAddress: { _id: addressId } } },
-      { new: true }
-    );
+  // Find the user and update the shipping address array
+  const user = await User.findByIdAndUpdate(
+    req.userAuthId,
+    { $pull: { shippingAddress: { _id: addressId } } },
+    { new: true }
+  );
 
-    if (!user) {
-      return res.status(404).json({ message: "User or address not found" });
-    }
-
-    res.status(200).json({ message: "Shipping address deleted", user });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+  if (!user) {
+    return res.status(404).json({ message: "User or address not found" });
   }
+
+  res.status(200).json({ message: "Shipping address deleted", user });
+
+  // res.status(500).json({ message: "Server error", error: error.message });
 });
 
 export const getUserProfile = asyncHandler(async (req, res) => {
@@ -279,30 +270,24 @@ export const getAllUsers = asyncHandler(async (req, res) => {
 });
 
 export const blockUnblockUser = asyncHandler(async (req, res) => {
-  try {
-    const { userId } = req.params;
-    // if (!mongoose.Types.ObjectId.isValid(userId)) {
+  const { userId } = req.params;
+  // if (!mongoose.Types.ObjectId.isValid(userId)) {
 
-    // }
+  // }
 
-    // Find the user
-    const user = await User.findById(userId);
+  // Find the user
+  const user = await User.findById(userId);
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Toggle the isBlocked status
-    user.isBlocked = !user.isBlocked;
-    await user.save();
-
-    res.status(200).json({
-      message: `User ${user.isBlocked ? "Blocked" : "Unblocked"} successfully`,
-      user,
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
   }
+
+  // Toggle the isBlocked status
+  user.isBlocked = !user.isBlocked;
+  await user.save();
+
+  res.status(200).json({
+    message: `User ${user.isBlocked ? "Blocked" : "Unblocked"} successfully`,
+    user,
+  });
 });
