@@ -74,7 +74,6 @@ export const verifyOtp = asyncHandler(async (req, res) => {
 export const resendOtp = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
-
   // Check if user exists
   const user = await OTP.findOne({ email });
   if (!user) {
@@ -151,7 +150,6 @@ export const googleLogin = asyncHandler(async (req, res) => {
 
     // Handle case where user signed up with email/password but now tries to log in with Google
     if (!user.isGoogleAuth) {
-   
       user.isGoogleAuth = true;
       await user.save();
     }
@@ -172,7 +170,28 @@ export const googleLogin = asyncHandler(async (req, res) => {
 export const updateShippingAddress = asyncHandler(async (req, res) => {
   const { firstName, lastName, address, city, postalCode, phone, country } =
     req.body;
-  const user = await User.findByIdAndUpdate(
+  const user = await User.findById(req.userAuthId);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+  // Check if address already exists (based on all fields)
+  const isDuplicate = user.shippingAddress.some(
+    (addr) =>
+      addr.firstName === firstName &&
+      addr.lastName === lastName &&
+      addr.address === address &&
+      addr.city === city &&
+      addr.postalCode === postalCode &&
+      addr.phone === phone &&
+      addr.country === country
+  );
+  if (isDuplicate) {
+    res.status(400);
+    throw new Error("This shipping address already exists");
+  }
+  const updatedUser = await User.findByIdAndUpdate(
     req.userAuthId,
     {
       $push: {
@@ -192,11 +211,11 @@ export const updateShippingAddress = asyncHandler(async (req, res) => {
       new: true,
     }
   );
- 
+
   res.json({
     status: "success",
     message: "User shipping address updated successfully",
-    user,
+    user: updatedUser,
   });
 });
 
@@ -218,7 +237,7 @@ export const updateUserShippingAddress = asyncHandler(async (req, res) => {
         // "shippingAddress.$.country": updatedAddress.country,
       },
     },
-    { new: true } 
+    { new: true }
   );
 
   if (!user) {

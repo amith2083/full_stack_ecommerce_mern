@@ -8,7 +8,7 @@ import {
 
 // Fetch wallet details
 export const getWalletDetails = asyncHandler(async (req, res) => {
-  const userId = req.userAuthId; 
+  const userId = req.userAuthId;
 
   const wallet = await Wallet.findOne({ userId });
 
@@ -25,12 +25,9 @@ export const getWalletDetails = asyncHandler(async (req, res) => {
 
 export const addFunds = async (req, res) => {
   const { amount } = req.body;
-  const userId = req.userAuthId; 
-
-  console.log("amount", amount);
+  const userId = req.userAuthId;
 
   const razorpayOrder = await createRazorpayOrder(userId.toString(), amount);
-  console.log("walletrazorpayorder:", razorpayOrder);
 
   res.json({
     success: true,
@@ -43,7 +40,6 @@ export const verifyWalletPayment = async (req, res) => {
   const { razorpay_payment_id, razorpay_order_id, razorpay_signature, amount } =
     req.body;
   const userId = req.userAuthId;
-  console.log("reqbody:", req.body);
 
   // Verify the Razorpay signature
   const isSignatureValid = verifyRazorpayPayment(
@@ -53,7 +49,7 @@ export const verifyWalletPayment = async (req, res) => {
 
     //   process.env.RAZORPAY_KEY_SECRET
   );
-  console.log("isSignatureValid:", isSignatureValid);
+
   if (!isSignatureValid) {
     res.status(400);
     throw new Error("Invalid payment ");
