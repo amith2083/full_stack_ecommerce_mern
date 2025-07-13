@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { resendOtp, verifyOtp } from "../../../redux/slices/users/userSlices";
 import { useNavigate } from "react-router-dom";
+import LoadingComponent from "../../LoadingComp/LoadingComponent";
+import ErrorMsg from "../../ErrorMsg/ErrorMsg";
+import SuccessMsg from "../../SuccessMsg/SuccessMsg";
 
 const OtpVerification = () => {
   const dispatch = useDispatch();
@@ -67,22 +70,35 @@ const OtpVerification = () => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     if (!otp) return;
-   
 
     const res = await dispatch(verifyOtp({ email, otp }));
 
-    if (res.payload?.msg) {
+    if (res?.payload?.status === "success") {
       localStorage.removeItem("otpExpiration"); // Remove OTP expiry after successful verification
       navigate("/login");
     }
   };
+  const { error, loading, success } = useSelector((state) => state.users);
+  console.log('success',success)
+  const handleResendOtp = async () => {
+    const result = await dispatch(resendOtp({ email }));
 
-  const handleResendOtp = () => {
-    setTimeLeft(60); // Reset timer to 60 seconds
+    if (resendOtp.rejected.match(result)) {
+      const message = result.payload?.message || result.payload;
+
+      if (message && message.toLowerCase().includes("please register again")) {
+        // Remove stored data and navigate to register
+        localStorage.removeItem("email");
+        localStorage.removeItem("otpExpiration");
+        navigate("/register");
+        return;
+      }
+    }
+
+    // If no error, reset timer
+    setTimeLeft(60);
     setIsDisabled(false);
     localStorage.setItem("otpExpiration", Date.now() + 60000);
-    // Dispatch an action to resend OTP here if required
-    dispatch(resendOtp({email}))
   };
 
   return (
@@ -96,6 +112,10 @@ const OtpVerification = () => {
                 <h3 className="mb-8 text-4xl md:text-5xl font-bold font-heading">
                   OTP Verification
                 </h3>
+                {success && (
+                  <SuccessMsg message={success?.message} />
+                )}
+                {error && <ErrorMsg message={error?.message} />}
                 <p className="mb-10 font-semibold font-heading">
                   Please enter the OTP sent to your email
                 </p>
@@ -105,7 +125,10 @@ const OtpVerification = () => {
                   Time left: {formatTime(timeLeft)}
                 </p>
 
-                <form className="flex flex-wrap -mx-4" onSubmit={onSubmitHandler}>
+                <form
+                  className="flex flex-wrap -mx-4"
+                  onSubmit={onSubmitHandler}
+                >
                   <div className="w-full px-4 mb-8">
                     <label>
                       <h4 className="mb-5 text-gray-400 uppercase font-bold font-heading">
@@ -124,17 +147,21 @@ const OtpVerification = () => {
                   </div>
 
                   <div className="w-full px-4">
-                    <button
-                      type="submit"
-                      className={`py-5 px-8 rounded-md uppercase font-bold font-heading ${
-                        isDisabled
-                          ? "bg-gray-500 cursor-not-allowed"
-                          : "bg-blue-800 hover:bg-blue-900 text-white"
-                      }`}
-                      disabled={isDisabled}
-                    >
-                      {isDisabled ? "OTP Expired" : "Verify OTP"}
-                    </button>
+                    {loading ? (
+                      <LoadingComponent />
+                    ) : (
+                      <button
+                        type="submit"
+                        className={`py-5 px-8 rounded-md uppercase font-bold font-heading ${
+                          isDisabled
+                            ? "bg-gray-500 cursor-not-allowed"
+                            : "bg-blue-800 hover:bg-blue-900 text-white"
+                        }`}
+                        disabled={isDisabled}
+                      >
+                        {isDisabled ? "OTP Expired" : "Verify OTP"}
+                      </button>
+                    )}
                   </div>
                 </form>
 

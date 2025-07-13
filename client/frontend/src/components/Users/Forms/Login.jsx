@@ -1,59 +1,48 @@
-import React, { useState,useEffect } from "react";
-import { useDispatch,useSelector } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { loginUserAction } from "../../../redux/slices/users/userSlices";
 import ErrorMsg from "../../ErrorMsg/ErrorMsg";
 import LoadingComponent from "../../LoadingComp/LoadingComponent";
 import { useNavigate } from "react-router-dom";
 import { getCartItemsFromDatabase } from "../../../redux/slices/cart/cartSlices";
 import Swal from "sweetalert2";
-
 import google from "./google.png";
 import useGoogleAuth from "../../../utils/useGoogleAuth";
 
-
 const Login = () => {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const googleLogin = useGoogleAuth();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-  //---Destructuring---
+
   const { email, password } = formData;
-  //---onchange handler----
+
+  const { loading, error } = useSelector((state) => state?.users?.userAuth);
+
   const onChangeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  //---onsubmit handler-------------------------------------------------------------------------
-  const onSubmitHandler = async(e) => {
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
-  
-    const response=await dispatch(loginUserAction({email,password}))
-    if (response?.error?.message ) {
+    const response = await dispatch(loginUserAction({ email, password }));
+
+    if (response?.payload?.message === "login success") {
+      await dispatch(getCartItemsFromDatabase());
+      navigate("/");
+    } else {
       Swal.fire({
         icon: "error",
         title: "Login Failed",
-        text: response.error.message,
-        confirmButtonText: "OK",
+        text: response.payload?.message || "Invalid email or password",
       });
-  
-    } else {
-      await dispatch(getCartItemsFromDatabase());
-      navigate("/");
     }
-    
-    
-    
   };
-const googleLogin = useGoogleAuth()
-  //select store data
-  const { loading,error, userInfo } = useSelector((state)=> state?.users?.userAuth
-  
-  );
 
-  
-  
   return (
     <>
       <section className="py-20 bg-gray-100 overflow-x-hidden">
@@ -68,10 +57,11 @@ const googleLogin = useGoogleAuth()
                 <p className="mb-10 font-semibold font-heading">
                   Happy to see you again
                 </p>
-                {error&&<ErrorMsg message={error?.message}/>}
+                {error && <ErrorMsg message={error?.message} />}
                 <form
                   className="flex flex-wrap -mx-4"
-                  onSubmit={onSubmitHandler}>
+                  onSubmit={onSubmitHandler}
+                >
                   <div className="w-full md:w-1/2 px-4 mb-8 md:mb-12">
                     <label>
                       <h4 className="mb-5 text-gray-400 uppercase font-bold font-heading">
@@ -83,7 +73,8 @@ const googleLogin = useGoogleAuth()
                         onChange={onChangeHandler}
                         className="p-5 w-full border border-gray-200 focus:ring-blue-300 focus:border-blue-300 rounded-md"
                         type="email"
-                      required />
+                        required
+                      />
                     </label>
                   </div>
                   <div className="w-full md:w-1/2 px-4 mb-12">
@@ -97,7 +88,8 @@ const googleLogin = useGoogleAuth()
                         onChange={onChangeHandler}
                         className="p-5 w-full border border-gray-200 focus:ring-blue-300 focus:border-blue-300 rounded-md"
                         type="password"
-                      required/>
+                        required
+                      />
                     </label>
                   </div>
 
@@ -108,36 +100,36 @@ const googleLogin = useGoogleAuth()
                       <button className="bg-blue-800  hover:bg-blue-900 w-1/2 text-white font-bold font-heading py-5 px-8 rounded-md uppercase">
                         Login
                       </button>
-
-
-
-
-                    
                     )}
                   </div>
                 </form>
                 <div className="w-full px-4 mt-6">
-                   <div className="flex items-center my-6">
-                  <div className="flex-1 border-t border-gray-300"></div>
-                  <p className="mx-4 text-gray-500 text-sm">or sign in with</p>
-                  <div className="flex-1 border-t border-gray-300"></div>
+                  <div className="flex items-center my-6">
+                    <div className="flex-1 border-t border-gray-300"></div>
+                    <p className="mx-4 text-gray-500 text-sm">
+                      or sign in with
+                    </p>
+                    <div className="flex-1 border-t border-gray-300"></div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => googleLogin()}
+                    className="w-full flex items-center justify-center gap-3 py-4 px-6 border border-gray-300 rounded-md shadow-sm bg-white hover:bg-gray-100 transition duration-200"
+                  >
+                    <img src={google} alt="Google" className="w-5 h-5" />
+                    <span className="text-gray-700 font-medium">
+                      Continue with Google
+                    </span>
+                  </button>
                 </div>
-  <button
-    type="button"
-    onClick={() => googleLogin()}
-    className="w-full flex items-center justify-center gap-3 py-4 px-6 border border-gray-300 rounded-md shadow-sm bg-white hover:bg-gray-100 transition duration-200"
-  >
-    <img src={google} alt="Google" className="w-5 h-5" />
-    <span className="text-gray-700 font-medium">Continue with Google</span>
-  </button>
-</div>
               </div>
             </div>
             <div
               className="w-full md:w-2/6 h-128 md:h-auto flex items-center lg:items-end px-4 pb-20 bg-cover bg-no-repeat"
               style={{
-                backgroundImage: `url("/images/young-woman.jpg")` ,
-              }}></div>
+                backgroundImage: `url("/images/young-woman.jpg")`,
+              }}
+            ></div>
           </div>
         </div>
       </section>

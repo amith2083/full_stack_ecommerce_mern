@@ -15,6 +15,7 @@ const initialState = {
     error: null,
     userInfo: {},
   },
+  success: null,
   updated: false,
   isDelete: false,
 };
@@ -25,18 +26,17 @@ export const registerUserAction = createAsyncThunk(
     { rejectWithValue, getState, dispatch }
   ) => {
     try {
-      console.log("Login Payload:", { email, password, name });
       const response = await axiosInstance.post(`/user/register`, {
         email,
         password,
         name,
       });
-      console.log(response.data);
+
       // Store user info in cookies
       // Cookies.set('user', JSON.stringify(response.data));
       return response.data;
     } catch (error) {
-      console.log(error);
+      console.log("err", error);
 
       return rejectWithValue(error?.response?.data);
     }
@@ -45,26 +45,25 @@ export const registerUserAction = createAsyncThunk(
 export const verifyOtp = createAsyncThunk(
   "user/verifyOtp",
   async ({ email, otp }, { rejectWithValue }) => {
-    console.log("sliceverify", email, otp);
     try {
       const response = await axiosInstance.post(`/user/verify-otp`, {
         email,
         otp,
       });
-      console.log("verifyres", response);
+
       return response.data;
     } catch (error) {
       return rejectWithValue(error?.response?.data);
     }
   }
 );
+
 export const resendOtp = createAsyncThunk(
   "user/resendOtp",
   async ({ email }, { rejectWithValue }) => {
-    
     try {
       const response = await axiosInstance.post(`/user/resend-otp`, { email });
-      console.log("Resend OTP Response:", response);
+
       return response.data;
     } catch (error) {
       return rejectWithValue(error?.response?.data);
@@ -78,16 +77,14 @@ export const loginUserAction = createAsyncThunk(
     try {
       console.log("Login Payload:", { email, password });
       const token = getState()?.users?.userAuth?.userInfo?.token;
-    
-     
+
       const response = await axiosInstance.post(`/user/login`, {
         email,
         password,
       });
-    
 
       Cookies.set("user", JSON.stringify(response.data), { expires: 7 });
-   
+
       return response.data;
     } catch (error) {
       console.log(error);
@@ -156,11 +153,10 @@ export const deleteUserShippingAddress = createAsyncThunk(
   "user/deleteAddress",
   async ({ addressId }, { rejectWithValue }) => {
     try {
-      console.log("Deleting address:", addressId);
       const response = await axiosInstance.delete(
         `/user/profile/shippingaddress/${addressId}`
       );
-      console.log("Delete response:", response.data);
+
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -201,15 +197,17 @@ export const getAllUsers = createAsyncThunk(
 );
 //user block & unblock--------------------------------------------------------------------------------------------------------------------
 
-export const toggleBlockUser = createAsyncThunk("users/toggleBlockUser", async (userId, { rejectWithValue, getState, dispatch  }) => {
-  try {
-    const response = await axiosInstance.put(`/user/block-unblock/${userId}`);
-    return response.data;
-  } catch (error) {
-    return rejectWithValue(error.response.data);
+export const toggleBlockUser = createAsyncThunk(
+  "users/toggleBlockUser",
+  async (userId, { rejectWithValue, getState, dispatch }) => {
+    try {
+      const response = await axiosInstance.put(`/user/block-unblock/${userId}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
   }
-});
-
+);
 
 //logout action
 export const logoutAction = createAsyncThunk(
@@ -228,13 +226,42 @@ const userSlice = createSlice({
       state.loading = true;
     });
     builder.addCase(registerUserAction.fulfilled, (state, action) => {
-      state.user = action.payload;
+      state.success= action.payload;
       state.loading = false;
     });
     builder.addCase(registerUserAction.rejected, (state, action) => {
       state.error = action.payload;
       state.loading = false;
     });
+    builder.addCase(verifyOtp.pending, (state) => {
+      state.loading = true;
+    });
+
+    builder.addCase(verifyOtp.fulfilled, (state, action) => {
+      state.loading = false;
+      // state.user = action.payload;
+      state.success = action.payload;
+    });
+
+    builder.addCase(verifyOtp.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload || "OTP verification failed.";
+    });
+    builder.addCase(resendOtp.pending, (state) => {
+      state.loading = true;
+    });
+
+    builder.addCase(resendOtp.fulfilled, (state, action) => {
+      state.loading = false;
+      
+     state.success = action.payload
+    });
+
+    builder.addCase(resendOtp.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload || "Failed to resend OTP.";
+    });
+
     builder.addCase(loginUserAction.pending, (state, action) => {
       state.userAuth.loading = true;
     });
@@ -243,7 +270,7 @@ const userSlice = createSlice({
       state.userAuth.loading = false;
     });
     builder.addCase(loginUserAction.rejected, (state, action) => {
-      state.userAuth.error = action.payload;
+      state.userAuth.error = action.payload.message;
       state.userAuth.loading = false;
     });
     builder.addCase(updateShippingAddress.pending, (state, action) => {
@@ -325,6 +352,7 @@ const userSlice = createSlice({
     builder.addCase(resetSuccess.pending, (state) => {
       state.updated = false;
       state.isDelete = false;
+      state.success = null;
     });
   },
 });

@@ -1,4 +1,3 @@
-
 import User from "../model/User.js";
 import asyncHandler from "express-async-handler";
 import bcrypt from "bcrypt";
@@ -12,14 +11,12 @@ import oauth2client from "../utils/googleConfig.js";
 import axios from "axios";
 import mongoose from "mongoose";
 
-
 export const register = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
-  console.log("reg", req.body);
 
   const userExists = await User.findOne({ email });
   if (userExists) {
-    throw new Error("User already exists");
+    throw new Error("User already exists,please register with new email");
   }
 
   const salt = await bcrypt.genSalt(10);
@@ -32,43 +29,45 @@ export const register = asyncHandler(async (req, res) => {
   await OTP.create({ email, otp, name, password: hashedPassword });
 
   // Send OTP to user email
-  await sendEmail(email, "Your OTP Code", `Your OTP is ${otp}`);
+  await sendEmail(email,  `Your OTP is ${otp}`);
 
   res.status(201).json({
     status: "success",
-    msg: "OTP sent to email",
+    message: "OTP sent to email",
     email,
   });
 });
 export const verifyOtp = asyncHandler(async (req, res) => {
   const { email, otp } = req.body;
-  console.log('email&otpis',email,otp)
 
+  // Check if OTP exists
   const storedOtp = await OTP.findOne({ email, otp });
-  console.log("storedotp", storedOtp);
   if (!storedOtp) {
-    return res.status(400).json({ msg: "Invalid OTP" });
+    res.status(400);
+    throw new Error("Invalid OTP");
   }
 
-  // Delete OTP from DB after verification
+  // Check if user already exists
+  const existingUser = await User.findOne({ email: storedOtp.email });
+  if (existingUser) {
+    res.status(400);
+    throw new Error("User already registered");
+  }
+
+  // Delete OTP after successful verification
   await OTP.deleteOne({ email });
 
-  // Retrieve stored user data and create a permanent user
-  // const userData = await OTP.findOne({  email: storedOtp?.email, });
-  // console.log('userdata',userData)
-
-  // const user = await User.create(userData);
-  // Create a permanent user
+  // Create permanent user
   const user = await User.create({
     name: storedOtp.name,
     email: storedOtp.email,
-    password: storedOtp.password, // Add any other required fields
+    password: storedOtp.password,
   });
-  console.log("user3", user);
 
-  res
-    .status(200)
-    .json({ msg: "User registered successfully, you can log in now" });
+  return res.status(200).json({
+    status: "success",
+    message: "User registered successfully, you can log in now",
+  });
 });
 
 // Resend OTP
@@ -79,13 +78,12 @@ export const resendOtp = asyncHandler(async (req, res) => {
   // Check if user exists
   const user = await OTP.findOne({ email });
   if (!user) {
-    return res.status(404).json({ message: "User not found" });
+    res.status(404);
+    throw new Error(" Please register again to get a new OTP.");
   }
-  console.log("user", user);
 
   // Generate new OTP
-  const newOtp = generateOtp(); // Function to generate a 6-digit OTP
-  console.log("newotp", newOtp);
+  const newOtp = crypto.randomInt(100000, 999999).toString();
 
   // Update OTP in DB
   user.otp = newOtp;
@@ -93,7 +91,7 @@ export const resendOtp = asyncHandler(async (req, res) => {
   await user.save();
 
   // Send OTP via email
-  await sendOtpEmail(email, newOtp);
+  await sendEmail(email, newOtp);
 
   res.status(200).json({ message: "New OTP sent to your email" });
 });
@@ -103,75 +101,68 @@ export const login = asyncHandler(async (req, res) => {
   const userFound = await User.findOne({ email });
   // Check if the email exists
   if (!userFound) {
-    return res
-      .status(404)
-      .json({ message: "Email not found. Please sign up." });
+    res.status(404);
+    throw new Error("Email not found. Please sign up.");
   }
   // Validate password
   const isMatch = await bcrypt.compare(password, userFound.password);
   if (!isMatch) {
-    return res.status(401).json({ message: "Incorrect password. Try again." });
+    res.status(401);
+    throw new Error("Invalid email or password.");
   }
   // Check if the user is blocked
   if (userFound.isBlocked) {
-    return res
-      .status(403)
-      .json({ message: "Your account is blocked. Contact support." });
+    res.status(403);
+    throw new Error("Your account is blocked. Contact support.");
   }
-  if (userFound && (await bcrypt.compare(password, userFound?.password))) {
-    res.status(200).json({
-      msg: "login success",
-      user: {
-        isAdmin: userFound.isAdmin,
-        name: userFound.name,
-      },
-      token: generateToken(userFound?._id),
-    });
-  } else {
-    throw new Error("invalid login");
-  }
+
+  res.status(200).json({
+    message: "login success",
+    user: {
+      isAdmin: userFound.isAdmin,
+      name: userFound.name,
+    },
+    token: generateToken(userFound?._id),
+  });
 });
 export const googleLogin = asyncHandler(async (req, res) => {
   try {
     const { code } = req.query;
-     
-
-    
 
     const googleRes = await oauth2client.getToken({
       code,
-      
     });
 
     oauth2client.setCredentials(googleRes.tokens);
     const userRes = await axios.get(
       `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`
     );
- 
-  
+
     const { email, name, picture } = userRes.data;
     // Check if user exists, else create new user
     let user = await User.findOne({ email });
 
-  if (user) {
-  // User exists - check if they're allowed to log in via Google
-  if (user.isBlocked) {
-    return res.status(403).json({ message: "Your account is blocked. Contact support." });
-  }
+    if (user) {
+      // User exists - check if they're allowed to log in via Google
+      if (user.isBlocked) {
+        return res
+          .status(403)
+          .json({ message: "Your account is blocked. Contact support." });
+      }
 
-  // Handle case where user signed up with email/password but now tries to log in with Google
-  if (!user.isGoogleAuth) {
-    // You can either:
-    // 1. Allow login and mark it as a Google-linked account
-    // 2. Or ask them to log in via password for security
-    user.isGoogleAuth = true;
-    await user.save();
-  }
-} else {
-  // First-time Google login - create new user
-  user = await User.create({ email, name, isGoogleAuth: true });
-}
-    
+      // Handle case where user signed up with email/password but now tries to log in with Google
+      if (!user.isGoogleAuth) {
+        // You can either:
+        // 1. Allow login and mark it as a Google-linked account
+        // 2. Or ask them to log in via password for security
+        user.isGoogleAuth = true;
+        await user.save();
+      }
+    } else {
+      // First-time Google login - create new user
+      user = await User.create({ email, name, isGoogleAuth: true });
+    }
+
     const token = await generateToken(user?._id);
     return res.status(200).json({
       message: "success",
@@ -305,14 +296,10 @@ export const blockUnblockUser = asyncHandler(async (req, res) => {
     user.isBlocked = !user.isBlocked;
     await user.save();
 
-    res
-      .status(200)
-      .json({
-        message: `User ${
-          user.isBlocked ? "Blocked" : "Unblocked"
-        } successfully`,
-        user,
-      });
+    res.status(200).json({
+      message: `User ${user.isBlocked ? "Blocked" : "Unblocked"} successfully`,
+      user,
+    });
   } catch (error) {
     res
       .status(500)

@@ -11,13 +11,10 @@ import useGoogleAuth from "../../../utils/useGoogleAuth";
 import { validateRegisterForm } from "../../../utils/validations/registrationValidation";
 import Swal from "sweetalert2";
 
-
-
-
 const RegisterForm = () => {
-  
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const googleLogin = useGoogleAuth();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -33,30 +30,26 @@ const RegisterForm = () => {
   //---onsubmit handler----------------------------------------------------------------------------------------
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-      const validationError = validateRegisterForm({ name, email, password });
-  if (validationError) {
-    return Swal.fire({
-      icon: "error",
-      title: "Validation Error",
-      text: validationError,
-    });
-  }
+    const validationError = validateRegisterForm({ name, email, password });
+    if (validationError) {
+      return Swal.fire({
+        icon: "error",
+        title: "Validation Error",
+        text: validationError,
+      });
+    }
     localStorage.setItem("email", email);
     const resultAction = await dispatch(
       registerUserAction({ email, password, name })
     );
 
-    if (registerUserAction.fulfilled.match(resultAction)) {
-      
+    if (resultAction?.payload.status === "success") {
       navigate("/verify-otp");
     }
   };
   //select store data
 
   const { user, error, loading } = useSelector((state) => state?.users);
-
- 
-  const googleLogin = useGoogleAuth()
 
   return (
     <>
@@ -65,7 +58,7 @@ const RegisterForm = () => {
           <div className="flex flex-wrap items-center">
             <div className="w-full lg:w-2/6 px-4 mb-12 lg:mb-0">
               <div className="py-20 text-center">
-                <h3 class="mb-6 text-2xl md:text-4xl font-bold font-heading">
+                <h3 className="mb-6 text-2xl md:text-4xl font-bold font-heading">
                   Create Your Account
                 </h3>
                 {/* errr */}
