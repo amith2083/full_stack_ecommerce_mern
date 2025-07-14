@@ -69,8 +69,8 @@ const Products = ({ products }) => {
     return (
 
       <>
-      <div key={product._id} className="w-full overflow-hidden rounded-lg bg-gray-100 group">
-        <div className="relative bg-white p-4 shadow-md rounded-lg">
+      <div key={product._id} className="w-full overflow-hidden rounded-lg  group">
+        <div className="relative bg-white p-4  rounded-lg">
           {/* Discount Badge */}
           {product.salesPrice && product.salesPrice < product.price && (
                   <span className="absolute top-4 left-4 px-2 py-1 text-xs font-bold bg-white border-2 border-red-500 rounded-full text-red-500">

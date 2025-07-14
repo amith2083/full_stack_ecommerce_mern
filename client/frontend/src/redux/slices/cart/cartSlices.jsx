@@ -14,11 +14,13 @@ const initialState = {
 // Add product to cart
 export const addOrderToCart = createAsyncThunk(
   "cart/add-to-cart",
-  async ({id,selectedSize,selectedColor}, { rejectWithValue }) => {
-    console.log('productId',id,selectedColor,selectedSize)
+  async ({ id, selectedSize, selectedColor }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.post(`/cart/${id}`,{size:selectedSize,color:selectedColor});
-      console.log('response',response.data)
+      const response = await axiosInstance.post(`/cart/${id}`, {
+        size: selectedSize,
+        color: selectedColor,
+      });
+
       return response.data; // Assume the API returns the updated cart
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -27,12 +29,12 @@ export const addOrderToCart = createAsyncThunk(
 );
 
 // Fetch cart items
-export const getCartItemsFromDatabase= createAsyncThunk(
+export const getCartItemsFromDatabase = createAsyncThunk(
   "cart/get-cart-items",
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get("/cart");
-      console.log("API response:", response.data);
+
       return response.data; // Assume the API returns the cart items
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -44,10 +46,10 @@ export const getCartItemsFromDatabase= createAsyncThunk(
 export const changeOrderItemQty = createAsyncThunk(
   "cart/change-item-qty",
   async ({ productId, qty }, { rejectWithValue }) => {
-    console.log('productid&qty',productId,qty)
+    console.log("productid&qty", productId, qty);
     try {
       const response = await axiosInstance.put(`/cart/${productId}`, { qty });
-      console.log('response',response.data)
+
       return response.data; // Assume the API returns the updated cart
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -95,11 +97,11 @@ const cartSlice = createSlice({
     builder.addCase(getCartItemsFromDatabase.fulfilled, (state, action) => {
       state.loading = false;
       state.cartItems = action.payload.cartItems;
-      console.log('state',state.cartItems)
+      console.log("state", state.cartItems);
     });
     builder.addCase(getCartItemsFromDatabase.rejected, (state, action) => {
       state.loading = false;
-    //   state.cartItems = [];
+      //   state.cartItems = [];
       state.error = action.payload;
     });
 
@@ -109,11 +111,11 @@ const cartSlice = createSlice({
     });
     builder.addCase(changeOrderItemQty.fulfilled, (state, action) => {
       state.loading = false;
-   console.log('before',state.cartItems)
-   
-//    console.log(action.payload.cartItems)
-    //   state.cartItems = action.payload.cartItems;
-      console.log('after',state.cartItems)
+      console.log("before", state.cartItems);
+
+      //    console.log(action.payload.cartItems)
+      //   state.cartItems = action.payload.cartItems;
+      console.log("after", state.cartItems);
       state.isUpdated = true;
     });
     builder.addCase(changeOrderItemQty.rejected, (state, action) => {
@@ -128,7 +130,7 @@ const cartSlice = createSlice({
     });
     builder.addCase(removeOrderItem.fulfilled, (state, action) => {
       state.loading = false;
-    //   state.cartItems = action.payload;
+      //   state.cartItems = action.payload;
       state.isDeleted = true;
     });
     builder.addCase(removeOrderItem.rejected, (state, action) => {

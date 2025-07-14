@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 
 import {
   Dialog,
@@ -15,6 +15,7 @@ import {
   MinusIcon,
   PlusIcon,
 } from "@heroicons/react/20/solid";
+import { debounce } from "lodash";
 import Products from "./Products";
 import { useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -76,7 +77,6 @@ export default function ProductsFilters() {
   const dispatch = useDispatch();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  //get query string
   const [params, setParams] = useSearchParams();
   const category = params.get("category");
   const [page, setPage] = useState(1);
@@ -88,6 +88,24 @@ export default function ProductsFilters() {
   const [size, setSize] = useState("");
 //sort
 const [sort, setSort] = useState("popularity"); // Default sort option
+// Reset filters function
+  const resetFilters = () => {
+    setColor("");
+    setPrice("");
+    setBrand("");
+    setSize("");
+    setSort("popularity");
+    setPage(1);
+    // Clear query parameters except category
+    setParams(category ? { category } : {});
+  };
+   // Debounced fetch function
+  const debouncedFetchProduct = useCallback(
+    debounce((url) => {
+      dispatch(fetchProduct({ url }));
+    }, 500),
+    [dispatch]
+  );
 
   //fetching products------------------------------------------------------------------------------------------------
   //build up url
@@ -114,13 +132,17 @@ const [sort, setSort] = useState("popularity"); // Default sort option
   if (sort) productUrl += `&sort=${sort}`;  // Include sort option
  
   useEffect(() => {
-    dispatch(fetchProduct({ url: productUrl }));
-  },[dispatch,category,size,brand,price,color,sort,page]);
+    debouncedFetchProduct(productUrl);
+    // Cleanup debounce on unmount to prevent memory leaks
+    return () => {
+      debouncedFetchProduct.cancel();
+    };
+  }, [category, size, brand, price, color, sort, page, debouncedFetchProduct]);
   //get data from store
   const {
     products,loading,error,pagination,
     } = useSelector((state) => state?.products);
-    console.log('>>>', pagination)
+    
 
   //fetching brands---------------------------------------------------------------------------------------------------------
   useEffect(() => {
@@ -135,6 +157,10 @@ const [sort, setSort] = useState("popularity"); // Default sort option
     dispatch(fetchColor({ url: productUrl }));
   },[dispatch]);
   //get data from store
+  // Reset filters when category changes
+  useEffect(() => {
+    resetFilters();
+  }, [category]);
   const {
     colors: { colors },
   } = useSelector((state) => state?.colors);
@@ -263,6 +289,13 @@ const [sort, setSort] = useState("popularity"); // Default sort option
                   {/* Mobile Filters */}
                   <form className="mt-4 border-t border-gray-200">
                     {/*  */}
+                    <button
+                      type="button"
+                      onClick={resetFilters}
+                      className="w-full px-4 py-2 mb-4 text-sm font-medium text-white bg-orange-400 rounded-md hover:bg-orange-700"
+                    >
+                      Clear All Filters
+                    </button>
                     <Disclosure
                       as="div"
                       key="disclosure"
@@ -363,22 +396,32 @@ const [sort, setSort] = useState("popularity"); // Default sort option
                           </h3>
                           <Disclosure.Panel className="pt-6">
                             <div className="space-y-6 mt-2">
-                              {allPrice?.map((price) => (
-                                <div
-                                  key={Math.random()}
-                                  className="flex items-center"
-                                >
-                                  <input
-                                    onClick={() => setPrice(price?.amount)}
-                                    name="price"
-                                    type="radio"
-                                    className="h-4 w-4 rounded border-gray-300 cursor-pointer text-indigo-600 focus:ring-indigo-500"
-                                  />
-                                  <label className="ml-3 min-w-0 flex-1 text-gray-500">
-                                     ₹{price?.amount}
-                                  </label>
-                                </div>
-                              ))}
+                             <RadioGroup value={price} onChange={setPrice}>
+                                {allPrice?.map((price) => (
+                                  <RadioGroup.Option
+                                    key={price.amount}
+                                    value={price.amount}
+                                    className={({ active, checked }) =>
+                                      classNames(
+                                        active && checked
+                                          ? "ring ring-offset-1"
+                                          : "",
+                                        !active && checked ? "ring-2" : "",
+                                        "relative flex items-center cursor-pointer"
+                                      )
+                                    }
+                                  >
+                                    <input
+                                      type="radio"
+                                      name="price"
+                                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                    />
+                                    <RadioGroup.Label className="ml-3 min-w-0 flex-1 text-gray-500">
+                                      ₹{price.amount}
+                                    </RadioGroup.Label>
+                                  </RadioGroup.Option>
+                                ))}
+                              </RadioGroup>
                             </div>
                           </Disclosure.Panel>
                         </>
@@ -416,22 +459,32 @@ const [sort, setSort] = useState("popularity"); // Default sort option
                           </h3>
                           <Disclosure.Panel className="pt-6">
                             <div className="space-y-2">
-                              {brands?.map((brand) => (
-                                <div
-                                  key={brand?._id}
-                                  className="flex items-center"
-                                >
-                                  <input
-                                    onClick={() => setBrand(brand?.name)}
-                                    name="brand"
-                                    type="radio"
-                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                  />
-                                  <label className="ml-3 min-w-0 flex-1 text-gray-500">
-                                    {brand?.name}
-                                  </label>
-                                </div>
-                              ))}
+                               <RadioGroup value={brand} onChange={setBrand}>
+                                {brands?.map((brand) => (
+                                  <RadioGroup.Option
+                                    key={brand?._id}
+                                    value={brand?.name}
+                                    className={({ active, checked }) =>
+                                      classNames(
+                                        active && checked
+                                          ? "ring ring-offset-1"
+                                          : "",
+                                        !active && checked ? "ring-2" : "",
+                                        "relative flex items-center cursor-pointer"
+                                      )
+                                    }
+                                  >
+                                    <input
+                                      type="radio"
+                                      name="brand"
+                                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                    />
+                                    <RadioGroup.Label className="ml-3 min-w-0 flex-1 text-gray-500">
+                                      {brand?.name}
+                                    </RadioGroup.Label>
+                                  </RadioGroup.Option>
+                                ))}
+                              </RadioGroup>
                             </div>
                           </Disclosure.Panel>
                         </>
@@ -469,19 +522,32 @@ const [sort, setSort] = useState("popularity"); // Default sort option
                           </h3>
                           <Disclosure.Panel className="pt-6">
                             <div className="space-y-6">
-                              {sizeCategories.map((option) => (
-                                <div key={option} className="flex items-center">
-                                  <input
-                                    type="radio"
-                                    name="size"
-                                    onClick={() => setSize(option)}
-                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                  />
-                                  <label className="ml-3 min-w-0 flex-1 text-gray-500">
-                                    {option}
-                                  </label>
-                                </div>
-                              ))}
+                             <RadioGroup value={size} onChange={setSize}>
+                                {sizeCategories.map((option) => (
+                                  <RadioGroup.Option
+                                    key={option}
+                                    value={option}
+                                    className={({ active, checked }) =>
+                                      classNames(
+                                        active && checked
+                                          ? "ring ring-offset-1"
+                                          : "",
+                                        !active && checked ? "ring-2" : "",
+                                        "relative flex items-center cursor-pointer"
+                                      )
+                                    }
+                                  >
+                                    <input
+                                      type="radio"
+                                      name="size"
+                                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                    />
+                                    <RadioGroup.Label className="ml-3 min-w-0 flex-1 text-gray-500">
+                                      {option}
+                                    </RadioGroup.Label>
+                                  </RadioGroup.Option>
+                                ))}
+                              </RadioGroup>
                             </div>
                           </Disclosure.Panel>
                         </>
@@ -568,6 +634,14 @@ const [sort, setSort] = useState("popularity"); // Default sort option
             <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
               {/* Desktop  Filters */}
               <form className="hidden lg:block">
+                <button
+                type="button"
+                onClick={resetFilters}
+                className="w-full px-4 py-2 mb-4 text-sm font-medium text-white bg-orange-400 rounded-md hover:bg-orange-700"
+              >
+                Clear All Filters
+              </button>
+                
                 <h3 className="sr-only">Categories</h3>
 
                 {/* colors categories Desktop section */}
@@ -576,6 +650,7 @@ const [sort, setSort] = useState("popularity"); // Default sort option
                   key="disclosure"
                   className="border-t border-gray-200 px-4 py-6"
                 >
+                  
                   {({ open }) => (
                     <>
                       <h3 className="-mx-2 -my-3 flow-root">
@@ -646,6 +721,7 @@ const [sort, setSort] = useState("popularity"); // Default sort option
                   key="disclosure"
                   className="border-t border-gray-200 px-4 py-6"
                 >
+                  
                   {({ open }) => (
                     <>
                       <h3 className="-mx-2 -my-3 flow-root">
@@ -670,19 +746,32 @@ const [sort, setSort] = useState("popularity"); // Default sort option
                       </h3>
                       <Disclosure.Panel className="pt-6">
                         <div className="space-y-6 mt-2">
-                          {allPrice?.map((price) => (
-                            <div className="flex items-center">
-                              <input
-                                onClick={() => setPrice(price?.amount)}
-                                name="price"
-                                type="radio"
-                                className="h-4 w-4 rounded border-gray-300 cursor-pointer text-indigo-600 focus:ring-indigo-500"
-                              />
-                              <label className="ml-3 min-w-0 flex-1 text-gray-500">
-                                ₹ {price?.amount}
-                              </label>
-                            </div>
-                          ))}
+                   <RadioGroup value={price} onChange={setPrice}>
+                            {allPrice?.map((price) => (
+                              <RadioGroup.Option
+                                key={price.amount}
+                                value={price.amount}
+                                className={({ active, checked }) =>
+                                  classNames(
+                                    active && checked
+                                      ? "ring ring-offset-1"
+                                      : "",
+                                    !active && checked ? "ring-2" : "",
+                                    "relative flex items-center cursor-pointer"
+                                  )
+                                }
+                              >
+                                <input
+                                  type="radio"
+                                  name="price"
+                                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                />
+                                <RadioGroup.Label className="ml-3 min-w-0 flex-1 text-gray-500">
+                                  ₹{price.amount}
+                                </RadioGroup.Label>
+                              </RadioGroup.Option>
+                            ))}
+                          </RadioGroup>
                         </div>
                       </Disclosure.Panel>
                     </>
@@ -720,19 +809,32 @@ const [sort, setSort] = useState("popularity"); // Default sort option
                       </h3>
                       <Disclosure.Panel className="pt-6">
                         <div className="space-y-2">
-                          {brands?.map((brand) => (
-                            <div key={brand?._id} className="flex items-center">
-                              <input
-                                onClick={() => setBrand(brand?.name)}
-                                name="brand"
-                                type="radio"
-                                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                              />
-                              <label className="ml-3 min-w-0 flex-1 text-gray-500">
-                                {brand?.name}
-                              </label>
-                            </div>
-                          ))}
+                          <RadioGroup value={brand} onChange={setBrand}>
+                            {brands?.map((brand) => (
+                              <RadioGroup.Option
+                                key={brand?._id}
+                                value={brand?.name}
+                                className={({ active, checked }) =>
+                                  classNames(
+                                    active && checked
+                                      ? "ring ring-offset-1"
+                                      : "",
+                                    !active && checked ? "ring-2" : "",
+                                    "relative flex items-center cursor-pointer"
+                                  )
+                                }
+                              >
+                                <input
+                                  type="radio"
+                                  name="brand"
+                                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                />
+                                <RadioGroup.Label className="ml-3 min-w-0 flex-1 text-gray-500">
+                                  {brand?.name}
+                                </RadioGroup.Label>
+                              </RadioGroup.Option>
+                            ))}
+                          </RadioGroup>
                         </div>
                       </Disclosure.Panel>
                     </>
@@ -770,19 +872,32 @@ const [sort, setSort] = useState("popularity"); // Default sort option
                       </h3>
                       <Disclosure.Panel className="pt-6">
                         <div className="space-y-6">
-                          {sizeCategories.map((option) => (
-                            <div key={option} className="flex items-center">
-                              <input
-                                type="radio"
-                                name="size"
-                                onClick={() => setSize(option)}
-                                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                              />
-                              <label className="ml-3 min-w-0 flex-1 text-gray-500">
-                                {option}
-                              </label>
-                            </div>
-                          ))}
+                          <RadioGroup value={size} onChange={setSize}>
+                            {sizeCategories.map((option) => (
+                              <RadioGroup.Option
+                                key={option}
+                                value={option}
+                                className={({ active, checked }) =>
+                                  classNames(
+                                    active && checked
+                                      ? "ring ring-offset-1"
+                                      : "",
+                                    !active && checked ? "ring-2" : "",
+                                    "relative flex items-center cursor-pointer"
+                                  )
+                                }
+                              >
+                                <input
+                                  type="radio"
+                                  name="size"
+                                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                />
+                                <RadioGroup.Label className="ml-3 min-w-0 flex-1 text-gray-500">
+                                  {option}
+                                </RadioGroup.Label>
+                              </RadioGroup.Option>
+                            ))}
+                          </RadioGroup>
                         </div>
                       </Disclosure.Panel>
                     </>

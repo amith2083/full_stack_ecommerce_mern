@@ -71,6 +71,7 @@ export default function Navbar() {
  
   const userCookie = Cookies.get('user');
   const user = userCookie ? JSON.parse(userCookie) : null;
+  console.log('user',user)
   const isLoggedIn = user?.token ? true : false;
 
   return (
@@ -258,6 +259,14 @@ export default function Navbar() {
                   <div className="flex flex-1 items-center justify-end">
                     <div className="flex items-center lg:ml-8">
                       <div className="flex space-x-8">
+                        {isLoggedIn && user?.user?.isAdmin && (
+  <Link
+    to="/admin"
+    className="text-sm font-semibold bg-orange-400 text-black hover:text-blue-800 px-4 py-2 border border-blue-600 rounded-md ml-2"
+  >
+    Admin Dashboard
+  </Link>
+)}
                         {isLoggedIn&&<div className="flex">
                           <Link
                             to="/user-profile"

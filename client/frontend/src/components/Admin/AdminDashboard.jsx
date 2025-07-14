@@ -583,8 +583,17 @@ export default function Example() {
                          
                         </dl>
                       </div>
+                                
+                       
+                    
                     </div>
                   </div>
+                   <Link
+                          to="/"
+                          className="text-sm font-semibold bg-orange-400 text-black hover:text-blue-800 px-4 py-2 border border-blue-600 rounded-md ml-2"
+                        >
+                          back to home
+                        </Link>
                  
                 </div>
               </div>
