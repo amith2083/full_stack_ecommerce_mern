@@ -62,7 +62,11 @@ export default function Navbar() {
   //get coupons
   const { coupons, loading, error } = useSelector((state)=>state?.coupons)
 
-  const latestCoupon = coupons?.coupons?.[coupons?.coupons?.length-1]
+
+  const latestCoupon = coupons?.coupons?.[0]
+
+  // Use isExpired virtual property to check if the coupon is valid
+  const isCouponValid = latestCoupon && !coupons?.coupons?.isExpired;
  
  
   
@@ -71,7 +75,7 @@ export default function Navbar() {
  
   const userCookie = Cookies.get('user');
   const user = userCookie ? JSON.parse(userCookie) : null;
-  console.log('user',user)
+ 
   const isLoggedIn = user?.token ? true : false;
 
   return (
@@ -175,7 +179,9 @@ export default function Navbar() {
           <div className="bg-gray-900">
             <div className="mx-auto flex h-10 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
               <p className="flex-1 text-center text-sm font-medium text-white lg:flex-none ">
-               {latestCoupon ?`🎉${latestCoupon?.code}-${latestCoupon?.discount}%🎉`:'No Flash Sale'}
+               {isCouponValid
+                  ? `🎉${latestCoupon?.code}-${latestCoupon?.discount}%🎉`
+                  : "No Flash Sale"}
               </p>
 
               <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">

@@ -27,7 +27,7 @@ export const createColor = asyncHandler(async (req, res) => {
 
 
 export const getAllColors = asyncHandler(async (req, res) => {
-  const colors = await Color.find();
+  const colors = await Color.find().sort({ createdAt: -1 });;
   res.json({
     status: "success",
     message: "colors fetched successfully",

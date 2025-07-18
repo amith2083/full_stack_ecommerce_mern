@@ -279,7 +279,7 @@ export const getUserProfile = asyncHandler(async (req, res) => {
 });
 export const getAllUsers = asyncHandler(async (req, res) => {
   //find the user
-  const users = await User.find();
+  const users = await User.find().sort({ createdAt: -1 });;
 
   res.json({
     status: "success",

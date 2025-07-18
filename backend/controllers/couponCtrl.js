@@ -38,7 +38,7 @@ export const createCoupon = asyncHandler(async (req, res) => {
 
 
 export const getAllCoupons = asyncHandler(async (req, res) => {
-  const coupons = await Coupon.find();
+  const coupons = await Coupon.find().sort({ createdAt: -1 });
   res.status(200).json({
     status: "success",
     message: "All coupons",

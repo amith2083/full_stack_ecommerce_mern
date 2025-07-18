@@ -5,14 +5,16 @@ import { fetchProduct } from "../../../redux/slices/products/productSlices";
 import { fetchCategory } from "../../../redux/slices/category/categorySlices";
 import { useDispatch, useSelector } from "react-redux";
 import { createOffer } from "../../../redux/slices/offers/OfferSlices";
+import { useNavigate } from "react-router-dom";
 
 export default function AddOffer() {
     const dispatch = useDispatch();
+    const navigate = useNavigate()
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [applicableTo, setApplicableTo] = useState("");
   const [selectedItem, setSelectedItem] = useState("");
-  console.log('selected',selectedItem)
+
  
   
   // Get products & categories from Redux store
@@ -40,7 +42,7 @@ export default function AddOffer() {
     }
   }, [applicableTo, dispatch]);
 
-  const onHandleSubmit = (e) => {
+  const onHandleSubmit = async (e) => {
     e.preventDefault();
     const offerData = {
         code: formData.code,
@@ -55,15 +57,11 @@ export default function AddOffer() {
         usageLimit: 10, // Set a default usage limit or take input from the user
       };
     
-      dispatch(createOffer(offerData))
-        .unwrap()
-        .then(() => {
-          navigate("/admin/manage-offer");
-        })
-        .catch((error) => {
-          console.error("Failed to create offer", error);
-          // Optionally, show an error message
-        });
+      const res = await dispatch(createOffer(offerData))
+        if (res?.payload?.status === "success") {
+    navigate("/admin/manage-offer");
+  }
+       
   };
 
   return (
@@ -118,8 +116,9 @@ export default function AddOffer() {
                 onChange={(e) => setApplicableTo(e.target.value)}
                 className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               >
-                <option value="Product">Product</option>
-                <option value="Category">Category</option>
+               <option value="" disabled>Select Type</option>
+  <option value="Product">Product</option>
+  <option value="Category">Category</option>
               </select>
             </div>
             <div>
@@ -131,17 +130,17 @@ export default function AddOffer() {
                 onChange={(e) => setSelectedItem(e.target.value)}
                 className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               >
-                {applicableTo === "Product"
-                  ? products?.map((product, index) => (
-                      <option key={index} value={product._id}>
-                        {product.name}
-                      </option>
-                    ))
-                  : categories?.categories?.map((category, index) => (
-                      <option key={index} value={category._id}>
-                        {category.name}
-                      </option>
-                    ))}
+                <option value="" disabled>
+    {applicableTo === "Product" ? "Select a product" : "Select a category"}
+  </option>
+  {(applicableTo === "Product"
+    ? products
+    : categories?.categories || []
+  ).map((item) => (
+    <option key={item._id} value={item._id}>
+      {item.name}
+    </option>
+  ))}
               </select>
             </div>
             <div>

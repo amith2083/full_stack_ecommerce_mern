@@ -22,7 +22,7 @@ export const createBrand = asyncHandler(async (req, res) => {
 });
 
 export const getAllBrands = asyncHandler(async (req, res) => {
-  const brands = await Brand.find();
+  const brands = await Brand.find().sort({ createdAt: -1 });;
   res.json({
     status: "success",
     message: "Brands fetched successfully",
