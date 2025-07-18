@@ -3,6 +3,7 @@ dotenv.config();
 import cors from "cors";
 import express from "express";
 import dbConnect from "../config/dbConnect.js";
+import morgan from "morgan";
 import userRoutes from "../routes/userRoute.js";
 import productRoute from "../routes/productRoute.js";
 import categoryRoute from "../routes/categoryRoute.js";
@@ -31,7 +32,9 @@ app.use(
     credentials: true, // Allow cookies and authentication headers
   })
 );
-
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
 app.use("/user", userRoutes);
 app.use("/product", productRoute);
 app.use("/category", categoryRoute);

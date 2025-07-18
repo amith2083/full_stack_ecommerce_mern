@@ -126,7 +126,7 @@ export default function Navbar() {
                   
                     
                       <Link
-                        to= '/product?category=clothing'
+                        to= '/'
                         className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-800">
                       Home
                       </Link>

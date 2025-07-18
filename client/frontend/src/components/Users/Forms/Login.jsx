@@ -124,12 +124,13 @@ const Login = () => {
                 </div>
               </div>
             </div>
-            <div
-              className="w-full md:w-2/6 h-128 md:h-auto flex items-center lg:items-end px-4 pb-20 bg-cover bg-no-repeat"
-              style={{
-                backgroundImage: `url("/images/young-woman.jpg")`,
-              }}
-            ></div>
+         <div className="w-full md:w-2/6">
+  <img
+    src="/images/young-woman.jpg"
+    alt="Login background"
+    className="w-full h-[50vh] md:h-auto object-contain"
+  />
+</div>
           </div>
         </div>
       </section>

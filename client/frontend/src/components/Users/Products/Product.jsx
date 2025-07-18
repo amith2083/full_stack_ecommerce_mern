@@ -250,7 +250,7 @@ export default function Product() {
                   className={classNames(
                     image.primary
                       ? "lg:col-span-2 lg:row-span-2"
-                      : "hidden lg:block",
+                      : " lg:block",
                     "rounded-lg transition-transform duration-300 ease-in-out hover:scale-150"
                   )}
                 />
