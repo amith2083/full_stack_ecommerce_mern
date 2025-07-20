@@ -210,7 +210,7 @@ export default function Navbar() {
                   {/* Logo (lg+) */}
                   <div className="hidden lg:flex lg:items-center">
                     <Link to="/">
-                      <span className="sr-only">Your Company</span>
+                      {/* <span className="sr-only">Your Company</span> */}
                       <img
                         className="h-32 pt-2 w-auto"
                         src={logo}
@@ -276,8 +276,8 @@ export default function Navbar() {
                         {isLoggedIn&&<div className="flex">
                           <Link
                             to="/user-profile"
-                            className="-m-2 p-2 mr-2 text-gray-400 hover:text-gray-500">
-                            <UserIcon className="h-6 w-6" aria-hidden="true" />
+                            className=" p-2 mr-2 text-gray-400 hover:text-gray-500">
+                            <UserIcon className="h-6 w-6" aria-hidden="true " />
                           </Link>
                           <button onClick={logoutHandler}>
   <LogOut className="size-5" />

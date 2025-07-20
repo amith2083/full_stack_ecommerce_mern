@@ -52,6 +52,7 @@ import { useEffect } from "react";
 import AddOffer from "./components/Admin/Offers/AddOffer";
 import ManageOffers from "./components/Admin/Offers/ManageOffers";
 import UpdateOffer from "./components/Admin/Offers/UpdateOffer";
+import Footer from "./components/Footer/Footer";
 
 // Function to handle conditional Navbar rendering
 const Layout = ({ children }) => {
@@ -63,6 +64,7 @@ const Layout = ({ children }) => {
       {!isAdminRoute && <Navbar />}{" "}
       {/* Show Navbar only if NOT an admin route */}
       {children}
+       {!isAdminRoute && <Footer/>} 
     </>
   );
 };
