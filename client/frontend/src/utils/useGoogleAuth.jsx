@@ -4,6 +4,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import Cookies from "js-cookie";
 import baseURL from "./baseURL";
+import Swal from "sweetalert2";
 
 
 
@@ -22,6 +23,11 @@ const useGoogleAuth = () => {
       }
     } catch (error) {
       console.error("Google sign-in error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Something went wrong with Google sign-in. Please try again later.",
+      });
     }
   };
 
@@ -29,6 +35,13 @@ const useGoogleAuth = () => {
     onSuccess: handleGoogleAuth,
     onError: (error) => {
       console.error("Google Login Failed:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Google Sign-In Failed",
+        text:
+          error?.error_description ||
+          "Unable to sign in with Google. Please try again or use another method.",
+      });
     },
     flow: "auth-code",
   });

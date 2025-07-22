@@ -22,7 +22,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     if (productExists) {
       throw new Error("product already exists");
     }
-    //create product
+    
     const convertedImages = req.files.map((file) => file.path);
 
     //find the brand

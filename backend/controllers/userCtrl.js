@@ -129,12 +129,12 @@ export const googleLogin = asyncHandler(async (req, res) => {
 
   const googleRes = await oauth2client.getToken({
     code,
-  });
+  });//to get access token by exchange authorization code
 
   oauth2client.setCredentials(googleRes.tokens);
   const userRes = await axios.get(
     `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`
-  );
+  );// Uses the access token to get the user’s email, name, and picture from Google’s Api
 
   const { email, name, picture } = userRes.data;
   // Check if user exists, else create new user

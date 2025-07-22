@@ -2,14 +2,12 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
-
 import ErrorMsg from "../../ErrorMsg/ErrorMsg";
 import LoadingComponent from "../../LoadingComp/LoadingComponent";
 import SuccessMsg from "../../SuccessMsg/SuccessMsg";
 import { fetchCategory } from "../../../redux/slices/category/categorySlices";
 import { fetchBrand } from "../../../redux/slices/brand/brandSlices";
 import { fetchColor } from "../../../redux/slices/color/colorSlices";
-
 import { createProduct } from "../../../redux/slices/products/productSlices";
 import { useNavigate } from "react-router-dom";
 
@@ -25,29 +23,30 @@ export default function AddProduct() {
   const [previewImages, setPreviewImages] = useState([]);
   const fileHandleChange = (event) => {
     const newFiles = Array.from(event.target.files);
-   
-     //validation
-     const newErrs = [];
-     const newPreviews = [];
 
-    // 
-  // Check if more than 3 images are selected
-  if (newFiles.length > 3) {
-    setFileErrs(["You can only upload up to 3 images."]);
-    return;
-  }
-     newFiles.forEach((file) => {
-       if (file?.size > 1000000) {
-         newErrs.push(`${file?.name} is too large`);
-       }
-       if (!file?.type?.startsWith("image/")) {
-         newErrs.push(`${file?.name} is not an image`);
-       }
-       newPreviews.push(URL.createObjectURL(file));
-      })
+    //validation
+    const newErrs = [];
+    const newPreviews = [];
+
+    //
+    // Check if more than 3 images are selected
+    if (newFiles.length > 3) {
+      setFileErrs(["You can only upload up to 3 images."]);
+      return;
+    }
+    newFiles.forEach((file) => {
+      if (file?.size > 1000000) {
+        newErrs.push(`${file?.name} is too large`);
+        return;
+      }
+      if (!file?.type?.startsWith("image/")) {
+        newErrs.push(`${file?.name} is not an image`);
+      }
+      newPreviews.push(URL.createObjectURL(file));
+    });
 
     setFiles(newFiles);
-    setFileErrs(newErrs)
+    setFileErrs(newErrs);
     setPreviewImages(newPreviews);
   };
   //for fetch categories---------------------------------------------------------------------------------------------------------
@@ -55,7 +54,7 @@ export default function AddProduct() {
     dispatch(fetchCategory());
   }, [dispatch]);
   const { categories } = useSelector((state) => state?.categories?.categories);
-  console.log(categories);
+
   //for fetch brands--------------------------------------------------------------------------------------------------------
   useEffect(() => {
     dispatch(fetchBrand());
@@ -66,7 +65,6 @@ export default function AddProduct() {
     dispatch(fetchColor());
   }, [dispatch]);
   const { colors } = useSelector((state) => state?.colors?.colors);
-  
 
   //for size--------------------------------------------------------------------------------------------------------------------
   const sizes = ["M", "S", "L", "XL"];
@@ -77,8 +75,8 @@ export default function AddProduct() {
       label: size,
     };
   });
-  const handleSizeChange = (sizes) => {
-    setSizeOption(sizes);
+  const handleSizeChange = (selectedSizes) => {
+    setSizeOption(selectedSizes);
   };
 
   //for color---------------------------------------------------------------------------------------------------------------------
@@ -90,16 +88,14 @@ export default function AddProduct() {
     };
   });
   const handleColorChange = (colors) => {
-    
     setColorOption(colors);
   };
- 
-  let // categories,
-    //   sizeOptionsConverted,
-    //   handleSizeChange,
-    colorOptionsCoverted,
-    handleColorChangeOption
-    
+
+  // let  categories,
+  //      sizeOptionsConverted,
+  //      handleSizeChange,
+  //   colorOptionsCoverted,
+  //   handleColorChangeOption
 
   //---form data---
   const [formData, setFormData] = useState({
@@ -109,7 +105,7 @@ export default function AddProduct() {
     sizes: "",
     brand: "",
     color: "",
-    
+
     price: "",
     totalQty: "",
   });
@@ -117,41 +113,41 @@ export default function AddProduct() {
   //onChange
   const handleOnChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  
   };
   //get data from store
-  const{product, isAdded,error,loading}= useSelector((state)=>state?.products)
+  const { product, isAdded, error, loading } = useSelector(
+    (state) => state?.products
+  );
 
   //onSubmit
   const handleOnSubmit = (e) => {
     e.preventDefault();
-   
+
     //reset form data
     setFormData({
       name: "",
       description: "",
       category: "",
-      sizes: "",
       brand: "",
-      color: "",
-      images: "",
       price: "",
       totalQty: "",
     });
-    dispatch(createProduct({...formData,files,
-      color: colorOption?.map((color) => color?.label),
-      sizes: sizeOption?.map((size) => size?.label),})).then(()=>{
-        navigate('/admin/manage-products')
+    dispatch(
+      createProduct({
+        ...formData,
+        files,
+        color: colorOption?.map((color) => color?.label),
+        sizes: sizeOption?.map((size) => size?.label),
       })
-
+    ).then(() => {
+      navigate("/admin/manage-products");
+    });
   };
 
   return (
     <>
       {error && <ErrorMsg message={error?.message} />}
-      {fileErrs?.length > 0 && (
-        <ErrorMsg message="file too large or upload an image" />
-      )}
+      {fileErrs?.length > 0 && <ErrorMsg message={fileErrs} />}
       {isAdded && <SuccessMsg message="Product Added Successfully" />}
       <div className="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -298,18 +294,23 @@ export default function AddProduct() {
                           <span>Upload files</span>
                           <input
                             multiple
-                          
                             onChange={fileHandleChange}
                             type="file"
+                            accept="image/*"
                           />
                         </label>
                       </div>
-                       {/* Show Preview */}
-      <div className="mt-4 flex flex-wrap gap-2">
-        {previewImages.map((img, index) => (
-          <img key={index} src={img} alt="Preview" className="w-24 h-24 object-cover rounded-md" />
-        ))}
-      </div>
+                      {/* Show Preview */}
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {previewImages.map((img, index) => (
+                          <img
+                            key={index}
+                            src={img}
+                            alt="Preview"
+                            className="w-24 h-24 object-cover rounded-md"
+                          />
+                        ))}
+                      </div>
                       <p className="text-xs text-gray-500">
                         PNG, JPG, GIF up to 1MB
                       </p>
@@ -372,7 +373,7 @@ export default function AddProduct() {
                   <LoadingComponent />
                 ) : (
                   <button
-                  disabled={fileErrs?.length>0}
+                    disabled={fileErrs?.length > 0}
                     type="submit"
                     className="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                   >
