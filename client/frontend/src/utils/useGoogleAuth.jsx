@@ -1,10 +1,11 @@
 
 import { useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
-import axios from "axios";
+// import axios from "axios";
 import Cookies from "js-cookie";
 import baseURL from "./baseURL";
 import Swal from "sweetalert2";
+import axiosInstance from "./axiosConfig";
 
 
 
@@ -14,9 +15,9 @@ const useGoogleAuth = () => {
   const handleGoogleAuth = async (authResult) => {
     try {
       if (authResult?.code) {
-        const response = await axios.get(
-          `${baseURL}/user/google/callback?code=${authResult.code}`,
-          { withCredentials: true }
+        const response = await axiosInstance.get(
+          `/user/google/callback?code=${authResult.code}`,
+          // { withCredentials: true }
         );
         Cookies.set("user", JSON.stringify(response.data), { expires: 7 });
         navigate("/");
