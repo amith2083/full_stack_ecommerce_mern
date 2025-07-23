@@ -69,8 +69,7 @@ const sizeCategories = [
   "L",
   "XL",
   "XXL",
-  "XXXL",
-  "XXXXL",
+  
 ];
 
 export default function ProductsFilters() {
@@ -81,6 +80,7 @@ export default function ProductsFilters() {
   const category = params.get("category");
   const [page, setPage] = useState(1);
   const limit = 8; // Number of products per page
+  const [searchTerm, setSearchTerm] = useState("");
   //filters
   const [color, setColor] = useState("");
   const [price, setPrice] = useState("");
@@ -96,16 +96,24 @@ const [sort, setSort] = useState("popularity"); // Default sort option
     setSize("");
     setSort("popularity");
     setPage(1);
+    setSearchTerm("");
     // Clear query parameters except category
     setParams(category ? { category } : {});
   };
    // Debounced fetch function
-  const debouncedFetchProduct = useCallback(
-    debounce((url) => {
-      dispatch(fetchProduct({ url }));
-    }, 500),
-    [dispatch]
-  );
+  // const debouncedFetchProduct = useCallback(
+  //   debounce((url) => {
+  //     dispatch(fetchProduct({ url }));
+  //   }, 500),
+  //   [dispatch]
+  // );
+  // Debounced function to update search term
+const debouncedSetSearchTerm = useCallback(
+  debounce((value) => {
+    setSearchTerm(value);
+  }, 500),
+  []
+);
 
   //fetching products------------------------------------------------------------------------------------------------
   //build up url
@@ -126,18 +134,24 @@ const [sort, setSort] = useState("popularity"); // Default sort option
   if (color) {
     productUrl = `${productUrl}&color=${color?.name}`;
   }
+  if (searchTerm) {
+  productUrl = `${productUrl}&name=${encodeURIComponent(searchTerm)}`;
+}
   if (page) {
     productUrl += `&page=${page}&limit=${limit}`;
   }
   if (sort) productUrl += `&sort=${sort}`;  // Include sort option
  
+  // useEffect(() => {
+  //   debouncedFetchProduct(productUrl);
+  //   // Cleanup debounce on unmount to prevent memory leaks
+  //   return () => {
+  //     debouncedFetchProduct.cancel();
+  //   };
+  // }, [category, size, brand, price, color, sort, page, debouncedFetchProduct]);
   useEffect(() => {
-    debouncedFetchProduct(productUrl);
-    // Cleanup debounce on unmount to prevent memory leaks
-    return () => {
-      debouncedFetchProduct.cancel();
-    };
-  }, [category, size, brand, price, color, sort, page, debouncedFetchProduct]);
+    dispatch(fetchProduct({ url: productUrl }));
+  },[dispatch,category,size,brand,price,color,sort,searchTerm,page]);
   //get data from store
   const {
     products,loading,error,pagination,
@@ -170,6 +184,7 @@ const [sort, setSort] = useState("popularity"); // Default sort option
   setBrand("");
   setSize("");
   setPrice("");
+  setSearchTerm("");
   }, [category])
 
  
@@ -289,6 +304,16 @@ const [sort, setSort] = useState("popularity"); // Default sort option
                   {/* Mobile Filters */}
                   <form className="mt-4 border-t border-gray-200">
                     {/*  */}
+                    {/* Search Input for Mobile */}
+    <div className="px-4 py-2">
+      <input
+        type="text"
+        placeholder="Search products..."
+        className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        onChange={(e) => debouncedSetSearchTerm(e.target.value)}
+        value={searchTerm}
+      />
+    </div>
                     <button
                       type="button"
                       onClick={resetFilters}
@@ -569,6 +594,12 @@ const [sort, setSort] = useState("popularity"); // Default sort option
             </h1>
             {/* sort */}
             <div className="flex items-center">
+              <input
+        type="text"
+        placeholder="Search products..."
+        className="mr-4 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+         value={searchTerm} onChange={(e) => debouncedSetSearchTerm(e.target.value)}
+      />
               <Menu as="div" className="relative inline-block text-left">
                 <div>
                   <Menu.Button className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">

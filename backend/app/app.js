@@ -28,7 +28,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "https://trendzcart.vercel.app", 
+    origin: "https://trendzcart.vercel.app",
     credentials: true, // Allow cookies and authentication headers
   })
 );
