@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { createReview } from "../../../redux/slices/review/reviewSlices";
 import LoadingComponent from "../../LoadingComp/LoadingComponent";
 import ErrorMsg from "../../ErrorMsg/ErrorMsg";
@@ -8,6 +8,7 @@ import SuccessMsg from "../../SuccessMsg/SuccessMsg";
 
 export default function AddReview() {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const {id}= useParams()
   //---form data---
   const [formData, setFormData] = useState({
@@ -26,6 +27,15 @@ export default function AddReview() {
     dispatch(createReview({id,rating:formData.rating,message:formData.message}))
   };
   const{loading,error,isAdded}= useSelector((state)=>state?.reviews)
+  // Navigate to product page after successful review submission
+  useEffect(() => {
+    if (isAdded) {
+     
+      setTimeout(() => {
+        navigate(`/product/${id}`);
+      }, 1000); // 2-second delay to allow the user to see the success message
+    }
+  }, [isAdded, navigate, id]);
 
   return (
     <>
