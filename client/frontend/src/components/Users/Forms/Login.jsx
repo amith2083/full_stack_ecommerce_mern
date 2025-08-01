@@ -5,6 +5,7 @@ import ErrorMsg from "../../ErrorMsg/ErrorMsg";
 import LoadingComponent from "../../LoadingComp/LoadingComponent";
 import { useNavigate } from "react-router-dom";
 import { getCartItemsFromDatabase } from "../../../redux/slices/cart/cartSlices";
+import Cookies from "js-cookie";
 import Swal from "sweetalert2";
 import google from "./google.png";
 import useGoogleAuth from "../../../utils/useGoogleAuth";
@@ -22,6 +23,15 @@ const Login = () => {
   const { email, password } = formData;
 
   const { loading, error } = useSelector((state) => state?.users?.userAuth);
+  // Check if user is already logged in
+  useEffect(() => {
+    const userCookie = Cookies.get("user");
+     const user = userCookie ? JSON.parse(userCookie) : null;
+     const isLoggedIn = !!user?.token;
+    if (isLoggedIn) {
+      navigate("/"); // Redirect to homepage if user is authenticated
+    }
+  }, [ navigate]);
 
   const onChangeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

@@ -36,7 +36,7 @@ export const registerUserAction = createAsyncThunk(
       // Cookies.set('user', JSON.stringify(response.data));
       return response.data;
     } catch (error) {
-      console.log("err", error);
+      // console.log("err", error);
 
       return rejectWithValue(error?.response?.data);
     }

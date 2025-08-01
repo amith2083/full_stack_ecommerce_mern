@@ -2,52 +2,56 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCategory } from "../../redux/slices/category/categorySlices";
+
 const AllCategories = () => {
   const dispatch = useDispatch();
+
   useEffect(() => {
     dispatch(fetchCategory());
   }, [dispatch]);
-  const { categories:{categories} } = useSelector((state) => state?.categories);
+
+  const {
+    categories: { categories },
+  } = useSelector((state) => state?.categories);
 
   return (
     <>
-      <div className="bg-white">
-        <div className="mx-auto max-w-7xl py-12 px-4 text-center sm:px-6 lg:py-16 lg:px-8">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            <span className="block">
-              Total Categories [{categories?.length}]
-            </span>
+      <div className="bg-gradient-to-r from-indigo-100 via-white to-pink-100 py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-4xl font-extrabold text-gray-900 mb-2">
+            Total Categories <span className="text-indigo-600">[{categories?.length}]</span>
           </h2>
-          <p>Browse our categories and find the best products for you.</p>
+          <p className="mt-2 text-lg text-gray-600">
+            Browse categories and discover amazing products just for you.
+          </p>
         </div>
       </div>
-      <div className="mt-4 flow-root">
-        <div className="-my-2">
-          <div className="relative box-content h-80 overflow-x-auto py-2 xl:overflow-visible">
-            <div className="min-w-screen-xl absolute flex space-x-8 px-4 sm:px-6 lg:px-8 xl:relative xl:grid m-2  xl:grid-cols-5 xl:gap-x-8 xl:space-x-0 xl:px-0">
-              {categories?.map((category) => (
-                <Link
-                  key={category?.name}
-                  to={`/products-filters?category=${category?.name}`}
-                  className="relative flex h-80 w-56 flex-col mt-4 overflow-hidden rounded-lg p-6 hover:opacity-75 xl:w-auto"
-                >
-                  <span aria-hidden="true" className="absolute inset-0">
-                    <img
-                      src={category?.image}
-                      alt=""
-                      className="h-full w-full object-cover object-center"
-                    />
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-gray-800 opacity-50"
-                  />
-                  <span className="relative mt-auto text-center text-xl font-bold text-white">
-                    {category.name} ({category.products.length})
-                  </span>
-                </Link>
-              ))}
-            </div>
+
+      <div className="bg-white py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            {categories?.map((category) => (
+              <Link
+                key={category?.name}
+                to={`/products-filters?category=${category?.name}`}
+                className="group relative block rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
+              >
+                <img
+                  src={category?.image}
+                  alt={category?.name}
+                  className="h-64 w-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-60 transition duration-300" />
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center">
+                  <h3 className="text-white text-xl font-bold drop-shadow-lg">
+                    {category.name}
+                  </h3>
+                  <p className="text-sm text-gray-200">
+                    ({category.products.length} products)
+                  </p>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </div>

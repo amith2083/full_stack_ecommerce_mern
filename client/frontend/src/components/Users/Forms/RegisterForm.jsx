@@ -50,6 +50,14 @@ const RegisterForm = () => {
   //select store data
 
   const { user, error, loading } = useSelector((state) => state?.users);
+   useEffect(() => {
+      const userCookie = Cookies.get("user");
+       const user = userCookie ? JSON.parse(userCookie) : null;
+       const isLoggedIn = !!user?.token;
+      if (isLoggedIn) {
+        navigate("/"); // Redirect to homepage if user is authenticated
+      }
+    }, [ navigate]);
 
   return (
     <>
