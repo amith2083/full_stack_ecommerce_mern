@@ -105,6 +105,7 @@ export default function Product() {
   //get data from store
   const { loading, error, product } = useSelector((state) => state?.products);
 
+
   const cartItems = useSelector((state) => state?.carts?.cartItems || []);
 
   const productIds = cartItems.flatMap((cartItem) =>
@@ -242,7 +243,7 @@ export default function Product() {
             <h2 className="sr-only">Images</h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-3 lg:gap-8">
-              {product?.images.map((image) => (
+              {product?.images?.map((image) => (
                 <img
                   key={image.id}
                   src={image}
@@ -370,7 +371,7 @@ export default function Product() {
               </h2>
 
               <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                {policies.map((policy) => (
+                {policies?.map((policy) => (
                   <div
                     key={policy.name}
                     className="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center"
@@ -404,7 +405,7 @@ export default function Product() {
           </h2>
 
           <div className="mt-6 space-y-10 divide-y divide-gray-200 border-t border-b border-gray-200 pb-10">
-            {product?.reviews.map((review) => (
+            {product?.reviews?.map((review) => (
               <div
                 key={review._id}
                 className="pt-10 lg:grid lg:grid-cols-12 lg:gap-x-8"
