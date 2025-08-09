@@ -1,4 +1,3 @@
-const baseURL = "https://trendzcart-backend-g2yw.onrender.com"
+const baseURL = " https://trendzpro.shop"
 
 export default baseURL;
- 
