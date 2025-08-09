@@ -44,6 +44,8 @@ const RegisterForm = () => {
     );
 
     if (resultAction?.payload.status === "success") {
+         // Set OTP expiration 60 seconds from now
+    localStorage.setItem("otpExpiration", Date.now() + 60000);
       navigate("/verify-otp");
     }
   };

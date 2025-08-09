@@ -18,34 +18,40 @@ const OtpVerification = () => {
 
   // Set and Retrieve OTP expiration time
   const getExpirationTime = () => {
-    return localStorage.getItem("otpExpiration")
-      ? parseInt(localStorage.getItem("otpExpiration"), 10)
-      : Date.now() + 60000; // Default: 60 seconds if not stored
-  };
+  return localStorage.getItem("otpExpiration")
+    ? parseInt(localStorage.getItem("otpExpiration"), 10)
+    : Date.now() + 60000; // fallback 60 seconds
+};
 
-  const [timeLeft, setTimeLeft] = useState(
-    Math.max(0, Math.floor((getExpirationTime() - Date.now()) / 1000))
-  );
+const calculateTimeLeft = () => {
+  return Math.max(0, Math.floor((getExpirationTime() - Date.now()) / 1000));
+};
 
-  useEffect(() => {
-    if (timeLeft <= 0) {
-      setIsDisabled(true);
-      return;
-    }
+const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          setIsDisabled(true);
-          clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+ useEffect(() => {
+  // If timer expired, disable button & clear interval
+  if (timeLeft <= 0) {
+    setIsDisabled(true);
+    return;
+  }
 
-    return () => clearInterval(timer);
-  }, [timeLeft]);
+  // Enable button if timeLeft > 0 (e.g. after resend)
+  setIsDisabled(false);
+
+  const timer = setInterval(() => {
+    setTimeLeft(prev => {
+      if (prev <= 1) {
+        clearInterval(timer);
+        setIsDisabled(true);
+        return 0;
+      }
+      return prev - 1;
+    });
+  }, 1000);
+
+  return () => clearInterval(timer);
+}, []);
 
   // Store OTP expiration in localStorage
   useEffect(() => {
@@ -79,7 +85,7 @@ const OtpVerification = () => {
     }
   };
   const { error, loading, success } = useSelector((state) => state.users);
-  console.log('success',success)
+
   const handleResendOtp = async () => {
     const result = await dispatch(resendOtp({ email }));
 
@@ -96,9 +102,10 @@ const OtpVerification = () => {
     }
 
     // If no error, reset timer
+    localStorage.setItem("otpExpiration", Date.now() + 60000);
     setTimeLeft(60);
     setIsDisabled(false);
-    localStorage.setItem("otpExpiration", Date.now() + 60000);
+    
   };
 
   return (
