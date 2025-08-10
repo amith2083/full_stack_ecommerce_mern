@@ -128,8 +128,8 @@ export const removeFromCart = asyncHandler(async (req, res) => {
 export const updateCartItem = asyncHandler(async (req, res) => {
   const { productId } = req.params;
   const { qty } = req.body;
+ 
 
-  // Ensure `productId` is cast to ObjectId
 
   const objectIdProductId = new mongoose.Types.ObjectId(productId);
   //   const cartItem = await Cart.findById({ "items.product": productId,});
@@ -146,16 +146,17 @@ export const updateCartItem = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("Product not found");
   }
-
+console.log('product',product)
   //   cartItem.quantity = quantity;
   //   await cartItem.save();
   // Calculate the new totalPrice for the item
   const newTotalPrice = product.price * qty;
-  const cartItems = await Cart.findOneAndUpdate(
-    { "items.product": objectIdProductId },
+const cartItems = await Cart.findOneAndUpdate(
+    { user: req.userAuthId, "items.product": objectIdProductId },
     { $set: { "items.$.qty": qty, "items.$.totalPrice": newTotalPrice } },
-    { new: true }
+    { new: true, writeConcern: { w: "majority" } }
   );
+  console.log('cartitems',cartItems)
   // const cartItems = await Cart.findOneAndUpdate(
   //     { "items.product": objectIdProductId }, // Find the cart with the product
   //     {
