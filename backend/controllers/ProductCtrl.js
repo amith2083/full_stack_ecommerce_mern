@@ -78,7 +78,7 @@ export const createProduct = asyncHandler(async (req, res) => {
 });
 
 export const getProducts = asyncHandler(async (req, res) => {
-  let productQuery = Product.find();
+  let productQuery = Product.find({status:false});
 
   //search by name
   if (req.query.name) {
@@ -201,6 +201,115 @@ export const getProducts = asyncHandler(async (req, res) => {
     results: products.length,
     pagination,
     message: "Products fetched successfully",
+    products,
+  });
+});
+
+export const getProductsForAdmin = asyncHandler(async (req, res) => {
+  let productQuery = Product.find(); // No status filter for admins
+
+  // Search by name
+  if (req.query.name) {
+    productQuery = productQuery.find({
+      name: { $regex: req.query.name, $options: "i" },
+    });
+  }
+
+  // Filter by brand
+  if (req.query.brand) {
+    productQuery = productQuery.find({
+      brand: { $regex: req.query.brand, $options: "i" },
+    });
+  }
+
+  // Filter by category
+  if (req.query.category) {
+    productQuery = productQuery.find({
+      category: new RegExp(`^${req.query.category}$`, "i"),
+    });
+  }
+
+  // Filter by color
+  if (req.query.color) {
+    productQuery = productQuery.find({
+      color: { $regex: req.query.color, $options: "i" },
+    });
+  }
+
+  // Filter by size
+  if (req.query.size) {
+    productQuery = productQuery.find({
+      sizes: { $regex: req.query.size, $options: "i" },
+    });
+  }
+
+  // Filter by price range
+  if (req.query.price) {
+    const priceRange = req.query.price.split("-");
+    productQuery = productQuery.find({
+      price: { $gte: priceRange[0], $lte: priceRange[1] },
+    });
+  }
+
+  // Sorting
+  if (req.query.sort) {
+    let sortOption = {};
+    switch (req.query.sort) {
+      case "price_asc":
+        sortOption = { price: 1 };
+        break;
+      case "price_desc":
+        sortOption = { price: -1 };
+        break;
+      case "rating_desc":
+        sortOption = { rating: -1 };
+        break;
+      case "popularity":
+        sortOption = { sold: -1 };
+        break;
+      case "newest":
+        sortOption = { createdAt: -1 };
+        break;
+      default:
+        sortOption = { popularity: -1 };
+    }
+    productQuery = productQuery.sort(sortOption);
+  }
+
+  // Pagination
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 8;
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
+  const total = await Product.countDocuments(); // Count all products for admin
+
+  productQuery = productQuery.skip(startIndex).limit(limit);
+
+  // Pagination results
+  const pagination = {};
+  if (endIndex < total) {
+    pagination.next = { page: page + 1, limit };
+  }
+  if (startIndex > 0) {
+    pagination.prev = { page: page - 1, limit };
+  }
+
+  // Await the query
+  const products = await productQuery.populate("reviews");
+
+  // Update salesPrice for each product
+  await Promise.all(
+    products.map(async (product) => {
+      product.salesPrice = await calculateAndUpdateSalesPrice(product._id);
+    })
+  );
+
+  res.json({
+    status: "success",
+    total,
+    results: products.length,
+    pagination,
+    message: "Products fetched successfully for admin",
     products,
   });
 });

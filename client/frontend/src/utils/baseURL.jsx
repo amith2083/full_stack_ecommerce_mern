@@ -1,3 +1,3 @@
-const baseURL = " https://trendzpro.shop"
+const baseURL = "https://trendzpro.shop"
 
 export default baseURL;

@@ -15,7 +15,7 @@ const navigate = useNavigate()
   const productsPerPage = 5; // Number of products per page
   //fetching products------------------------------------------------------------------------------------------------
   //build up url
-  let productUrl = `/product`;
+  let productUrl = `/product/admin`;
   useEffect(() => {
     dispatch(fetchProduct({ url: productUrl }));
   },[dispatch]);
