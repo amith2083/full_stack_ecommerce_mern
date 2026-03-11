@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCategory } from "../../redux/slices/category/categorySlices";
+import { ArrowRight } from "lucide-react";
 
 const AllCategories = () => {
   const dispatch = useDispatch();
@@ -15,47 +16,87 @@ const AllCategories = () => {
   } = useSelector((state) => state?.categories);
 
   return (
-    <>
-      <div className="bg-gradient-to-r from-indigo-100 via-white to-pink-100 py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-4xl font-extrabold text-gray-900 mb-2">
-            Total Categories <span className="text-indigo-600">[{categories?.length}]</span>
-          </h2>
-          <p className="mt-2 text-lg text-gray-600">
-            Browse categories and discover amazing products just for you.
-          </p>
-        </div>
-      </div>
+    <div className="bg-stone-100 min-h-screen font-sans">
 
-      <div className="bg-white py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {categories?.map((category) => (
-              <Link
-                key={category?.name}
-                to={`/products-filters?category=${category?.name}`}
-                className="group relative block rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
-              >
-                <img
-                  src={category?.image}
-                  alt={category?.name}
-                  className="h-64 w-full object-cover object-center transform group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-60 transition duration-300" />
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center">
-                  <h3 className="text-white text-xl font-bold drop-shadow-lg">
-                    {category.name}
-                  </h3>
-                  <p className="text-sm text-gray-200">
-                    ({category.products.length} products)
-                  </p>
-                </div>
-              </Link>
-            ))}
+      {/* HERO HEADER */}
+      <div className="bg-neutral-900 px-10 py-20 relative overflow-hidden">
+        {/* Ghost watermark */}
+        <span
+          className="absolute bottom-[-30px] right-[-20px] text-[180px] font-black text-white opacity-[0.03] pointer-events-none select-none whitespace-nowrap"
+          style={{ fontFamily: "'Georgia', serif" }}
+        >
+          CATEGORIES
+        </span>
+
+        <div className="max-w-7xl mx-auto relative z-10 flex items-end justify-between flex-wrap gap-6">
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <span className="w-7 h-px bg-amber-500 block"></span>
+              <span className="text-[10px] font-bold tracking-[0.28em] uppercase text-amber-500">Shop by</span>
+            </div>
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.05]" style={{ fontFamily: "'Georgia', serif" }}>
+              All<br /><span className="italic text-amber-400">Categories</span>
+            </h1>
+          </div>
+
+          {/* Count badge */}
+          <div className="border border-white/10 bg-white/5 px-7 py-5 flex items-center gap-4">
+            <div>
+              <div className="text-3xl font-bold text-amber-400 leading-none" style={{ fontFamily: "'Georgia', serif" }}>
+                {categories?.length ?? "—"}
+              </div>
+              <div className="text-[10px] tracking-[0.18em] uppercase text-white/40 mt-1">Total Categories</div>
+            </div>
           </div>
         </div>
       </div>
-    </>
+
+      {/* GRID */}
+      <div className="max-w-7xl mx-auto px-8 py-16">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {categories?.map((category, i) => (
+            <Link
+              key={category?.name}
+              to={`/products-filters?category=${category?.name}`}
+              className={`group relative block overflow-hidden bg-neutral-200 no-underline${i === 0 ? " col-span-2 row-span-2" : ""}`}
+              style={{ aspectRatio: i === 0 ? "auto" : "3/4", minHeight: i === 0 ? "420px" : undefined }}
+            >
+              {/* Image */}
+              <img
+                src={category?.image}
+                alt={category?.name}
+                loading="lazy"
+                className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.07] absolute inset-0"
+              />
+
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent group-hover:from-black/90 transition-all duration-300" />
+
+              {/* Arrow badge top-right */}
+              <div className="absolute top-3.5 right-3.5 w-9 h-9 bg-amber-500 flex items-center justify-center text-neutral-900 opacity-0 scale-75 rotate-[-45deg] group-hover:opacity-100 group-hover:scale-100 group-hover:rotate-0 transition-all duration-300">
+                <ArrowRight size={16} />
+              </div>
+
+              {/* Content */}
+              <div className="absolute bottom-0 left-0 right-0 p-5">
+                <h3
+                  className="text-white font-bold leading-tight mb-1.5"
+                  style={{
+                    fontFamily: "'Georgia', serif",
+                    fontSize: i === 0 ? "26px" : "18px",
+                  }}
+                >
+                  {category.name}
+                </h3>
+                <p className="text-[11px] tracking-[0.14em] uppercase text-white/50">
+                  {category.products?.length} products
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 };
 

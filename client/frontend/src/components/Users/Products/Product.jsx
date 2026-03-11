@@ -1,93 +1,35 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-
 import { RadioGroup } from "@headlessui/react";
-import {
-  CurrencyDollarIcon,
-  GlobeAmericasIcon,
-} from "@heroicons/react/24/outline";
+import { CurrencyDollarIcon, GlobeAmericasIcon } from "@heroicons/react/24/outline";
 import { StarIcon } from "@heroicons/react/20/solid";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-
-import {
-  addOrderToCart,
-  getCartItemsFromDatabase,
-} from "../../../redux/slices/cart/cartSlices";
+import { addOrderToCart, getCartItemsFromDatabase } from "../../../redux/slices/cart/cartSlices";
 import { fetchSingleProduct } from "../../../redux/slices/products/productSlices";
 import getToken from "../../../utils/getToken";
-
-
-// import { get } from "mongoose";
-// const product = {
-//   name: "Basic Tee",
-//   price: "$35",
-//   href: "#",
-//   breadcrumbs: [
-//     { id: 1, name: "Women", href: "#" },
-//     { id: 2, name: "Clothing", href: "#" },
-//   ],
-//   images: [
-//     {
-//       id: 1,
-//       imageSrc:
-//         "https://tailwindui.com/img/ecommerce-images/product-page-01-featured-product-shot.jpg",
-//       imageAlt: "Back of women's Basic Tee in black.",
-//       primary: true,
-//     },
-//     {
-//       id: 2,
-//       imageSrc:
-//         "https://tailwindui.com/img/ecommerce-images/product-page-01-product-shot-01.jpg",
-//       imageAlt: "Side profile of women's Basic Tee in black.",
-//       primary: false,
-//     },
-//     {
-//       id: 3,
-//       imageSrc:
-//         "https://tailwindui.com/img/ecommerce-images/product-page-01-product-shot-02.jpg",
-//       imageAlt: "Front of women's Basic Tee in black.",
-//       primary: false,
-//     },
-//   ],
-//   colors: [
-//     { name: "Black", bgColor: "bg-gray-900", selectedColor: "ring-gray-900" },
-//     {
-//       name: "Heather Grey",
-//       bgColor: "bg-gray-400",
-//       selectedColor: "ring-gray-400",
-//     },
-//   ],
-//   sizes: [
-//     { name: "XXS", inStock: true },
-//     { name: "XS", inStock: true },
-//     { name: "S", inStock: true },
-//     { name: "M", inStock: true },
-//     { name: "L", inStock: true },
-//     { name: "XL", inStock: false },
-//   ],
-//   description: `
-//     <p>The Basic tee is an honest new take on a classic. The tee uses super soft, pre-shrunk cotton for true comfort and a dependable fit. They are hand cut and sewn locally, with a special dye technique that gives each tee it's own look.</p>
-//     <p>Looking to stock your closet? The Basic tee also comes in a 3-pack or 5-pack at a bundle discount.</p>
-//   `,
-//   details: [
-//     "Only the best materials",
-//     "Ethically and locally made",
-//     "Pre-washed and pre-shrunk",
-//     "Machine wash cold with similar colors",
-//   ],
-// };
+import { ShoppingBag, Truck, RotateCcw, Shield, ChevronRight, ArrowRight } from "lucide-react";
 
 const policies = [
   {
-    name: "International delivery",
-    icon: GlobeAmericasIcon,
-    description: "Get your order in 2 years",
+    name: "Worldwide Delivery",
+    icon: Truck,
+    description: "Free shipping on orders above ₹999",
   },
   {
-    name: "Loyalty rewards",
+    name: "Easy Returns",
+    icon: RotateCcw,
+    description: "Hassle-free 30-day return policy",
+  },
+  {
+    name: "Secure Payment",
+    icon: Shield,
+    description: "100% secured transactions",
+  },
+  {
+    name: "Loyalty Rewards",
     icon: CurrencyDollarIcon,
-    description: "Don't look at other tees",
+    description: "Earn points on every purchase",
   },
 ];
 
@@ -98,367 +40,386 @@ function classNames(...classes) {
 export default function Product() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
+  const [activeImage, setActiveImage] = useState(0);
   const { id } = useParams();
-  //get data from store
+
   const { loading, error, product } = useSelector((state) => state?.products);
-
-
   const cartItems = useSelector((state) => state?.carts?.cartItems || []);
-
   const productIds = cartItems.flatMap((cartItem) =>
     cartItem.items.map((item) => item.product?._id)
   );
-
-  const isInCart = productIds.includes(product?._id); // true if product is in cart
-  // Check if product is in cart
-  // const isInCart = cartItems.some((item) => item.product._id === product?._id);
-
-  // let isInCart
+  const isInCart = productIds.includes(product?._id);
 
   useEffect(() => {
-    if (id) {
-      dispatch(fetchSingleProduct(id));
-    }
+    if (id) dispatch(fetchSingleProduct(id));
   }, [dispatch, id]);
 
-  // Check if product is in the cart
-  //  const cartItems= useSelector((state)=>{state?.carts?.carts})
-  // const cartState = useSelector((state) => state?.carts?.cartItems);
+  const hasDiscount = product?.salesPrice && product?.salesPrice < product?.price;
+  const discountPct = hasDiscount
+    ? Math.round(((product.price - product.salesPrice) / product.price) * 100)
+    : null;
 
-  // const cartItems = cartState.length > 0 ? cartState[0].items : [];
-
-  //  const isInCart = cartItems.some((item) => item.product._id === product._id);
-  //Add to cart handler
   const addToCartHandler = async () => {
-    // 1. Check login
-   const token = getToken()
-
+    const token = getToken();
     if (!token) {
       Swal.fire({
         icon: "warning",
         title: "Please login to use Cart",
         confirmButtonText: "Go to Login",
       }).then((result) => {
-        if (result.isConfirmed) {
-          navigate("/login");
-        }
+        if (result.isConfirmed) navigate("/login");
       });
       return;
     }
-    if (!isInCart) {
-      if (!selectedSize || !selectedColor) {
-        Swal.fire({
-          icon: "error",
-          title: "Selection Required",
-          text: "Please select size and color before adding to cart.",
-        });
-        return;
-      }
+    if (!isInCart && (!selectedSize || !selectedColor)) {
+      Swal.fire({
+        icon: "error",
+        title: "Selection Required",
+        text: "Please select size and color before adding to cart.",
+      });
+      return;
     }
-
     if (isInCart) {
-      // If already in cart, navigate to shopping cart
       navigate("/shopping-cart");
       return;
     }
-    await dispatch(
-      addOrderToCart({ id: product?._id, selectedColor, selectedSize })
-    );
-    Swal.fire({
-      icon: "success",
-      title: "Good Job",
-      text: "Product added to cart successfully",
-    });
-    return dispatch(getCartItemsFromDatabase());
+    await dispatch(addOrderToCart({ id: product?._id, selectedColor, selectedSize }));
+    Swal.fire({ icon: "success", title: "Added to Cart!", text: "Product added successfully." });
+    dispatch(getCartItemsFromDatabase());
   };
-  let productDetails = {};
-  let productColor;
-  let productSize;
-  // let cartItems = [];
 
   return (
-    <div className="bg-white">
-      <main className="mx-auto mt-8 max-w-2xl px-4 pb-16 sm:px-6 sm:pb-24 lg:max-w-7xl lg:px-8">
-        <div className="lg:grid lg:auto-rows-min lg:grid-cols-12 lg:gap-x-8">
-          <div className="lg:col-span-5 lg:col-start-8">
-            <div className="flex justify-between">
-              <h1 className="text-xl font-medium text-gray-900">
+    <div className="bg-stone-50 min-h-screen font-sans">
+
+      {/* ── BREADCRUMB ── */}
+      <div className="bg-white border-b border-neutral-100">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-3 flex items-center gap-2 text-[11px] font-medium tracking-wider uppercase text-neutral-400">
+          <Link to="/" className="hover:text-neutral-900 transition-colors">Home</Link>
+          <ChevronRight size={12} />
+          <Link to="/products-filters" className="hover:text-neutral-900 transition-colors">Shop</Link>
+          <ChevronRight size={12} />
+          <span className="text-neutral-900">{product?.name}</span>
+        </div>
+      </div>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        {/* ── PRODUCT LAYOUT ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-20">
+
+          {/* ── IMAGE GALLERY ── */}
+          <div className="flex gap-4">
+            {/* Thumbnails */}
+            {product?.images?.length > 1 && (
+              <div className="flex flex-col gap-3 w-20 shrink-0">
+                {product.images.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveImage(i)}
+                    className={classNames(
+                      "aspect-square overflow-hidden border-2 transition-all duration-200",
+                      activeImage === i
+                        ? "border-neutral-900"
+                        : "border-transparent hover:border-neutral-300"
+                    )}
+                  >
+                    <img src={img} alt="" className="w-full h-full object-cover object-center" />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Main image */}
+            <div className="flex-1 relative overflow-hidden bg-neutral-100 aspect-[3/4]">
+              {product?.images?.[activeImage] && (
+                <img
+                  src={product.images[activeImage]}
+                  alt={product?.name}
+                  className="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-105"
+                />
+              )}
+              {hasDiscount && (
+                <div className="absolute top-4 left-4 bg-rose-500 text-white text-[9px] font-bold tracking-[0.18em] uppercase px-3 py-1.5">
+                  -{discountPct}% OFF
+                </div>
+              )}
+              {product?.qtyLeft <= 0 && (
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                  <span className="text-white text-sm font-bold tracking-[0.2em] uppercase">Out of Stock</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ── PRODUCT INFO ── */}
+          <div className="flex flex-col">
+
+            {/* Name + Price */}
+            <div className="pb-7 border-b border-neutral-200">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-[10px] font-bold tracking-[0.22em] uppercase text-amber-500">
+                  {product?.brand || "Premium Collection"}
+                </span>
+              </div>
+              <h1
+                className="text-3xl sm:text-4xl font-black text-neutral-900 leading-tight mb-5"
+                style={{ fontFamily: "'Georgia', serif" }}
+              >
                 {product?.name}
               </h1>
-              <p className="text-xl font-medium text-gray-900">
-                ₹ {product?.price}.00
-              </p>
-            </div>
-            {/* Reviews */}
-            <div className="mt-4">
-              <h2 className="sr-only">Reviews</h2>
-              <div className="flex items-center">
-                <p className="text-sm text-gray-700">
-                  {product?.reviews?.length > 0 ? product?.averageRating : 0}
-                </p>
-                <div className="ml-1 flex items-center">
-                  {[0, 1, 2, 3, 4].map((rating) => (
+
+              {/* Rating */}
+              <div className="flex items-center gap-3 mb-5">
+                <div className="flex items-center gap-0.5">
+                  {[0, 1, 2, 3, 4].map((r) => (
                     <StarIcon
-                      key={rating}
+                      key={r}
                       className={classNames(
-                        product?.averageRating > rating
-                          ? "text-yellow-400"
-                          : "text-gray-200",
-                        "h-5 w-5 flex-shrink-0"
+                        product?.averageRating > r ? "text-amber-400" : "text-neutral-200",
+                        "h-4 w-4 shrink-0"
                       )}
-                      aria-hidden="true"
                     />
                   ))}
                 </div>
-                <div
-                  aria-hidden="true"
-                  className="ml-4 text-sm text-gray-300"
-                ></div>
-                <div className="ml-4 flex">
-                  <a
-                    href="#"
-                    className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
-                  >
-                    {productDetails?.product?.totalReviews} total reviews
-                  </a>
-                </div>
-              </div>
-              {/* leave a review */}
-
-              <div className="mt-4">
-                <Link to={`/add-review/${product?._id}`}>
-                  <h3 className="text-sm font-medium text-blue-600">
-                    Leave a review
-                  </h3>
+                <span className="text-sm text-neutral-500 font-medium">
+                  {product?.averageRating > 0 ? product?.averageRating?.toFixed(1) : "No ratings yet"}
+                </span>
+                <span className="text-neutral-300">·</span>
+                <Link
+                  to={`/add-review/${product?._id}`}
+                  className="text-sm font-semibold text-neutral-900 hover:text-amber-500 transition-colors underline underline-offset-2"
+                >
+                  Write a review
                 </Link>
               </div>
-            </div>
-          </div>
 
-          {/* Image gallery */}
-          <div className="mt-8 lg:col-span-7 lg:col-start-1 lg:row-span-3 lg:row-start-1 lg:mt-0">
-            <h2 className="sr-only">Images</h2>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-3 lg:gap-8">
-              {product?.images?.map((image) => (
-                <img
-                  key={image.id}
-                  src={image}
-                  alt={image.imageAlt}
-                  className={classNames(
-                    image.primary
-                      ? "lg:col-span-2 lg:row-span-2"
-                      : " lg:block",
-                    "rounded-lg transition-transform duration-300 ease-in-out hover:scale-150"
-                  )}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-8 lg:col-span-5">
-            <>
-              {/* Color picker */}
-              <div>
-                <h2 className="text-sm font-medium text-gray-900">Color</h2>
-                <div className="flex items-center space-x-3">
-                  <RadioGroup value={selectedColor} onChange={setSelectedColor}>
-                    <div className="mt-4 flex items-center space-x-3">
-                      {product?.color?.map((color) => (
-                        <RadioGroup.Option
-                          key={color}
-                          value={color}
-                          className={({ active, checked }) =>
-                            classNames(
-                              active && checked ? "ring ring-offset-1" : "",
-                              !active && checked ? "ring-2" : "",
-                              "-m-0.5 relative p-0.5 rounded-full flex items-center justify-center cursor-pointer focus:outline-none"
-                            )
-                          }
-                        >
-                          <RadioGroup.Label as="span" className="sr-only">
-                            {color.name}
-                          </RadioGroup.Label>
-                          <span
-                            style={{ backgroundColor: color }}
-                            aria-hidden="true"
-                            className={classNames(
-                              "h-8 w-8 border border-black border-opacity-10 rounded-full"
-                            )}
-                          />
-                        </RadioGroup.Option>
-                      ))}
-                    </div>
-                  </RadioGroup>
-                </div>
-              </div>
-
-              {/* Size picker */}
-              <div className="mt-8">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-medium text-gray-900">Size</h2>
-                </div>
-                <RadioGroup
-                  value={selectedSize}
-                  onChange={setSelectedSize}
-                  className="mt-2"
+              {/* Price */}
+              <div className="flex items-baseline gap-3">
+                <span
+                  className="text-3xl font-black text-neutral-900"
+                  style={{ fontFamily: "'Georgia', serif" }}
                 >
-                  {/* Choose size */}
-                  <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
-                    {product?.sizes?.map((size) => (
-                      <RadioGroup.Option
-                        key={size}
-                        value={size}
-                        className={({ active, checked }) => {
-                          return classNames(
-                            checked
-                              ? "bg-indigo-600 border-transparent  text-white hover:bg-indigo-700"
-                              : "bg-white border-gray-200 text-gray-900 hover:bg-gray-50",
-                            "border rounded-md py-3 px-3 flex items-center justify-center text-sm font-medium uppercase sm:flex-1 cursor-pointer"
-                          );
-                        }}
-                      >
-                        <RadioGroup.Label as="span">{size}</RadioGroup.Label>
-                      </RadioGroup.Option>
-                    ))}
-                  </div>
-                </RadioGroup>
+                  ₹{(hasDiscount ? product.salesPrice : product?.price)?.toLocaleString("en-IN")}
+                </span>
+                {hasDiscount && (
+                  <span className="text-lg text-neutral-400 line-through font-medium">
+                    ₹{product.price?.toLocaleString("en-IN")}
+                  </span>
+                )}
+                {hasDiscount && (
+                  <span className="text-sm font-bold text-emerald-600">
+                    Save ₹{(product.price - product.salesPrice).toLocaleString("en-IN")}
+                  </span>
+                )}
               </div>
-              {/* add to cart */}
+            </div>
+
+            {/* Color */}
+            <div className="py-6 border-b border-neutral-200">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[11px] font-bold tracking-[0.18em] uppercase text-neutral-900">Color</span>
+                {selectedColor && (
+                  <span className="text-xs text-neutral-500 capitalize">{selectedColor}</span>
+                )}
+              </div>
+              <RadioGroup value={selectedColor} onChange={setSelectedColor}>
+                <div className="flex flex-wrap gap-3">
+                  {product?.color?.map((color) => (
+                    <RadioGroup.Option
+                      key={color}
+                      value={color}
+                      className={({ checked }) =>
+                        classNames(
+                          "relative rounded-full cursor-pointer focus:outline-none transition-all duration-150",
+                          checked
+                            ? "ring-2 ring-offset-2 ring-neutral-900 scale-110"
+                            : "hover:scale-105 ring-1 ring-black/10"
+                        )
+                      }
+                    >
+                      <span
+                        style={{ backgroundColor: color }}
+                        className="block h-8 w-8 rounded-full border border-black/10"
+                      />
+                    </RadioGroup.Option>
+                  ))}
+                </div>
+              </RadioGroup>
+            </div>
+
+            {/* Size */}
+            <div className="py-6 border-b border-neutral-200">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[11px] font-bold tracking-[0.18em] uppercase text-neutral-900">Size</span>
+                {selectedSize && (
+                  <span className="text-xs font-semibold text-neutral-500">{selectedSize} selected</span>
+                )}
+              </div>
+              <RadioGroup value={selectedSize} onChange={setSelectedSize}>
+                <div className="flex flex-wrap gap-2">
+                  {product?.sizes?.map((size) => (
+                    <RadioGroup.Option
+                      key={size}
+                      value={size}
+                      className={({ checked }) =>
+                        classNames(
+                          "w-12 h-12 flex items-center justify-center text-sm font-bold border cursor-pointer transition-all duration-150",
+                          checked
+                            ? "bg-neutral-900 text-white border-neutral-900"
+                            : "bg-white text-neutral-700 border-neutral-200 hover:border-neutral-900"
+                        )
+                      }
+                    >
+                      {size}
+                    </RadioGroup.Option>
+                  ))}
+                </div>
+              </RadioGroup>
+            </div>
+
+            {/* Stock indicator */}
+            {product?.qtyLeft > 0 && product?.qtyLeft <= 10 && (
+              <div className="py-4 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-amber-500 inline-block animate-pulse"></span>
+                <span className="text-xs font-semibold text-amber-600">
+                  Only {product.qtyLeft} left in stock — order soon
+                </span>
+              </div>
+            )}
+
+            {/* CTA */}
+            <div className="pt-6 flex flex-col gap-3">
               {product?.qtyLeft <= 0 ? (
                 <button
                   disabled
-                  style={{ cursor: "not-allowed" }}
-                  className="mt-8 flex w-full items-center justify-center rounded-md border border-transparent  bg-red-300 py-3 px-8 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  className="w-full flex items-center justify-center gap-3 bg-neutral-200 text-neutral-400 text-[12px] font-bold tracking-[0.18em] uppercase py-4 cursor-not-allowed"
                 >
-                  Out of stock
+                  Out of Stock
                 </button>
               ) : (
                 <button
-                  onClick={() => addToCartHandler()}
-                  className="mt-8 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 py-3 px-8 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  onClick={addToCartHandler}
+                  className="w-full flex items-center justify-center gap-3 bg-neutral-900 text-white text-[12px] font-bold tracking-[0.18em] uppercase py-4 hover:bg-amber-500 hover:text-neutral-900 transition-colors duration-200"
                 >
+                  <ShoppingBag size={16} />
                   {isInCart ? "Go to Cart" : "Add to Cart"}
                 </button>
               )}
 
-              {/* proceed to check */}
-
-              {/* {cartItems.length > 0 && (
+              {isInCart && (
                 <Link
                   to="/shopping-cart"
-                  className="mt-8 flex w-full items-center justify-center rounded-md border border-transparent bg-green-800 py-3 px-8 text-base font-medium text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                  Proceed to checkout
+                  className="w-full flex items-center justify-center gap-3 border border-neutral-900 text-neutral-900 text-[12px] font-bold tracking-[0.18em] uppercase py-4 hover:bg-neutral-900 hover:text-white transition-colors duration-200 no-underline"
+                >
+                  Proceed to Checkout <ArrowRight size={15} />
                 </Link>
-              )} */}
-            </>
+              )}
+            </div>
 
-            {/* Product details */}
-            <div className="mt-10">
-              <h2 className="text-sm font-medium text-gray-900">Description</h2>
-              <div className="prose prose-sm mt-4 text-gray-500">
-                {product?.description}
-              </div>
+            {/* Description */}
+            <div className="pt-8 border-t border-neutral-200 mt-6">
+              <h2 className="text-[11px] font-bold tracking-[0.18em] uppercase text-neutral-900 mb-3">
+                Description
+              </h2>
+              <p className="text-sm text-neutral-500 leading-relaxed">{product?.description}</p>
             </div>
 
             {/* Policies */}
-            <section aria-labelledby="policies-heading" className="mt-10">
-              <h2 id="policies-heading" className="sr-only">
-                Our Policies
-              </h2>
-
-              <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                {policies?.map((policy) => (
-                  <div
-                    key={policy.name}
-                    className="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center"
-                  >
-                    <dt>
-                      <policy.icon
-                        className="mx-auto h-6 w-6 flex-shrink-0 text-gray-400"
-                        aria-hidden="true"
-                      />
-                      <span className="mt-4 text-sm font-medium text-gray-900">
-                        {policy.name}
-                      </span>
-                    </dt>
-                    <dd className="mt-1 text-sm text-gray-500">
-                      {policy.description}
-                    </dd>
+            <div className="pt-6 grid grid-cols-2 gap-3 mt-2">
+              {policies.map((policy) => (
+                <div
+                  key={policy.name}
+                  className="flex items-start gap-3 bg-white border border-neutral-100 p-4"
+                >
+                  <policy.icon className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" aria-hidden="true" />
+                  <div>
+                    <p className="text-[11px] font-bold tracking-wide text-neutral-900">{policy.name}</p>
+                    <p className="text-[11px] text-neutral-400 mt-0.5">{policy.description}</p>
                   </div>
-                ))}
-              </dl>
-            </section>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Reviews */}
-        <section aria-labelledby="reviews-heading" className="mt-16 sm:mt-24">
-          <h2
-            id="reviews-heading"
-            className="text-lg font-medium text-gray-900"
-          >
-            Recent reviews
-          </h2>
-
-          <div className="mt-6 space-y-10 divide-y divide-gray-200 border-t border-b border-gray-200 pb-10">
-            {product?.reviews?.map((review) => (
-              <div
-                key={review._id}
-                className="pt-10 lg:grid lg:grid-cols-12 lg:gap-x-8"
+        {/* ── REVIEWS ── */}
+        <section className="mt-24">
+          <div className="flex items-end justify-between mb-8 pb-6 border-b border-neutral-200">
+            <div>
+              <div className="text-[10px] font-bold tracking-[0.22em] uppercase text-amber-500 mb-2">
+                What customers say
+              </div>
+              <h2
+                className="text-3xl font-black text-neutral-900"
+                style={{ fontFamily: "'Georgia', serif" }}
               >
-                <div className="lg:col-span-8 lg:col-start-5 xl:col-span-9 xl:col-start-4 xl:grid xl:grid-cols-3 xl:items-start xl:gap-x-8">
-                  <div className="flex items-center xl:col-span-1">
-                    <div className="flex items-center">
-                      {[0, 1, 2, 3, 4].map((rating) => (
-                        <StarIcon
-                          key={rating}
-                          className={classNames(
-                            review.rating > rating
-                              ? "text-yellow-400"
-                              : "text-gray-200",
-                            "h-5 w-5 flex-shrink-0"
-                          )}
-                          aria-hidden="true"
-                        />
-                      ))}
+                Customer <span className="italic">Reviews</span>
+              </h2>
+            </div>
+            <Link
+              to={`/add-review/${product?._id}`}
+              className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.14em] uppercase text-neutral-900 border-b border-neutral-900 pb-0.5 hover:text-amber-500 hover:border-amber-500 transition-colors no-underline"
+            >
+              Write a Review <ArrowRight size={13} />
+            </Link>
+          </div>
+
+          {product?.reviews?.length === 0 ? (
+            <div className="text-center py-16 text-neutral-400">
+              <StarIcon className="h-10 w-10 mx-auto mb-3 text-neutral-200" />
+              <p className="text-sm font-medium">No reviews yet. Be the first to review!</p>
+            </div>
+          ) : (
+            <div className="space-y-0 divide-y divide-neutral-100">
+              {product?.reviews?.map((review) => (
+                <div key={review._id} className="py-8 grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-6">
+                  {/* Reviewer info */}
+                  <div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 bg-neutral-900 text-white flex items-center justify-center text-sm font-bold shrink-0">
+                        {review?.user?.name?.[0]?.toUpperCase() || "U"}
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-neutral-900">{review?.user?.name}</p>
+                        <time className="text-xs text-neutral-400">
+                          {new Date(review.createdAt).toLocaleDateString("en-IN", {
+                            day: "numeric", month: "short", year: "numeric",
+                          })}
+                        </time>
+                      </div>
                     </div>
-                    <p className="ml-3 text-sm text-gray-700">
-                      {review.rating}
-                      <span className="sr-only"> out of 5 stars</span>
-                    </p>
                   </div>
 
-                  <div className="mt-4 lg:mt-6 xl:col-span-2 xl:mt-0">
-                    <h3 className="text-sm font-medium text-gray-900">
-                      {review?.message}
-                    </h3>
-
+                  {/* Review content */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      {[0, 1, 2, 3, 4].map((r) => (
+                        <StarIcon
+                          key={r}
+                          className={classNames(
+                            review.rating > r ? "text-amber-400" : "text-neutral-200",
+                            "h-4 w-4 shrink-0"
+                          )}
+                        />
+                      ))}
+                      <span className="text-xs text-neutral-500 font-medium ml-1">
+                        {review.rating}/5
+                      </span>
+                    </div>
+                    <h3 className="text-sm font-bold text-neutral-900 mb-2">{review?.message}</h3>
                     <div
-                      className="mt-3 space-y-6 text-sm text-gray-500"
+                      className="text-sm text-neutral-500 leading-relaxed"
                       dangerouslySetInnerHTML={{ __html: review.content }}
                     />
                   </div>
                 </div>
-
-                <div className="mt-6 flex items-center text-sm lg:col-span-4 lg:col-start-1 lg:row-start-1 lg:mt-0 lg:flex-col lg:items-start xl:col-span-3">
-                  <p className="font-medium text-gray-900">
-                    {review?.user?.name}
-                  </p>
-                  <time
-                    dateTime={review.datetime}
-                    className="ml-4 border-l border-gray-200 pl-4 text-gray-500 lg:ml-0 lg:mt-2 lg:border-0 lg:pl-0"
-                  >
-                    {new Date(review.createdAt).toLocaleDateString()}
-                  </time>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
+
       </main>
     </div>
   );

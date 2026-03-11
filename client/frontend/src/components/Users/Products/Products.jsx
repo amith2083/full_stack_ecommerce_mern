@@ -1,125 +1,150 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { addToWishlist, fetchWishlist, removeFromWishlist, } from "../../../redux/slices/wishlist/wishListSlices";
+import {
+  addToWishlist,
+  fetchWishlist,
+  removeFromWishlist,
+} from "../../../redux/slices/wishlist/wishListSlices";
 import Swal from "sweetalert2";
 import SuccessMsg from "../../SuccessMsg/SuccessMsg";
 import getToken from "../../../utils/getToken";
-
-
+import { Heart } from "lucide-react";
 
 const Products = ({ products }) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [localWishlist, setLocalWishlist] = useState([]);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(fetchWishlist());
-    // setLocalWishlist(wishlistProductIds);
-   
   }, [dispatch]);
-  const { wishLists,isAdded,isDelete } = useSelector((state) => state?.wishLists);
- 
- // Update localWishlist whenever wishLists change
- useEffect(() => {
-  setLocalWishlist(wishLists?.map((item) => item._id) || []);
-}, [wishLists]);;
 
- 
-    // Extract product IDs from the wishlist
-    const wishlistProductIds = wishLists?.map((item)=>item._id)
-   
+  const { wishLists, isAdded, isDelete } = useSelector(
+    (state) => state?.wishLists
+  );
+
+  useEffect(() => {
+    setLocalWishlist(wishLists?.map((item) => item._id) || []);
+  }, [wishLists]);
+
   const handleWishlistClick = (productId) => {
-    // 1. Check login
- const token = getToken()
- 
-  
-  if (!token) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Please login to use wishlist',
-      confirmButtonText: 'Go to Login',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        navigate("/login");
-      }
-    });
-    return;
-  }
+    const token = getToken();
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "Please login to use wishlist",
+        confirmButtonText: "Go to Login",
+      }).then((result) => {
+        if (result.isConfirmed) navigate("/login");
+      });
+      return;
+    }
     if (localWishlist.includes(productId)) {
-      setLocalWishlist((prev) => prev.filter((id) => id !== productId)); // Update local state instantly
+      setLocalWishlist((prev) => prev.filter((id) => id !== productId));
       dispatch(removeFromWishlist(productId));
-      dispatch(fetchWishlist())
+      dispatch(fetchWishlist());
     } else {
-      setLocalWishlist((prev) => [...prev, productId]); // Update local state instantly
+      setLocalWishlist((prev) => [...prev, productId]);
       dispatch(addToWishlist(productId));
-      dispatch(fetchWishlist())
+      dispatch(fetchWishlist());
     }
   };
-  
+
   return (
     <>
-      {isAdded && <SuccessMsg message={"Product added to wishlist"} />}
-      {isDelete && <SuccessMsg message={"Product removed from wishlist"}/>}
+      {isAdded && <SuccessMsg message="Product added to wishlist" />}
+      {isDelete && <SuccessMsg message="Product removed from wishlist" />}
 
-<div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:col-span-3 lg:gap-x-8">
-  {products?.map((product) => {
-    const isWishlisted = localWishlist.includes(product._id);
+      <div className="grid grid-cols-2 gap-0.5 lg:col-span-3 xl:grid-cols-3">
+        {products?.map((product) => {
+          const isWishlisted = localWishlist.includes(product._id);
+          const hasDiscount =
+            product.salesPrice && product.salesPrice < product.price;
+          const discountPct = hasDiscount
+            ? Math.round(
+                ((product.price - product.salesPrice) / product.price) * 100
+              )
+            : null;
 
-    return (
+          return (
+            <div
+              key={product._id}
+              className="group relative bg-stone-100 overflow-hidden"
+            >
+              {/* Image area */}
+              <div className="relative aspect-[3/4] overflow-hidden bg-stone-200">
+                <Link to={`/product/${product?.id}`} className="block w-full h-full">
+                  <img
+                    className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+                    src={product?.images[0]}
+                    alt={product?.name}
+                  />
+                </Link>
 
-      <>
-      <div key={product._id} className="w-full overflow-hidden rounded-lg  group">
-        <div className="relative bg-white p-4  rounded-lg">
-          {/* Discount Badge */}
-          {product.salesPrice && product.salesPrice < product.price && (
-                  <span className="absolute top-4 left-4 px-2 py-1 text-xs font-bold bg-white border-2 border-red-500 rounded-full text-red-500">
-                    -{Math.round(((product.price - product.salesPrice) / product.price) * 100)}%
+                {/* Hover overlay + Quick View */}
+                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+                  <span className="bg-white text-neutral-900 text-[10px] font-bold tracking-[0.18em] uppercase px-6 py-2.5 translate-y-3 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
+                    Quick View
                   </span>
+                </div>
+
+                {/* Discount badge */}
+                {hasDiscount && (
+                  <div className="absolute top-3 left-3 bg-rose-500 text-white text-[9px] font-bold tracking-[0.18em] uppercase px-2.5 py-1">
+                    -{discountPct}%
+                  </div>
                 )}
 
-          {/* Image Wrapper */}
-          <Link className="block w-full" to={`/product/${product?.id}`}>
-          <div className="relative w-full max-h-[300px] aspect-[4/5] overflow-hidden rounded-md">
-              <img
-                className="w-full h-full object-contain object-center"
-                src={product?.images[0]}
-                alt={product?.name}
-              />
+                {/* Wishlist button */}
+                <button
+                  onClick={() => handleWishlistClick(product?._id)}
+                  className={`absolute top-3 right-3 w-9 h-9 flex items-center justify-center transition-all duration-200 shadow-md
+                    ${isWishlisted
+                      ? "bg-rose-500 text-white opacity-100"
+                      : "bg-white text-neutral-400 opacity-0 group-hover:opacity-100 hover:text-rose-500"
+                    }`}
+                  aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                >
+                  <Heart
+                    size={15}
+                    className={isWishlisted ? "fill-white" : ""}
+                  />
+                </button>
+              </div>
+
+              {/* Product info */}
+              <div className="bg-white px-4 py-4">
+                <h3 className="text-sm font-semibold text-neutral-800 truncate leading-snug mb-2">
+                  {product?.name}
+                </h3>
+                <div className="flex items-center gap-2">
+                  {hasDiscount ? (
+                    <>
+                      <span
+                        className="text-base font-bold text-neutral-900"
+                        style={{ fontFamily: "'Georgia', serif" }}
+                      >
+                        ₹{product.salesPrice.toLocaleString("en-IN")}
+                      </span>
+                      <span className="text-xs text-neutral-400 line-through">
+                        ₹{product.price.toLocaleString("en-IN")}
+                      </span>
+                    </>
+                  ) : (
+                    <span
+                      className="text-base font-bold text-neutral-900"
+                      style={{ fontFamily: "'Georgia', serif" }}
+                    >
+                      ₹{product.price.toLocaleString("en-IN")}
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
-          </Link>
-
-          {/* Product Details */}
-          <div className="px-4 pb-4 mt-4">
-          <h3 className="mb-2 text-center font-bold font-heading">
-                      {product?.name}
-                    </h3>
-          <p className="text-center font-bold text-blue-500">
-                    {product.salesPrice && product.salesPrice < product.price ? (
-                      <>
-                        <span className="text-blue-500">₹{product.salesPrice}</span>
-                        <span className="ml-2 text-sm text-gray-500 line-through">₹{product.price}</span>
-                      </>
-                    ) : (
-                      <span>₹{product.price}</span>
-                    )}
-                  </p>
-
-            {/* Wishlist Button */}
-            <button
-              onClick={() => handleWishlistClick(product?._id)}
-              className="absolute top-0 right-0 m-1 flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-md hover:bg-gray-200 transition"
-            >
-              {isWishlisted ? "❤️" : "🤍"}
-            </button>
-          </div>
-        </div>
+          );
+        })}
       </div>
-      </>
-    );
-  })}
-</div>
-
     </>
   );
 };
