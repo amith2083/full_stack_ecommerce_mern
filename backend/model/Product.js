@@ -163,7 +163,8 @@ ProductSchema.virtual("totalReviews").get(function () {
     const averageRating = Number(ratingsTotal / product?.reviews?.length).toFixed(
       1
     );
-    return averageRating;
+   
+     return Number(averageRating);
   });
   //qty left
 ProductSchema.virtual("qtyLeft").get(function () {

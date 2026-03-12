@@ -46,6 +46,7 @@ export default function Product() {
   const { id } = useParams();
 
   const { loading, error, product } = useSelector((state) => state?.products);
+ 
   const cartItems = useSelector((state) => state?.carts?.cartItems || []);
   const productIds = cartItems.flatMap((cartItem) =>
     cartItem.items.map((item) => item.product?._id)

@@ -158,7 +158,7 @@ export const fetchProduct = createAsyncThunk(
 export const fetchSingleProduct = createAsyncThunk(
   "/product/fetch",
   async (productId, { rejectWithValue, getState, dispatch }) => {
-    console.log("productid", productId);
+   
     try {
       const response = await axiosInstance.get(`/product/${productId}`);
 

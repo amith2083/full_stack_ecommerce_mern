@@ -1,341 +1,308 @@
-import React from "react";
+import React, { useEffect, lazy, Suspense } from "react";
 import {
-  BrowserRouter,
   Route,
   Routes,
-  Outlet,
   useLocation,
   useNavigate,
 } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import AdminDashboard from "./components/Admin/AdminDashboard";
-import ManageCoupons from "./components/Admin/Coupons/ManageCoupons";
-import AddCoupon from "./components/Admin/Coupons/AddCoupon";
-import Login from "./components/Users/Forms/Login";
-import AddProduct from "./components/Admin/Products/AddProduct";
-import RegisterForm from "./components/Users/Forms/RegisterForm";
-import HomePage from "./components/HomePage/HomePage";
+
 import Navbar from "./components/Navbar/Navbar";
-import OrderHistory from "./components/Admin/Orders/ManageOrders";
-import OrderPayment from "./components/Users/Products/OrderPayment";
-import ManageCategories from "./components/Admin/Categories/ManageCategories";
-import ManageStocks from "./components/Admin/Products/ManageStocks";
-import AddCategory from "./components/Admin/Categories/AddCategory";
-import AddBrand from "./components/Admin/Categories/AddBrand";
-import AddColor from "./components/Admin/Categories/AddColor";
-import AllCategories from "./components/HomePage/AllCategories";
-import UpdateCoupon from "./components/Admin/Coupons/UpdateCoupon";
-import Product from "./components/Users/Products/Product";
-import ShoppingCart from "./components/Users/Products/ShoppingCart";
-import ProductsFilters from "./components/Users/Products/ProductsFilters";
-import CustomerProfile from "./components/Users/Profile/CustomerProfile";
-import AddReview from "./components/Users/Reviews/AddReview";
-import UpdateCategory from "./components/Admin/Categories/UpdateCategory";
-import ThanksForOrdering from "./components/Users/Products/ThanksForOrdering";
-import OrdersList from "./components/Admin/Orders/OrdersList";
-import ManageOrders from "./components/Admin/Orders/ManageOrders";
-import ManageBrands from "./components/Admin/Categories/ManageBrands";
+import Footer from "./components/Footer/Footer";
 import AuthRoute from "./components/Authenciation/AuthRoute";
 import AdminCheck from "./components/Authenciation/AdminCheck";
-import ProfilePage from "./components/Users/userProfile/ProfilePage";
-import Orders from "./components/Users/userProfile/Orders";
-import ProductUpdate from "./components/Admin/Products/ProductUpdate";
-import OtpVerification from "./components/Users/Forms/OtpVerification";
-import ShippingAddressDetails from "./components/Users/userProfile/ShippingAddressDetails";
-import WishList from "./components/Users/Products/WishList";
-import Wallet from "./components/Users/userProfile/Wallet";
-import UpdateOrders from "./components/Admin/Orders/UpdateOrders";
-import Customers from "./components/Admin/Customers/Customers";
-import ColorLists from "./components/Admin/Categories/ColorLists";
 import { setNavigate } from "./utils/axiosConfig";
-import { useEffect } from "react";
-import AddOffer from "./components/Admin/Offers/AddOffer";
-import ManageOffers from "./components/Admin/Offers/ManageOffers";
-import UpdateOffer from "./components/Admin/Offers/UpdateOffer";
-import Footer from "./components/Footer/Footer";
+import FullPageLoader from "./components/HomePage/FullPageLoader";
 
-// Function to handle conditional Navbar rendering
+
+/* -------------------- Lazy Imports -------------------- */
+
+// Home
+const HomePage = lazy(() => import("./components/HomePage/HomePage"));
+const AllCategories = lazy(() => import("./components/HomePage/AllCategories"));
+
+// Products
+const Product = lazy(() => import("./components/Users/Products/Product"));
+const ProductsFilters = lazy(() =>
+  import("./components/Users/Products/ProductsFilters")
+);
+const ShoppingCart = lazy(() =>
+  import("./components/Users/Products/ShoppingCart")
+);
+const WishList = lazy(() => import("./components/Users/Products/WishList"));
+const OrderPayment = lazy(() =>
+  import("./components/Users/Products/OrderPayment")
+);
+const ThanksForOrdering = lazy(() =>
+  import("./components/Users/Products/ThanksForOrdering")
+);
+
+// Users
+const Login = lazy(() => import("./components/Users/Forms/Login"));
+const RegisterForm = lazy(() =>
+  import("./components/Users/Forms/RegisterForm")
+);
+const OtpVerification = lazy(() =>
+  import("./components/Users/Forms/OtpVerification")
+);
+
+const ProfilePage = lazy(() =>
+  import("./components/Users/userProfile/ProfilePage")
+);
+const Orders = lazy(() => import("./components/Users/userProfile/Orders"));
+const Wallet = lazy(() => import("./components/Users/userProfile/Wallet"));
+const ShippingAddressDetails = lazy(() =>
+  import("./components/Users/userProfile/ShippingAddressDetails")
+);
+
+const CustomerProfile = lazy(() =>
+  import("./components/Users/Profile/CustomerProfile")
+);
+
+// Reviews
+const AddReview = lazy(() => import("./components/Users/Reviews/AddReview"));
+
+// Admin Dashboard
+const AdminDashboard = lazy(() =>
+  import("./components/Admin/AdminDashboard")
+);
+
+// Products Admin
+const AddProduct = lazy(() =>
+  import("./components/Admin/Products/AddProduct")
+);
+const ManageStocks = lazy(() =>
+  import("./components/Admin/Products/ManageStocks")
+);
+const ProductUpdate = lazy(() =>
+  import("./components/Admin/Products/ProductUpdate")
+);
+
+// Categories Admin
+const AddCategory = lazy(() =>
+  import("./components/Admin/Categories/AddCategory")
+);
+const ManageCategories = lazy(() =>
+  import("./components/Admin/Categories/ManageCategories")
+);
+const UpdateCategory = lazy(() =>
+  import("./components/Admin/Categories/UpdateCategory")
+);
+const AddBrand = lazy(() => import("./components/Admin/Categories/AddBrand"));
+const ManageBrands = lazy(() =>
+  import("./components/Admin/Categories/ManageBrands")
+);
+const AddColor = lazy(() => import("./components/Admin/Categories/AddColor"));
+const ColorLists = lazy(() =>
+  import("./components/Admin/Categories/ColorLists")
+);
+
+// Coupons
+const AddCoupon = lazy(() =>
+  import("./components/Admin/Coupons/AddCoupon")
+);
+const ManageCoupons = lazy(() =>
+  import("./components/Admin/Coupons/ManageCoupons")
+);
+const UpdateCoupon = lazy(() =>
+  import("./components/Admin/Coupons/UpdateCoupon")
+);
+
+// Offers
+const AddOffer = lazy(() =>
+  import("./components/Admin/Offers/AddOffer")
+);
+const ManageOffers = lazy(() =>
+  import("./components/Admin/Offers/ManageOffers")
+);
+const UpdateOffer = lazy(() =>
+  import("./components/Admin/Offers/UpdateOffer")
+);
+
+// Orders
+const OrdersList = lazy(() =>
+  import("./components/Admin/Orders/OrdersList")
+);
+const ManageOrders = lazy(() =>
+  import("./components/Admin/Orders/ManageOrders")
+);
+const UpdateOrders = lazy(() =>
+  import("./components/Admin/Orders/UpdateOrders")
+);
+
+// Customers
+const Customers = lazy(() =>
+  import("./components/Admin/Customers/Customers")
+);
+
+/* -------------------- Layout -------------------- */
+
 const Layout = ({ children }) => {
   const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith("/admin"); // Check if route starts with /admin
+  const isAdminRoute = location.pathname.startsWith("/admin");
 
   return (
     <>
-      {!isAdminRoute && <Navbar />}{" "}
-      {/* Show Navbar only if NOT an admin route */}
+      {!isAdminRoute && <Navbar />}
       {children}
-       {!isAdminRoute && <Footer/>} 
+      {!isAdminRoute && <Footer />}
     </>
   );
 };
+
+/* -------------------- App -------------------- */
 
 const App = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setNavigate(navigate); // Set navigate function globally
+    setNavigate(navigate);
   }, [navigate]);
 
   return (
     <Layout>
-      {/* hide navbar if admin */}
-      <Routes>
-        {/* nested route */}
-        <Route
-          path="admin"
-          element={
-            <AdminCheck>
-              <AdminDashboard />
-            </AdminCheck>
-          }
-        >
-          {/* products */}
+      <Suspense fallback={<FullPageLoader />}>
+        <Routes>
+
+          {/* ---------------- Admin Routes ---------------- */}
+
           <Route
-            path=""
+            path="admin"
             element={
               <AdminCheck>
-                <OrdersList />
+                <AdminDashboard />
               </AdminCheck>
             }
-          />
+          >
+            <Route path="" element={<OrdersList />} />
+
+            {/* Products */}
+            <Route path="add-product" element={<AddProduct />} />
+            <Route path="manage-products" element={<ManageStocks />} />
+            <Route path="products/edit/:id" element={<ProductUpdate />} />
+
+            {/* Coupons */}
+            <Route path="add-coupon" element={<AddCoupon />} />
+            <Route path="manage-coupon" element={<ManageCoupons />} />
+            <Route path="manage-coupon/edit/:code" element={<UpdateCoupon />} />
+
+            {/* Offers */}
+            <Route path="add-offer" element={<AddOffer />} />
+            <Route path="manage-offer" element={<ManageOffers />} />
+            <Route path="manage-offer/edit/:code" element={<UpdateOffer />} />
+
+            {/* Categories */}
+            <Route path="add-category" element={<AddCategory />} />
+            <Route path="manage-category" element={<ManageCategories />} />
+            <Route path="edit-category/:id" element={<UpdateCategory />} />
+
+            {/* Brands */}
+            <Route path="add-brand" element={<AddBrand />} />
+            <Route path="all-brands" element={<ManageBrands />} />
+
+            {/* Colors */}
+            <Route path="add-color" element={<AddColor />} />
+            <Route path="all-colors" element={<ColorLists />} />
+
+            {/* Orders */}
+            <Route path="manage-orders" element={<ManageOrders />} />
+            <Route path="order-details/:id" element={<UpdateOrders />} />
+
+            {/* Customers */}
+            <Route path="customers" element={<Customers />} />
+          </Route>
+
+          {/* ---------------- Public Routes ---------------- */}
+
+          <Route path="/" element={<HomePage />} />
+          <Route path="/products-filters" element={<ProductsFilters />} />
+          <Route path="/product/:id" element={<Product />} />
+          <Route path="/all-categories" element={<AllCategories />} />
+          <Route path="/success" element={<ThanksForOrdering />} />
+
+          {/* Reviews */}
           <Route
-            path="add-product"
+            path="/add-review/:id"
             element={
-              <AdminCheck>
-                <AddProduct />
-              </AdminCheck>
-            }
-          />
-          <Route
-            path="manage-products"
-            element={
-              <AdminCheck>
-                <ManageStocks />
-              </AdminCheck>
-            }
-          />
-          <Route
-            path="products/edit/:id"
-            element={
-              <AdminCheck>
-                <ProductUpdate />
-              </AdminCheck>
-            }
-          />
-          {/* coupons */}
-          <Route
-            path="add-coupon"
-            element={
-              <AdminCheck>
-                <AddCoupon />
-              </AdminCheck>
-            }
-          />
-          <Route
-            path="manage-coupon"
-            element={
-              <AdminCheck>
-                <ManageCoupons />
-              </AdminCheck>
-            }
-          />
-          <Route
-            path="manage-coupon/edit/:code"
-            element={
-              <AdminCheck>
-                <UpdateCoupon />
-              </AdminCheck>
-            }
-          />
-          {/* offers */}
-          <Route
-            path="add-offer"
-            element={
-              <AdminCheck>
-                <AddOffer />
-              </AdminCheck>
-            }
-          />
-          <Route
-            path="manage-offer"
-            element={
-              <AdminCheck>
-                <ManageOffers />
-              </AdminCheck>
-            }
-          />
-           <Route
-            path="manage-offer/edit/:code"
-            element={
-              <AdminCheck>
-                <UpdateOffer/>
-              </AdminCheck>
+              <AuthRoute>
+                <AddReview />
+              </AuthRoute>
             }
           />
 
-          {/* Category */}
-          {/* <Route path="category-to-add" element={<AdminCheck><CategoryToAdd /></AdminCheck>} /> */}
+          {/* Wishlist */}
           <Route
-            path="add-category"
+            path="/wishlist"
             element={
-              <AdminCheck>
-                <AddCategory />
-              </AdminCheck>
+              <AuthRoute>
+                <WishList />
+              </AuthRoute>
             }
           />
+
+          {/* Cart */}
           <Route
-            path="manage-category"
+            path="/shopping-cart"
             element={
-              <AdminCheck>
-                <ManageCategories />
-              </AdminCheck>
+              <AuthRoute>
+                <ShoppingCart />
+              </AuthRoute>
             }
           />
+
+          {/* Payment */}
           <Route
-            path="edit-category/:id"
+            path="/order-payment"
             element={
-              <AdminCheck>
-                <UpdateCategory />
-              </AdminCheck>
+              <AuthRoute>
+                <OrderPayment />
+              </AuthRoute>
             }
           />
-          {/* brand category */}
+
+          {/* Auth */}
           <Route
-            path="add-brand"
+            path="/login"
             element={
-              <AdminCheck>
-                <AddBrand />
-              </AdminCheck>
-            }
-          />
-          <Route
-            path="all-brands"
-            element={
-              <AdminCheck>
-                <ManageBrands />
-              </AdminCheck>
-            }
-          />
-          {/* color category */}
-          <Route
-            path="add-color"
-            element={
-              <AdminCheck>
-                <AddColor />
-              </AdminCheck>
-            }
-          />
-          <Route
-            path="all-colors"
-            element={
-              <AdminCheck>
-                <ColorLists />
-              </AdminCheck>
-            }
-          />
-          {/* Orders */}
-          <Route
-            path="manage-orders"
-            element={
-              <AdminCheck>
-                <ManageOrders />
-              </AdminCheck>
-            }
-          />
-          <Route
-            path="order-details/:id"
-            element={
-              <AdminCheck>
-                <UpdateOrders />
-              </AdminCheck>
+              <GoogleOAuthProvider
+                clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
+              >
+                <Login />
+              </GoogleOAuthProvider>
             }
           />
 
           <Route
-            path="customers"
+            path="/register"
             element={
-              <AdminCheck>
-                <Customers />
-              </AdminCheck>
+              <GoogleOAuthProvider
+                clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
+              >
+                <RegisterForm />
+              </GoogleOAuthProvider>
             }
           />
-        </Route>
-        {/* public links */}
-        {/* Products */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/products-filters" element={<ProductsFilters />} />
-        <Route path="/product/:id" element={<Product />} />
-        <Route path="/all-categories" element={<AllCategories />} />
-        <Route path="/success" element={<ThanksForOrdering />} />
-        {/* review */}
-        <Route
-          path="/add-review/:id"
-          element={
-            <AuthRoute>
-              <AddReview />
-            </AuthRoute>
-          }
-        />
 
-        {/* shopping cart &wishlist */}
-        <Route
-          path="/wishlist"
-          element={
-            <AuthRoute>
-              <WishList />
-            </AuthRoute>
-          }
-        />
+          <Route path="/verify-otp" element={<OtpVerification />} />
 
-        <Route
-          path="/shopping-cart"
-          element={
-            <AuthRoute>
-              <ShoppingCart />
-            </AuthRoute>
-          }
-        />
-        <Route
-          path="/order-payment"
-          element={
-            <AuthRoute>
-              <OrderPayment />
-            </AuthRoute>
-          }
-        />
-        {/* users */}
-        <Route path="/login" element={<GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID} ><Login /></GoogleOAuthProvider>} />
-        <Route
-          path="/register"
-          element={
-            <GoogleOAuthProvider
-              clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
-            >
-              <RegisterForm />
-            </GoogleOAuthProvider>
-          }
-        />
-        <Route path="/verify-otp" element={<OtpVerification />} />
+          {/* Profile */}
+          <Route path="/user-profile" element={<ProfilePage />}>
+            <Route path="orders" element={<Orders />} />
+            <Route path="wallet" element={<Wallet />} />
+            <Route path="addresses" element={<ShippingAddressDetails />} />
+          </Route>
 
-        {/* <Route path="/register" element={<RegisterForm />} /> */}
-        <Route path="/user-profile" element={<ProfilePage />}>
-          <Route path="/user-profile/orders" element={<Orders />} />
-          <Route path="/user-profile/wallet" element={<Wallet />} />
           <Route
-            path="/user-profile/addresses"
-            element={<ShippingAddressDetails />}
+            path="/customer-profile"
+            element={
+              <AuthRoute>
+                <CustomerProfile />
+              </AuthRoute>
+            }
           />
-        </Route>
 
-        <Route
-          path="/customer-profile"
-          element={
-            <AuthRoute>
-              <CustomerProfile />
-            </AuthRoute>
-          }
-        />
-      </Routes>
+        </Routes>
+      </Suspense>
     </Layout>
   );
 };
