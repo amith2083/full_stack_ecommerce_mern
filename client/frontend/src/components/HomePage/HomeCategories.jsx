@@ -11,7 +11,7 @@ const HomeCategories = () => {
   const {categories}=useSelector((state)=>state?.categories)
   console.log('cat',categories)
   
-  const categoriesToShow = categories?.categories?.slice(0, 2) || [];
+  const categoriesToShow = categories?.slice(0, 2) || [];
   console.log('categories',categoriesToShow)
  
 

@@ -19,6 +19,7 @@ import { logoutAction } from "../../redux/slices/users/userSlices";
 import { fetchCoupons } from "../../redux/slices/coupon/couponSlices";
 import { getCartItemsFromDatabase } from "../../redux/slices/cart/cartSlices";
 import { fetchWishlist } from "../../redux/slices/wishlist/wishListSlices";
+import FullPageLoader from "../HomePage/FullPageLoader";
 
 export default function Navbar() {
   const dispatch = useDispatch();
@@ -38,11 +39,14 @@ export default function Navbar() {
     dispatch(fetchCoupons());
   }, [dispatch]);
 
-  const { categories } = useSelector((state) => state?.categories);
-  const categoriesToDisplay = categories?.categories?.slice(0, 2) || [];
+  const { categories,loading:categoryLoading } = useSelector((state) => state?.categories);
+  const categoriesToDisplay = categories?.slice(0, 2) || [];
   const { cartItems } = useSelector((state) => state?.carts);
   const { wishLists } = useSelector((state) => state?.wishLists);
   const { coupons } = useSelector((state) => state?.coupons);
+  if (categoryLoading) {
+    return <FullPageLoader/>;
+  }
 
   const latestCoupon = coupons?.coupons?.[0];
   const isCouponValid = latestCoupon && !coupons?.coupons?.isExpired;

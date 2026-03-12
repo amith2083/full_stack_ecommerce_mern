@@ -20,7 +20,7 @@ export default function ManageCategories() {
   //delete category handler
   const deleteCategoryHandler = (id) => {};
 
-  const totalCategories = categories?.categories?.length || 0;
+  const totalCategories = categories?.length || 0;
   const totalPages = Math.ceil(totalCategories / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentCategories = categories?.categories?.slice(startIndex, startIndex + itemsPerPage);
